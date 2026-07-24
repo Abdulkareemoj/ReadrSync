@@ -1,6 +1,7 @@
 import { useCollectionsStore } from "@packages/store";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Bookmark, Compass, Plus, Rss } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { DashboardCard } from "@/components/dashboard-card";
 import ArticleCard from "@/components/rss/article-card";
 import { Button } from "@/components/ui/button";
@@ -166,11 +167,11 @@ function DashboardComponent() {
 				</div>
 				<div className="flex gap-2">
 					<Button variant="outline" size="sm">
-						<Plus data-icon="inline-start" className="mr-2" />
+						<Plus data-icon="inline-start" />
 						Add Bookmark
 					</Button>
 					<Button size="sm">
-						<Plus data-icon="inline-start" className="mr-2" />
+						<Plus data-icon="inline-start" />
 						Add Feed
 					</Button>
 				</div>
@@ -224,12 +225,13 @@ function DashboardComponent() {
 						</h2>
 						<div className="flex flex-wrap gap-2">
 							{bookmarkCollections.slice(0, 6).map((collection) => (
-								<span
+								<Badge
 									key={collection.id}
-									className="inline-flex rounded-full bg-secondary px-3 py-1 font-medium text-secondary-foreground text-sm"
+									variant="secondary"
+									className="rounded-full px-3 py-1 font-medium text-sm"
 								>
 									{collection.name}
-								</span>
+								</Badge>
 							))}
 							{bookmarkCollections.length > 6 && (
 								<span className="inline-flex rounded-full bg-muted px-3 py-1 font-medium text-muted-foreground text-sm">

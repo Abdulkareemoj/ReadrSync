@@ -22,7 +22,7 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 import { useBookmarks } from "@/hooks/use-bookmarks";
-import { useCollectionsStore } from "@/lib/collections-store";
+import { useCollectionsStore } from "@packages/store";
 import { useReaderStore } from "@/lib/store";
 
 export const Route = createFileRoute("/bookmarks/")({
@@ -242,9 +242,12 @@ function BookmarksComponent() {
 							</span>
 						</div>
 					)}
+									{/* View toggle */}
+						<div className="flex items-center gap-0.5 rounded-lg border border-border p-0.5">
 					<Button
 						variant={viewMode === "list" ? "secondary" : "ghost"}
 						size="icon"
+						className="size-7"
 						onClick={() => setViewMode("list")}
 						title="List View"
 					>
@@ -253,11 +256,12 @@ function BookmarksComponent() {
 					<Button
 						variant={viewMode === "grid" ? "secondary" : "ghost"}
 						size="icon"
+						className="size-7"
 						onClick={() => setViewMode("grid")}
 						title="Grid View"
 					>
 						<LayoutGrid data-icon="inline-start" />
-					</Button>
+					</Button></div>
 				</div>
 			</header>
 

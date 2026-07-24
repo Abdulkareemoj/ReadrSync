@@ -27,10 +27,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getInitializedAgents } from "@/lib/agents";
 import { useSettingsStore } from "@/lib/store";
 import { exportSyncData, importSyncData, detectFormat } from "@/lib/sync";
@@ -84,20 +87,18 @@ function Row({
   last?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "flex items-center justify-between gap-6 py-4",
-        !last && "border-b border-border/60"
-      )}
-    >
-      <div className="min-w-0">
-        <p className="font-medium text-sm text-foreground">{label}</p>
-        {description && (
-          <p className="mt-0.5 text-muted-foreground text-xs">{description}</p>
-        )}
+    <>
+      <div className="flex items-center justify-between gap-6 py-4">
+        <div className="min-w-0">
+          <p className="font-medium text-sm text-foreground">{label}</p>
+          {description && (
+            <p className="mt-0.5 text-muted-foreground text-xs">{description}</p>
+          )}
+        </div>
+        <div className="shrink-0">{children}</div>
       </div>
-      <div className="shrink-0">{children}</div>
-    </div>
+      {!last && <Separator />}
+    </>
   );
 }
 
@@ -110,7 +111,7 @@ function StatusDot({ status }: { status: "connected" | "syncing" | "error" | "id
         : status === "syncing"
           ? "bg-amber-500 animate-pulse"
           : "bg-muted-foreground/40";
-  return <span className={cn("inline-block h-1.5 w-1.5 rounded-full", color)} />;
+  return <span className={cn("inline-block size-1.5 rounded-full", color)} />;
 }
 
 // ─── Theme card ───────────────────────────────────────────────────────────────
@@ -343,7 +344,7 @@ function SettingsComponent() {
 
       <div className="mx-auto max-w-3xl px-6 py-8">
         {/* Content */}
-        <div className="space-y-12">
+        <div className="flex flex-col gap-12">
           {/* Appearance */}
           <section>
             <SectionHeading
@@ -351,7 +352,7 @@ function SettingsComponent() {
               description="Choose how the app looks and how text is sized for reading"
             />
 
-            <div className="space-y-8">
+            <div className="flex flex-col gap-8">
               <div>
                 <p className="mb-3 font-medium text-sm">Theme</p>
                 <div className="grid grid-cols-3 gap-3">
@@ -370,32 +371,28 @@ function SettingsComponent() {
 
               <div>
                 <p className="mb-3 font-medium text-sm">Reading font size</p>
-                <div className="flex gap-2">
-                  {FONT_SIZES.map((fs) => {
-                    const active = readerFontSize === fs.value;
-                    return (
-                      <button
-                        key={fs.value}
-                        type="button"
-                        onClick={() => setReaderFontSize(fs.value)}
-                        className={cn(
-                          "flex flex-1 flex-col items-center gap-1.5 rounded-xl border py-4 transition-all",
-                          active
-                            ? "border-foreground ring-1 ring-foreground"
-                            : "border-border hover:border-foreground/40"
-                        )}
+                <ToggleGroup
+                  type="single"
+                  value={readerFontSize}
+                  onValueChange={(v) => { if (v) setReaderFontSize(v); }}
+                  className="flex gap-2"
+                >
+                  {FONT_SIZES.map((fs) => (
+                    <ToggleGroupItem
+                      key={fs.value}
+                      value={fs.value}
+                      className="flex flex-1 flex-col items-center gap-1.5 py-4 data-[state=on]:border-foreground data-[state=on]:ring-1 data-[state=on]:ring-foreground"
+                    >
+                      <span
+                        className="font-medium text-foreground"
+                        style={{ fontSize: fs.px }}
                       >
-                        <span
-                          className="font-medium text-foreground"
-                          style={{ fontSize: fs.px }}
-                        >
-                          {fs.sample}
-                        </span>
-                        <span className="text-muted-foreground text-xs">{fs.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                        {fs.sample}
+                      </span>
+                      <span className="text-muted-foreground text-xs">{fs.label}</span>
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
               </div>
             </div>
           </section>
@@ -422,8 +419,8 @@ function SettingsComponent() {
                       <SelectItem value="html">HTML</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5">
-                    <Download className="size-3.5" />
+                  <Button variant="outline" size="sm" onClick={handleExport}>
+                    <Download data-icon="inline-start" />
                     Export
                   </Button>
                 </div>
@@ -494,8 +491,8 @@ function SettingsComponent() {
                       </div>
                     </label>
                   </RadioGroup>
-                  <Button variant="outline" size="sm" onClick={handleImport} className="mt-3 gap-1.5 sm:mt-0 sm:ml-auto">
-                    <Upload className="size-3.5" />
+                  <Button variant="outline" size="sm" onClick={handleImport} className="mt-3 sm:mt-0 sm:ml-auto">
+                    <Upload data-icon="inline-start" />
                     Import
                   </Button>
                 </div>
@@ -509,9 +506,9 @@ function SettingsComponent() {
                   variant="outline"
                   size="sm"
                   onClick={handleClearCache}
-                  className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <Trash2 className="size-3.5" />
+                  <Trash2 data-icon="inline-start" />
                   Clear
                 </Button>
               </Row>
@@ -541,8 +538,8 @@ function SettingsComponent() {
                       )}
                     </div>
                   </div>
-                  <Button onClick={handleSignOut} variant="outline" size="sm" className="gap-1.5">
-                    <LogOut className="size-3.5" />
+                  <Button onClick={handleSignOut} variant="outline" size="sm">
+                    <LogOut data-icon="inline-start" />
                     Disconnect
                   </Button>
                 </div>
@@ -553,8 +550,8 @@ function SettingsComponent() {
                   </p>
                   <AlertDialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
                     <AlertDialogTrigger asChild>
-                      <Button size="sm" className="gap-1.5">
-                        <Cloud className="size-3.5" />
+                      <Button size="sm">
+                        <Cloud data-icon="inline-start" />
                         Connect
                       </Button>
                     </AlertDialogTrigger>
@@ -579,9 +576,8 @@ function SettingsComponent() {
                             setShowConnectDialog(false);
                             handleSignIn();
                           }}
-                          className="gap-1.5"
                         >
-                          <Cloud className="size-3.5" />
+                          <Cloud data-icon="inline-start" />
                           Continue
                         </Button>
                       </AlertDialogFooter>
@@ -618,10 +614,10 @@ function SettingsComponent() {
                       size="sm"
                       onClick={handleSyncNow}
                       disabled={syncStatus === "syncing"}
-                      className="gap-1.5"
                     >
                       <RefreshCw
-                        className={cn("size-3.5", syncStatus === "syncing" && "animate-spin")}
+                        data-icon="inline-start"
+                        className={syncStatus === "syncing" ? "animate-spin" : ""}
                       />
                       Sync now
                     </Button>
@@ -640,11 +636,10 @@ function SettingsComponent() {
               description="Optional YouTube Data API key for handle resolution (future feature — works without one today)"
             />
             <div className="rounded-xl border border-border p-4">
-              <input
+              <Input
                 type="password"
                 disabled
                 placeholder="AIzaSy..."
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               <p className="mt-2 text-muted-foreground text-xs">
                 Not yet implemented. The app resolves YouTube handles automatically without an API key.
