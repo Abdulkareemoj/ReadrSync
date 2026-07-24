@@ -4,6 +4,7 @@ import {
 	Archive,
 	Bookmark,
 	ChevronRight,
+	Folder,
 	Heart,
 	Home,
 	Inbox,
@@ -12,9 +13,10 @@ import {
 } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { useCollectionsStore } from "@/lib/store";
+import type { CollectionTreeNode } from "@packages/agents";
+import { useCollectionsStore, useReaderStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { AddBookmarkModal } from "./add-bookmark-modal";
+import { AddBookmarkModal } from "./bookmarks/add-bookmark-modal";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 
 interface CollectionsBottomSheetProps {
@@ -32,6 +34,7 @@ export function CollectionsBottomSheet({
 }: CollectionsBottomSheetProps) {
 	const { bookmarkCollections } = useCollectionsStore();
 	const { addBookmark } = useBookmarks();
+	const collectionTree = useReaderStore((s) => s.collections);
 	const bottomSheetRef = useRef<BottomSheet>(null);
 
 	const snapPoints = useMemo(() => ["60%", "80%"], []);
@@ -60,7 +63,8 @@ export function CollectionsBottomSheet({
 		router.navigate(href);
 	};
 
-	const getCollectionIcon = (id: string) => {
+	const getCollectionIcon = (id: string, depth: number) => {
+		if (depth > 0) return ChevronRight;
 		switch (id) {
 			case "all":
 				return Home;
@@ -71,7 +75,7 @@ export function CollectionsBottomSheet({
 			case "saved":
 				return Bookmark;
 			default:
-				return ChevronRight;
+				return Folder;
 		}
 	};
 
@@ -80,11 +84,31 @@ export function CollectionsBottomSheet({
 		{ id: "archive", name: "Archive", icon: Archive, href: "/bookmarks/archive" as const },
 	];
 
+	// Flatten tree into a list with depth info for display
+	const treeItems = useMemo(() => {
+		const items: { id: string; name: string; depth: number }[] = [];
+		const walk = (nodes: CollectionTreeNode[], depth: number) => {
+			for (const n of nodes) {
+				items.push({ id: n.id, name: n.name, depth });
+				walk(n.children, depth + 1);
+			}
+		};
+		if (collectionTree.length > 0) {
+			walk(collectionTree, 0);
+		} else {
+			// Fallback to persist store
+			for (const c of bookmarkCollections) {
+				if (c.id !== "all") items.push({ id: c.id, name: c.name, depth: 0 });
+			}
+		}
+		return items;
+	}, [collectionTree, bookmarkCollections]);
+
 	const collections = [
-		{ id: "all", name: "All Bookmarks" },
-		{ id: "liked", name: "Liked" },
-		{ id: "saved", name: "Saved" },
-		...bookmarkCollections.filter((c) => c.id !== "all" && c.id !== "inbox"),
+		{ id: "all", name: "All Bookmarks", depth: 0 },
+		{ id: "liked", name: "Liked", depth: 0 },
+		{ id: "saved", name: "Saved", depth: 0 },
+		...treeItems.filter((c) => c.id !== "all" && c.id !== "liked" && c.id !== "saved"),
 	];
 
 	return (
@@ -146,8 +170,9 @@ export function CollectionsBottomSheet({
 						Filters
 					</Text>
 					{collections.map((collection) => {
-						const Icon = getCollectionIcon(collection.id);
+						const Icon = getCollectionIcon(collection.id, (collection as any).depth ?? 0);
 						const isActive = activeTab === collection.id;
+						const depth = (collection as any).depth ?? 0;
 
 						return (
 							<TouchableOpacity
@@ -156,6 +181,7 @@ export function CollectionsBottomSheet({
 									onTabChange(collection.id);
 									onClose();
 								}}
+								style={{ paddingLeft: 16 + depth * 16 }}
 								className={cn(
 									"mb-2 flex-row items-center rounded-xl px-4 py-3",
 									isActive ? "bg-primary/10" : "active:bg-accent",
