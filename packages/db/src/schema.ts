@@ -65,13 +65,56 @@ export const articles = sqliteTable("articles", {
 	readAt: text("read_at"),
 });
 
+// --- Collections Schema ---
+
+export const collections = sqliteTable("collections", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	parentId: text("parent_id"),
+	position: integer("position").default(0).notNull(),
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+// --- Highlights Schema ---
+
+export const highlights = sqliteTable("highlights", {
+	id: text("id").primaryKey(),
+	articleId: text("article_id")
+		.notNull()
+		.references(() => articles.id, { onDelete: "cascade" }),
+	text: text("text").notNull(),
+	color: text("color").notNull(),
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+// --- Annotations Schema ---
+
+export const annotations = sqliteTable("annotations", {
+	id: text("id").primaryKey(),
+	highlightId: text("highlight_id")
+		.notNull()
+		.references(() => highlights.id, { onDelete: "cascade" }),
+	text: text("text").notNull(),
+	timestamp: text("timestamp").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 // Export Types for Drizzle, but you could probably tell, no?
 
 export type Bookmark = typeof bookmarks.$inferSelect;
 export type NewBookmark = typeof bookmarks.$inferInsert;
+
+export type Collection = typeof collections.$inferSelect;
+export type NewCollection = typeof collections.$inferInsert;
 
 export type Feed = typeof feeds.$inferSelect;
 export type NewFeed = typeof feeds.$inferInsert;
 
 export type Article = typeof articles.$inferSelect;
 export type NewArticle = typeof articles.$inferInsert;
+
+export type Highlight = typeof highlights.$inferSelect;
+export type NewHighlight = typeof highlights.$inferInsert;
+
+export type Annotation = typeof annotations.$inferSelect;
+export type NewAnnotation = typeof annotations.$inferInsert;

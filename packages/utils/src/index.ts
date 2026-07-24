@@ -7,23 +7,26 @@ import { extract as extractArticle } from "@extractus/article-extractor";
 // Re-export everything from agents so existing imports keep working
 export {
 	createBookmarkAgent,
+	createCollectionAgent,
 	createRssAgent,
 	createHighlightAgent,
 	type IBookmarkAgent,
+	type ICollectionAgent,
 	type IRssAgent,
 	type IHighlightAgent,
 	type ISyncAgent,
 	type IAuthAgent,
 	type IAgents,
 	type Bookmark,
+	type Collection,
 	type Feed,
 	type Article,
+	type CollectionTreeNode,
 	type ParsedArticle,
 	type SyncData,
 	type SyncResult,
 	type SyncProvider,
 	type AuthProvider,
-	type AuthResult,
 	type AuthUserInfo,
 } from "@packages/agents";
 

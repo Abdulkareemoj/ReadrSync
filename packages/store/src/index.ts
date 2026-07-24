@@ -2,15 +2,16 @@ import { create } from "zustand";
 import type { StoreApi, UseBoundStore } from "zustand";
 import type {
 	IBookmarkAgent,
+	ICollectionAgent,
 	IRssAgent,
 	IHighlightAgent,
 	ISyncAgent,
 	IAuthAgent,
 	SyncResult,
+	CollectionTreeNode,
 } from "@packages/agents";
 
 // Types
-
 export interface Highlight {
 	id: string;
 	articleId: string;
@@ -26,9 +27,9 @@ export type Feed = Awaited<ReturnType<IRssAgent["listFeeds"]>>[number];
 export type Article = Awaited<ReturnType<IRssAgent["listArticles"]>>[number];
 
 // State interface
-
 export interface ReaderState {
 	bookmarkAgent: IBookmarkAgent;
+	collectionAgent: ICollectionAgent;
 	rssAgent: IRssAgent;
 	highlightAgent: IHighlightAgent;
 	syncAgent: ISyncAgent;
@@ -36,6 +37,7 @@ export interface ReaderState {
 
 	highlights: Highlight[];
 	bookmarks: Bookmark[];
+	collections: CollectionTreeNode[];
 	feeds: Feed[];
 	articles: Article[];
 
@@ -74,10 +76,16 @@ export interface ReaderState {
 	// - Mobile: overridden in mobile-init.ts using apps/mobile/lib/rss.ts
 	fetchArticleContent: (id: string) => Promise<void>;
 	triggerSync: () => Promise<SyncResult>;
+
+	// Collection actions
+	loadCollections: () => Promise<void>;
+	createCollection: (name: string, parentId?: string | null) => Promise<void>;
+	renameCollection: (id: string, name: string) => Promise<void>;
+	deleteCollection: (id: string) => Promise<void>;
+	moveCollection: (id: string, newParentId: string | null, position?: number) => Promise<void>;
 }
 
 // Helpers
-
 function withUnreadCounts(feedList: Feed[], articleList: Article[]): Feed[] {
 	const unreadMap = new Map<string, number>();
 	for (const a of articleList) {
@@ -87,12 +95,12 @@ function withUnreadCounts(feedList: Feed[], articleList: Article[]): Feed[] {
 }
 
 // Store factory
-
 export const createReaderStore = (
 	set: (fn: (s: ReaderState) => Partial<ReaderState>) => void,
 	get: () => ReaderState,
 	agents: {
 		bookmarkAgent: IBookmarkAgent;
+		collectionAgent: ICollectionAgent;
 		rssAgent: IRssAgent;
 		highlightAgent: IHighlightAgent;
 		syncAgent: ISyncAgent;
@@ -100,6 +108,7 @@ export const createReaderStore = (
 	},
 ): ReaderState => ({
 	bookmarkAgent: agents.bookmarkAgent,
+	collectionAgent: agents.collectionAgent,
 	rssAgent: agents.rssAgent,
 	highlightAgent: agents.highlightAgent,
 	syncAgent: agents.syncAgent,
@@ -107,13 +116,15 @@ export const createReaderStore = (
 
 	highlights: [],
 	bookmarks: [],
+	collections: [],
 	feeds: [],
 	articles: [],
 
 	loadInitialData: async () => {
-		const { bookmarkAgent, rssAgent, highlightAgent } = get();
-		const [bookmarks, feeds, articles, dbHighlights] = await Promise.all([
+		const { bookmarkAgent, collectionAgent, rssAgent, highlightAgent } = get();
+		const [bookmarks, tree, feeds, articles, dbHighlights] = await Promise.all([
 			bookmarkAgent.listBookmarks(),
+			collectionAgent.getCollectionTree(),
 			rssAgent.listFeeds(),
 			rssAgent.listArticles(),
 			highlightAgent.listHighlights(),
@@ -129,6 +140,7 @@ export const createReaderStore = (
 
 		set(() => ({
 			bookmarks,
+			collections: tree,
 			feeds: withUnreadCounts(feeds, articles),
 			articles,
 			highlights: highlightsWithAnnotations,
@@ -385,14 +397,44 @@ export const createReaderStore = (
 		}
 	},
 
+	// Collection actions
+	loadCollections: async () => {
+		const tree = await get().collectionAgent.getCollectionTree();
+		set(() => ({ collections: tree }));
+	},
+
+	createCollection: async (name, parentId) => {
+		await get().collectionAgent.createCollection(name, parentId);
+		const tree = await get().collectionAgent.getCollectionTree();
+		set(() => ({ collections: tree }));
+	},
+
+	renameCollection: async (id, name) => {
+		await get().collectionAgent.renameCollection(id, name);
+		const tree = await get().collectionAgent.getCollectionTree();
+		set(() => ({ collections: tree }));
+	},
+
+	deleteCollection: async (id) => {
+		await get().collectionAgent.deleteCollection(id);
+		const tree = await get().collectionAgent.getCollectionTree();
+		set(() => ({ collections: tree }));
+	},
+
+	moveCollection: async (id, newParentId, position) => {
+		await get().collectionAgent.moveCollection(id, newParentId, position);
+		const tree = await get().collectionAgent.getCollectionTree();
+		set(() => ({ collections: tree }));
+	},
+
 	triggerSync: async () => {
-		const { syncAgent } = get();
+		const { syncAgent, collectionAgent } = get();
 		const result = await syncAgent.sync();
 		if (result.success) {
-			// Reload data after sync completes
 			const { bookmarkAgent, rssAgent, highlightAgent } = get();
-			const [bookmarks, feeds, articles, dbHighlights] = await Promise.all([
+			const [bookmarks, tree, feeds, articles, dbHighlights] = await Promise.all([
 				bookmarkAgent.listBookmarks(),
+				collectionAgent.getCollectionTree(),
 				rssAgent.listFeeds(),
 				rssAgent.listArticles(),
 				highlightAgent.listHighlights(),
@@ -403,18 +445,18 @@ export const createReaderStore = (
 					return { ...h, annotations: anns };
 				}),
 			);
-			set(() => ({ bookmarks, feeds, articles, highlights: highlightsWithAnnotations }));
+			set(() => ({ bookmarks, collections: tree, feeds, articles, highlights: highlightsWithAnnotations }));
 		}
 		return result;
 	},
 });
 
 // Store singleton
-
 let readerStore: UseBoundStore<StoreApi<ReaderState>> | null = null;
 
 export function initializeReaderStore(agents: {
 	bookmarkAgent: IBookmarkAgent;
+	collectionAgent: ICollectionAgent;
 	rssAgent: IRssAgent;
 	highlightAgent: IHighlightAgent;
 	syncAgent: ISyncAgent;
