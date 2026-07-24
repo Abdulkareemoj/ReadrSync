@@ -1,6 +1,7 @@
-import type { Bookmark } from "@packages/store"; // Import Bookmark type from shared store
-import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import type { Bookmark } from "@packages/store";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import { BookmarkGridCard } from "./bookmark-grid-card";
 
 interface BookmarkGridViewProps {
@@ -66,16 +67,16 @@ export function BookmarkGridView({
 						))}
 					</div>
 				) : (
-					<div className="flex h-full items-center justify-center">
-						<div className="text-center">
-							<p className="mb-2 text-muted-foreground">No bookmarks found</p>
-							<p className="text-muted-foreground text-sm">
+					<Empty>
+						<EmptyContent>
+							<EmptyTitle>No bookmarks found</EmptyTitle>
+							<EmptyDescription>
 								{search
 									? "Try adjusting your search query"
 									: "No bookmarks available"}
-							</p>
-						</div>
-					</div>
+							</EmptyDescription>
+						</EmptyContent>
+					</Empty>
 				)}
 			</div>
 		</div>

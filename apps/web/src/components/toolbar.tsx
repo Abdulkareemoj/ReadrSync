@@ -1,13 +1,13 @@
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { Moon, Settings, Sun } from "lucide-react";
+import { BookOpenText, Moon, Settings, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import SearchBar from "@/components/search-bar";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useSidebar } from "./ui/sidebar";
 
 export default function Toolbar() {
 	const { theme, setTheme } = useTheme();
-
+	const { state, toggleSidebar } = useSidebar();
 	const toggleTheme = () => {
 		if (theme === "dark") {
 			setTheme("light");
@@ -22,11 +22,18 @@ export default function Toolbar() {
 		<header className="border-border border-b bg-background">
 			<div className="flex h-16 items-center justify-between px-4 md:px-6">
 				{/* Left Section */}
-				<div className="flex items-center gap-4">
-					<SidebarTrigger />
-					{/* <div className="hidden font-semibold text-foreground text-lg sm:block">
-            <h2> Today's Articles</h2>
-          </div> */}
+				<div className="...">
+				{state === "collapsed" && (
+					<Button
+						onClick={toggleSidebar}
+						aria-label="Open sidebar"
+						title="Open sidebar (⌘B)"
+						className="cursor-pointer transition-opacity hover:opacity-80"
+					>
+							<BookOpenText className="size-4" />
+					</Button>
+				)}
+					
 				</div>
 
 				{/* Center Section - Search */}

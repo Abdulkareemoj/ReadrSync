@@ -1,6 +1,7 @@
 import { Send, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 interface Annotation {
 	id: string;
@@ -67,11 +68,11 @@ export default function AnnotationPanel({
 
 				{/* Annotation Input */}
 				<div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-					<textarea
+					<Textarea
 						value={annotationText}
 						onChange={(e) => setAnnotationText(e.target.value)}
 						placeholder="Add your thoughts, notes, or questions..."
-						className="h-24 w-full resize-none rounded-md bg-muted p-3 text-foreground text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+						className="h-24 resize-none"
 					/>
 
 					{/* Previous Annotations */}

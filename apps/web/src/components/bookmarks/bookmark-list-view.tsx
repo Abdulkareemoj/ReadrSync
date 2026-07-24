@@ -10,7 +10,9 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -80,12 +82,13 @@ function BookmarkListItem({
 					{bookmark.tags && bookmark.tags.length > 0 && (
 						<div className="hidden items-center gap-1 sm:flex">
 							{bookmark.tags.slice(0, 2).map((tag) => (
-								<span
+								<Badge
 									key={tag}
-									className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+									variant="secondary"
+									className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
 								>
 									{tag}
-								</span>
+								</Badge>
 							))}
 							{bookmark.tags.length > 2 && (
 								<span className="text-[10px] text-muted-foreground">
@@ -217,16 +220,16 @@ export function BookmarkListView({
 						))}
 					</div>
 				) : (
-					<div className="flex h-full items-center justify-center">
-						<div className="text-center">
-							<p className="font-medium text-lg">No bookmarks found</p>
-							<p className="text-muted-foreground">
+					<Empty>
+						<EmptyContent>
+							<EmptyTitle>No bookmarks found</EmptyTitle>
+							<EmptyDescription>
 								{search
 									? `No bookmarks found matching "${search}".`
 									: "You haven't saved any bookmarks yet."}
-							</p>
-						</div>
-					</div>
+							</EmptyDescription>
+						</EmptyContent>
+					</Empty>
 				)}
 			</div>
 		</div>

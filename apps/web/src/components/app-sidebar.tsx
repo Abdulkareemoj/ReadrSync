@@ -5,7 +5,6 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import {
-	GalleryVerticalEnd,
 	HelpCircleIcon,
 	Search,
 	Settings,
@@ -25,14 +24,14 @@ import {
 	SidebarGroup,
 	SidebarHeader,
 	SidebarMenu,
-	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { useFeeds } from "@/hooks/use-feeds";
-import { useCollectionsStore } from "@/lib/collections-store";
+import { useCollectionsStore } from "@packages/store";
 import { useReaderStore } from "@/lib/store";
 import { ExploreSidebar } from "./explore-sidebar";
+import { SidebarBrand } from "./sidebar-brand";
 
 const navSecondary = [
 	{
@@ -58,24 +57,46 @@ export function AppSidebar() {
 		bookmarkCollections,
 		addBookmarkCollection,
 		removeBookmarkCollection,
+		setBookmarkCollections,
 	} = useCollectionsStore();
 	const { feeds, removeFeed } = useFeeds();
-	const { bookmarks } = useReaderStore((state) => state);
+	const {
+		bookmarks,
+		collections: collectionTree,
+		createCollection,
+		renameCollection,
+		deleteCollection,
+		moveCollection,
+	} = useReaderStore((state) => state);
 
 	// Get current collection/feed ID from search params
 	const currentCollectionId = (location.search as any)?.filter || null;
 
-	// Map collections with their bookmarks
-	const collectionsWithBookmarks = useMemo(() => {
-		return bookmarkCollections.map((collection) => ({
-			id: collection.id,
-			name: collection.name,
-			bookmarks: bookmarks.filter(
-				(bookmark) =>
-					collection.id === "all" || bookmark.collectionId === collection.id,
-			),
-		}));
-	}, [bookmarkCollections, bookmarks]);
+	// Build a flat list of all collections for parent picker
+	const flatCollections = useMemo(() => {
+		const result: { id: string; name: string; parentId: string | null }[] = [];
+		const walk = (nodes: typeof collectionTree) => {
+			for (const n of nodes) {
+				result.push({ id: n.id, name: n.name, parentId: n.parentId });
+				walk(n.children);
+			}
+		};
+		walk(collectionTree);
+		return result;
+	}, [collectionTree]);
+
+	// Sync DB-backed collections into the zustand persist store (for backward compat)
+	useMemo(() => {
+		if (collectionTree.length > 0) {
+			const flat = flatCollections;
+			// Add virtual "all" entry at the front
+			setBookmarkCollections([
+				{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
+				{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
+				...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
+			]);
+		}
+	}, [collectionTree]);
 
 	function setCollectionParam(collectionId: string | null) {
 		const currentPath = location.pathname;
@@ -119,19 +140,30 @@ export function AppSidebar() {
 
 	function handleAddCollection(name: string) {
 		if (!name.trim()) return;
+		createCollection(name.trim());
+		// Also add to the legacy persist store for backward compat
 		addBookmarkCollection(name.trim());
-		setCollectionParam(slugify(name.trim()));
+	}
+
+	function handleRenameCollection(id: string, name: string) {
+		renameCollection(id, name);
+	}
+
+	function handleDeleteCollection(id: string) {
+		deleteCollection(id);
 	}
 
 	const renderCollectionList = () => {
 		if (matchRoute({ to: "/bookmarks", fuzzy: true })) {
 			return (
 				<BookmarkSidebar
-					collections={collectionsWithBookmarks}
+					collectionTree={collectionTree}
+					flatCollections={flatCollections}
 					selectedCollectionId={currentCollectionId}
 					onSelectCollection={setCollectionParam}
-					onRemoveCollection={removeBookmarkCollection}
+					onRemoveCollection={handleDeleteCollection}
 					onAddCollection={handleAddCollection}
+					onRenameCollection={handleRenameCollection}
 				/>
 			);
 		}
@@ -165,20 +197,7 @@ export function AppSidebar() {
 	return (
 		<Sidebar collapsible="offcanvas">
 			<SidebarHeader>
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" asChild>
-							<Link to="/">
-								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-									<GalleryVerticalEnd className="size-4" />
-								</div>
-								<div className="flex flex-col gap-0.5 leading-none">
-									<span className="font-medium">WIP</span>
-								</div>
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
+					<SidebarBrand />
 			</SidebarHeader>
 			<SidebarContent>
 				<div className="p-2">

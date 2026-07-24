@@ -8,6 +8,7 @@ import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import {
 	createBookmarkAgent,
+	createCollectionAgent,
 	createRssAgent,
 	createHighlightAgent,
 	type IAgents,
@@ -183,6 +184,7 @@ export async function initializeWebAgents() {
 	// We assert the type to the generic DB union type for agent compatibility
 	const genericDb = db as unknown as DB;
 	const bookmarkAgent = createBookmarkAgent(genericDb);
+	const collectionAgent = createCollectionAgent(genericDb);
 	const rssAgent = createRssAgent(genericDb);
 	const highlightAgent = createHighlightAgent(genericDb);
 	const authAgent = createWebAuthAgent();
@@ -195,6 +197,7 @@ export async function initializeWebAgents() {
 
 	initializedAgents = {
 		bookmarkAgent,
+		collectionAgent,
 		rssAgent,
 		highlightAgent,
 		syncAgent,

@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import ArticleCard from "@/components/rss/article-card";
 
 interface Article {
@@ -84,16 +85,16 @@ export default function ArticleListView({
 						))}
 					</div>
 				) : (
-					<div className="flex h-full items-center justify-center">
-						<div className="text-center">
-							<p className="mb-2 text-muted-foreground">No articles found</p>
-							<p className="text-muted-foreground text-sm">
+					<Empty>
+						<EmptyContent>
+							<EmptyTitle>No articles found</EmptyTitle>
+							<EmptyDescription>
 								{search
 									? "Try adjusting your search query"
 									: "No articles available"}
-							</p>
-						</div>
-					</div>
+							</EmptyDescription>
+						</EmptyContent>
+					</Empty>
 				)}
 			</div>
 		</div>

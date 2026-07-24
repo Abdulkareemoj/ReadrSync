@@ -9,20 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RssIndexRouteImport } from './routes/rss/index'
-import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
-import { Route as BookmarksFavoritesRouteImport } from './routes/bookmarks/favorites'
-import { Route as BookmarksArchiveRouteImport } from './routes/bookmarks/archive'
-import { Route as BookmarksIdRouteImport } from './routes/bookmarks/$id'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
+import { Route as BookmarksIdRouteImport } from './routes/bookmarks/$id'
+import { Route as BookmarksArchiveRouteImport } from './routes/bookmarks/archive'
+import { Route as BookmarksFavoritesRouteImport } from './routes/bookmarks/favorites'
+import { Route as RssIndexRouteImport } from './routes/rss/index'
 import { Route as RssArticleIdRouteImport } from './routes/rss/article.$id'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -30,14 +30,14 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RssIndexRoute = RssIndexRouteImport.update({
-  id: '/rss/',
-  path: '/rss/',
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookmarksIndexRoute = BookmarksIndexRouteImport.update({
@@ -45,9 +45,9 @@ const BookmarksIndexRoute = BookmarksIndexRouteImport.update({
   path: '/bookmarks/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BookmarksFavoritesRoute = BookmarksFavoritesRouteImport.update({
-  id: '/bookmarks/favorites',
-  path: '/bookmarks/favorites',
+const BookmarksIdRoute = BookmarksIdRouteImport.update({
+  id: '/bookmarks/$id',
+  path: '/bookmarks/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookmarksArchiveRoute = BookmarksArchiveRouteImport.update({
@@ -55,14 +55,14 @@ const BookmarksArchiveRoute = BookmarksArchiveRouteImport.update({
   path: '/bookmarks/archive',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BookmarksIdRoute = BookmarksIdRouteImport.update({
-  id: '/bookmarks/$id',
-  path: '/bookmarks/$id',
+const BookmarksFavoritesRoute = BookmarksFavoritesRouteImport.update({
+  id: '/bookmarks/favorites',
+  path: '/bookmarks/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
+const RssIndexRoute = RssIndexRouteImport.update({
+  id: '/rss/',
+  path: '/rss/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RssArticleIdRoute = RssArticleIdRouteImport.update({
@@ -162,11 +162,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -176,18 +176,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rss/': {
-      id: '/rss/'
-      path: '/rss'
-      fullPath: '/rss/'
-      preLoaderRoute: typeof RssIndexRouteImport
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookmarks/': {
@@ -197,11 +197,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookmarksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bookmarks/favorites': {
-      id: '/bookmarks/favorites'
-      path: '/bookmarks/favorites'
-      fullPath: '/bookmarks/favorites'
-      preLoaderRoute: typeof BookmarksFavoritesRouteImport
+    '/bookmarks/$id': {
+      id: '/bookmarks/$id'
+      path: '/bookmarks/$id'
+      fullPath: '/bookmarks/$id'
+      preLoaderRoute: typeof BookmarksIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookmarks/archive': {
@@ -211,18 +211,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookmarksArchiveRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bookmarks/$id': {
-      id: '/bookmarks/$id'
-      path: '/bookmarks/$id'
-      fullPath: '/bookmarks/$id'
-      preLoaderRoute: typeof BookmarksIdRouteImport
+    '/bookmarks/favorites': {
+      id: '/bookmarks/favorites'
+      path: '/bookmarks/favorites'
+      fullPath: '/bookmarks/favorites'
+      preLoaderRoute: typeof BookmarksFavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
+    '/rss/': {
+      id: '/rss/'
+      path: '/rss'
+      fullPath: '/rss/'
+      preLoaderRoute: typeof RssIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rss/article/$id': {

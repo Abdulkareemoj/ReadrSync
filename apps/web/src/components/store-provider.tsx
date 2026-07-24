@@ -36,6 +36,30 @@ export function StoreProvider({ children }: StoreProviderProps) {
 				// refreshFeed now baked into store — no override needed
 
 				await store.getState().loadInitialData();
+
+				// Sync collections from DB to persist store for backward compat
+				try {
+					const { useCollectionsStore } = await import("@packages/store");
+					const tree = store.getState().collections;
+					if (tree.length > 0) {
+						const flat: { id: string; name: string; parentId: string | null; position: number }[] = [];
+						const walk = (nodes: any[]) => {
+							for (const n of nodes) {
+								flat.push({ id: n.id, name: n.name, parentId: n.parentId ?? null, position: n.position ?? 0 });
+								walk(n.children ?? []);
+							}
+						};
+						walk(tree);
+						useCollectionsStore.getState().setBookmarkCollections([
+							{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
+							{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
+							...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
+						]);
+					}
+				} catch (e) {
+					console.warn("[StoreProvider] Sync collections failed:", e);
+				}
+
 				setIsInitialized(true);
 			} catch (e) {
 				console.error("Failed to initialize application:", e);

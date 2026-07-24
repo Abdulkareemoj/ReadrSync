@@ -7,6 +7,7 @@ import {
 	Trash2,
 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useReaderStore } from "@/lib/store";
@@ -49,15 +50,14 @@ export default function BookmarkDisplay({
 	return (
 		<article className="mx-auto w-full max-w-3xl px-4 py-8 md:px-8 md:py-12">
 			<div className="mb-6 flex items-center justify-between">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => window.history.back()}
-					className="inline-flex items-center"
-				>
-					<ArrowLeft className="mr-2 size-4" />
-					Back
-				</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => window.history.back()}
+					>
+						<ArrowLeft data-icon="inline-start" />
+						Back
+					</Button>
 				<div className="flex items-center gap-1">
 					<Button
 						variant="ghost"
@@ -152,12 +152,13 @@ export default function BookmarkDisplay({
 						</p>
 						<div className="flex flex-wrap gap-2">
 							{tags.map((tag) => (
-								<span
+								<Badge
 									key={tag}
-									className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
+									variant="secondary"
+									className="rounded-md px-2 py-1"
 								>
 									{tag}
-								</span>
+								</Badge>
 							))}
 						</div>
 					</div>

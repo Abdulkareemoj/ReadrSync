@@ -7,6 +7,7 @@ import {
 	Pencil,
 	Trash2,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -151,7 +152,7 @@ export function BookmarkGridCard({
 					)}
 				</div>
 
-				<div className="space-y-2 p-4">
+				<div className="flex flex-col gap-2 p-4">
 					<h3 className="line-clamp-1 font-medium">{title}</h3>
 					{description && (
 						<p className="line-clamp-2 text-sm text-muted-foreground">
@@ -161,12 +162,13 @@ export function BookmarkGridCard({
 					{tags && tags.length > 0 && (
 						<div className="flex flex-wrap gap-1 pt-1">
 							{tags.slice(0, 3).map((tag) => (
-								<span
+								<Badge
 									key={tag}
-									className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+									variant="secondary"
+									className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
 								>
 									{tag}
-								</span>
+								</Badge>
 							))}
 							{tags.length > 3 && (
 								<span className="py-0.5 text-[10px] text-muted-foreground">

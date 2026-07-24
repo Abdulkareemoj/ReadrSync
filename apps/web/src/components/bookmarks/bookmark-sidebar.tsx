@@ -1,4 +1,4 @@
-import type { Bookmark as BookmarkType } from "@packages/store";
+import type { CollectionTreeNode } from "@packages/agents";
 import {
 	useNavigate,
 	useRouterState,
@@ -6,14 +6,23 @@ import {
 import {
 	Archive,
 	Bookmark,
+	ChevronDown,
 	Heart,
+	MoreHorizontal,
+	Pencil,
 	Plus,
 	Search,
 	Tag,
+	Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
 	Dialog,
 	DialogClose,
@@ -22,25 +31,28 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useReaderStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-interface CollectionWithBookmarks {
-	id: string;
-	name: string;
-	bookmarks: BookmarkType[];
-}
-
 interface BookmarkSidebarProps {
-	collections: CollectionWithBookmarks[];
+	collectionTree: CollectionTreeNode[];
+	flatCollections: { id: string; name: string; parentId: string | null }[];
 	selectedCollectionId: string | null;
 	onSelectCollection: (id: string | null) => void;
 	onRemoveCollection: (id: string) => void;
 	onAddCollection: (name: string) => void;
+	onRenameCollection: (id: string, name: string) => void;
 }
 
 const navItems = [
@@ -48,18 +60,101 @@ const navItems = [
 	{ icon: Archive, label: "Archive", href: "/bookmarks/archive" },
 ];
 
+function CollectionListItem({
+	collection,
+	selected,
+	onSelect,
+	onRename,
+	onDelete,
+}: {
+	collection: { id: string; name: string };
+	selected: boolean;
+	onSelect: (id: string) => void;
+	onRename: (id: string, name: string) => void;
+	onDelete: (id: string) => void;
+}) {
+	const [renaming, setRenaming] = useState(false);
+	const [renameInput, setRenameInput] = useState(collection.name);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	const handleRename = () => {
+		if (renameInput.trim() && renameInput !== collection.name) {
+			onRename(collection.id, renameInput.trim());
+		}
+		setRenaming(false);
+	};
+
+	return (
+		<div className="flex items-center justify-between rounded-md px-1 py-0.5 hover:bg-accent/50">
+			{renaming ? (
+				<input
+					ref={inputRef}
+					autoFocus
+					value={renameInput}
+					onChange={(e) => setRenameInput(e.target.value)}
+					onBlur={handleRename}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") handleRename();
+						if (e.key === "Escape") setRenaming(false);
+					}}
+					className="h-6 flex-1 rounded bg-background px-1 text-sm outline-none ring-1 ring-border"
+				/>
+			) : (
+				<button
+					onClick={() => onSelect(collection.id)}
+					className={cn(
+						"flex min-w-0 flex-1 items-center gap-1.5 rounded px-1 py-0.5 text-left text-sm transition-colors",
+						selected
+							? "bg-accent font-medium text-accent-foreground"
+							: "text-muted-foreground hover:text-foreground",
+					)}
+				>
+					<Bookmark className="size-3.5 shrink-0 text-muted-foreground" />
+					<span className="truncate">{collection.name}</span>
+				</button>
+			)}
+			{!renaming && (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<button className="flex size-5 shrink-0 items-center justify-center rounded opacity-0 hover:bg-accent group-hover:opacity-100">
+							<MoreHorizontal className="size-3.5" />
+						</button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="w-40">
+						<DropdownMenuItem onClick={() => { setRenaming(true); setRenameInput(collection.name); }}>
+							<Pencil className="mr-2 size-3.5" />
+							Rename
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							className="text-destructive"
+							onClick={() => onDelete(collection.id)}
+						>
+							<Trash2 className="mr-2 size-3.5" />
+							Delete
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			)}
+		</div>
+	);
+}
+
 export function BookmarkSidebar({
-	collections = [],
+	collectionTree,
+	flatCollections,
 	selectedCollectionId,
 	onSelectCollection,
 	onRemoveCollection,
 	onAddCollection,
+	onRenameCollection,
 }: BookmarkSidebarProps) {
 	const navigate = useNavigate();
 	const location = useRouterState({ select: (s) => s.location });
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showSearch, setShowSearch] = useState(false);
 	const [newCollectionName, setNewCollectionName] = useState("");
+	const [dialogOpen, setDialogOpen] = useState(false);
 
 	// Read current tags from URL
 	const tagsParam = ((location.search as any)?.tags as string) || "";
@@ -68,27 +163,32 @@ export function BookmarkSidebar({
 		return tagsParam.split(",").filter(Boolean);
 	}, [tagsParam]);
 
-	// Extract unique tags from all bookmarks with counts
+	// Collect all tags from bookmarks
+	const bookmarks = useReaderStore((s) => s.bookmarks);
 	const allTags = useMemo(() => {
 		const tagMap = new Map<string, number>();
-		collections.forEach((c) => {
-			c.bookmarks.forEach((b) => {
-				if (b.tags && Array.isArray(b.tags)) {
-					b.tags.forEach((t) => {
-						tagMap.set(t, (tagMap.get(t) || 0) + 1);
-					});
-				}
-			});
+		bookmarks.forEach((b) => {
+			if (b.tags && Array.isArray(b.tags)) {
+				b.tags.forEach((t) => tagMap.set(t, (tagMap.get(t) || 0) + 1));
+			}
 		});
 		return Array.from(tagMap.entries())
 			.sort((a, b) => b[1] - a[1])
 			.map(([name, count]) => ({ name, count }));
-	}, [collections]);
+	}, [bookmarks]);
 
-	const totalBookmarks = collections.reduce(
-		(acc, c) => acc + (c.bookmarks?.length || 0),
-		0,
-	);
+	const totalBookmarks = useMemo(() => {
+		const count = (nodes: CollectionTreeNode[]): number =>
+			nodes.reduce((sum, n) => sum + n.bookmarkCount + count(n.children), 0);
+		return count(collectionTree);
+	}, [collectionTree]);
+
+	const handleAddCollection = () => {
+		if (!newCollectionName.trim()) return;
+		onAddCollection(newCollectionName.trim());
+		setNewCollectionName("");
+		setDialogOpen(false);
+	};
 
 	const toggleTag = (tag: string) => {
 		const current = new Set(selectedTags);
@@ -106,6 +206,12 @@ export function BookmarkSidebar({
 			replace: true,
 		});
 	};
+
+	// Private collections (exclude virtual "all" and "inbox")
+	const privateCollections = useMemo(
+		() => flatCollections.filter((c) => c.id !== "all" && c.id !== "inbox"),
+		[flatCollections],
+	);
 
 	const handleSearch = (query: string) => {
 		setSearchQuery(query);
@@ -168,92 +274,67 @@ export function BookmarkSidebar({
 				</Button>
 
 				{/* Collections */}
-				{collections.length > 1 && (
-					<>
-						<Separator />
-						<div className="flex flex-col gap-1">
-							<h3 className="px-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-								Collections
-							</h3>
-							{/* New Collection */}
-				<Dialog>
-					<DialogTrigger asChild>
-						<Button
-							variant="ghost"
-							className="w-full justify-start"
+				<Separator />
+				<Collapsible defaultOpen className="flex flex-col gap-1">
+					<div className="flex items-center justify-between px-2">
+						<CollapsibleTrigger className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+							<span>Collections</span>
+							<ChevronDown className="size-3.5 transition-transform ui-open:rotate-180" />
+						</CollapsibleTrigger>
+						<button
+							onClick={() => setDialogOpen(true)}
+							className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
 						>
-							<Plus className="mr-2 size-4" />
-							New Collection
-						</Button>
-					</DialogTrigger>
-					<DialogContent className="sm:max-w-106.25">
-						<DialogHeader>
-							<DialogTitle>New Collection</DialogTitle>
-							<DialogDescription>
-								Create a new bookmark collection to organize your saved links.
-							</DialogDescription>
-						</DialogHeader>
-						<div className="py-2">
-							<Input
-								placeholder="Enter name..."
-								value={newCollectionName}
-								onChange={(e) => setNewCollectionName(e.target.value)}
-							/>
-						</div>
-						<DialogFooter>
-							<DialogClose asChild>
-								<Button type="button" variant="outline">
-									Cancel
-								</Button>
-							</DialogClose>
-							<DialogClose asChild>
-								<Button
-									onClick={() => {
-										onAddCollection(newCollectionName);
-										setNewCollectionName("");
+							<Plus className="size-3.5" />
+						</button>
+					</div>
+
+					{/* New Collection Dialog */}
+					<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+						<DialogContent className="sm:max-w-106.25">
+							<DialogHeader>
+								<DialogTitle>New Collection</DialogTitle>
+								<DialogDescription>
+									Create a new collection to organize your bookmarks.
+								</DialogDescription>
+							</DialogHeader>
+							<div className="py-2">
+								<Input
+									placeholder="Collection name..."
+									value={newCollectionName}
+									onChange={(e) => setNewCollectionName(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") handleAddCollection();
 									}}
-								>
-									Add
-								</Button>
-							</DialogClose>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
-							{collections
-								.filter((c) => c.id !== "all")
-								.map((collection) => (
-									<div
-										key={collection.id}
-										className="group flex items-center justify-between"
-									>
-										<Button
-											variant={
-												selectedCollectionId === collection.id
-													? "secondary"
-													: "ghost"
-											}
-											className="w-full justify-start pr-2"
-											onClick={() => onSelectCollection(collection.id)}
-										>
-											<span className="truncate">{collection.name}</span>
-											{collection.bookmarks?.length > 0 && (
-												<Badge
-													variant="secondary"
-													className={cn(
-														"ml-auto",
-														selectedCollectionId === collection.id &&
-															"bg-primary text-primary-foreground",
-													)}
-												>
-													{collection.bookmarks?.length}
-												</Badge>
-											)}
-										</Button>
-									</div>
-								))}
+								/>
+							</div>
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button type="button" variant="outline">
+										Cancel
+									</Button>
+								</DialogClose>
+								<Button onClick={handleAddCollection}>Add</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
+
+					<CollapsibleContent>
+						{/* Collection List - Flat */}
+						<div className="space-y-0.5">
+							{privateCollections.map((collection) => (
+								<CollectionListItem
+									key={collection.id}
+									collection={collection}
+									selected={selectedCollectionId === collection.id}
+									onSelect={onSelectCollection}
+									onRename={onRenameCollection}
+									onDelete={onRemoveCollection}
+								/>
+							))}
 						</div>
-					</>
-				)}
+					</CollapsibleContent>
+				</Collapsible>
 
 				{/* Tags */}
 				{allTags.length > 0 && (
@@ -326,8 +407,6 @@ export function BookmarkSidebar({
 						})}
 					</div>
 				</>
-
-				
 			</div>
 		</ScrollArea>
 	);
