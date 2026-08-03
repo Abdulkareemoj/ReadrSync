@@ -9,8 +9,8 @@ import React, {
 	useState,
 } from "react";
 import { FlatList, Pressable, RefreshControl, View } from "react-native";
-import { AddFeedModal } from "@/components/add-feed-modal";
-import { RssArticleCardMobile } from "@/components/rss-article-card-mobile";
+import { AddFeedModal } from "@/components/rss/add-feed-modal";
+import { RssArticleCardMobile } from "@/components/rss/rss-article-card-mobile";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useFeeds } from "@/hooks/use-feeds";

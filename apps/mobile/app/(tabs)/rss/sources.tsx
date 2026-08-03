@@ -18,8 +18,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AddFeedModal } from "@/components/add-feed-modal";
-import { EditFeedModal } from "@/components/edit-feed-modal";
+import { AddFeedModal } from "@/components/rss/add-feed-modal";
+import { EditFeedModal } from "@/components/rss/edit-feed-modal";
 import { Text } from "@/components/ui/text";
 import { useFeeds } from "@/hooks/use-feeds";
 import type { Feed } from "@packages/store";

@@ -9,7 +9,7 @@ import {
 } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { FlatList, Linking, Pressable, View } from "react-native";
-import BookmarkCard from "@/components/bookmark-card";
+import BookmarkCard from "@/components/bookmarks/bookmark-card";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useBookmarks } from "@/hooks/use-bookmarks";
