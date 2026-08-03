@@ -68,7 +68,7 @@ async function clearTokens(): Promise<void> {
 		const path = await getTokensPath();
 		await writeTextFile(path, JSON.stringify({}));
 	} catch {
-		// Ignore — file might not exist
+		// Ignore, file might not exist
 	}
 }
 

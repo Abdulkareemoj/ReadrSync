@@ -6,7 +6,6 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
-    "beforeDevCommand": "powershell -ExecutionPolicy Bypass -File ./kill-port.ps1 & pnpm --filter desktop dev",
     "beforeBuildCommand": "pnpm --filter desktop build"
   },
   "app": {

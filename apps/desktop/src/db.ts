@@ -1,9 +1,10 @@
 import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
 import * as schema from "@packages/db/src/schema";
 import type { DB } from "@packages/db/src/index";
-import { runMigrations } from "@packages/db";
+import { runFtsSetup, runMigrations } from "@packages/db";
 import {
   createBookmarkAgent,
+  createCollectionAgent,
   createRssAgent,
   createHighlightAgent,
 } from "@packages/utils";
@@ -17,6 +18,7 @@ const DB_FILENAME = "bookmark_tool.db";
 
 let initializedAgents: {
   bookmarkAgent: ReturnType<typeof createBookmarkAgent>;
+  collectionAgent: ReturnType<typeof createCollectionAgent>;
   rssAgent: ReturnType<typeof createRssAgent>;
   highlightAgent: ReturnType<typeof createHighlightAgent>;
   syncAgent: ReturnType<typeof createDesktopSyncAgent>;
@@ -102,9 +104,11 @@ export async function initializeTauriAgents() {
   const db = drizzle(sqlJsDb, { schema });
 
   await runMigrations(db as unknown as DB);
+  await runFtsSetup(db as unknown as DB);
 
   const genericDb = db as unknown as DB;
   const bookmarkAgent = createBookmarkAgent(genericDb);
+  const collectionAgent = createCollectionAgent(genericDb);
   const rssAgent = createRssAgent(genericDb);
   const highlightAgent = createHighlightAgent(genericDb);
   const authAgent = createDesktopAuthAgent();
@@ -117,6 +121,7 @@ export async function initializeTauriAgents() {
 
   initializedAgents = {
     bookmarkAgent,
+    collectionAgent,
     rssAgent,
     highlightAgent,
     syncAgent,
