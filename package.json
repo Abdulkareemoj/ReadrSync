@@ -13,12 +13,10 @@
 		"check-types": "turbo check-types",
 		"dev:mobile": "turbo -F mobile dev",
 		"dev:web": "turbo -F web dev",
-		"dev:desktop": "turbo dev",
-		"build:marketing": "cd apps/marketing && pnpm build",
-		"deploy:marketing": "cd apps/marketing && pnpm deploy"
+		"dev:desktop": "turbo dev"
 	},
 	"devDependencies": {
-		
+		"@biomejs/biome": "2.5.5",
 		"turbo": "^2.10.6"
 	},
 	"packageManager": "pnpm@11.17.0"
