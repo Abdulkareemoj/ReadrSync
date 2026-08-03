@@ -138,7 +138,7 @@ async function refreshAccessToken(
 
 export function createMobileAuthAgent(clientId: string): IAuthAgent {
 	const redirectUri = makeRedirectUri({
-		scheme: "minimal",
+		scheme: "ReadrSync",
 		path: "oauth2redirect/google",
 	});
 

@@ -1,5 +1,5 @@
-import Tabs from "expo-router/tabs";
 import { router, useFocusEffect } from "expo-router";
+import Tabs from "expo-router/tabs";
 import {
 	Bookmark,
 	Compass,
@@ -8,12 +8,11 @@ import {
 	Search,
 	Settings,
 } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import React from "react";
 
 export default function TabsLayout() {
 	const [showSearchInput, setShowSearchInput] = useState(false);
@@ -33,108 +32,106 @@ export default function TabsLayout() {
 
 	return (
 		<Tabs
-				screenOptions={{
-					headerShown: true,
-					tabBarStyle: {
-						backgroundColor: "#ffffff",
-						borderTopColor: "#e5e7eb",
-						borderTopWidth: 1,
-						height: Platform.OS === "ios" ? 88 : 70,
-						paddingBottom: Platform.OS === "ios" ? 28 : 8,
-					},
-					tabBarLabelStyle: {
-						fontSize: 12,
-						marginTop: 4,
-						fontWeight: "600",
-					},
-					tabBarActiveTintColor: "#3b82f6",
-					tabBarInactiveTintColor: "#9ca3af",
-					header: ({ route, options }) => (
-						<View
-							style={{ paddingTop: top + 7 }}
-							className="flex-row items-center justify-between border-border border-b bg-background px-4 pb-3"
-						>
-							<View className="flex-1 flex-row items-center gap-3">
-								{route.name === "settings" ? (
-									<Text className="text-xl font-bold text-foreground">
-										{options.title}
-									</Text>
-								) : showSearchInput ? (
-									<Input
-										placeholder={`Search ${route.name}...`}
-										value={searchQuery}
-										onChangeText={(text) => {
-											setSearchQuery(text);
-											router.setParams({ searchQuery: text });
-										}}
-										className="mr-2 h-10 flex-1"
-										autoFocus
-									/>
-								) : (
-									<Text className="text-xl font-bold text-foreground">
-										{options.title}
-									</Text>
-								)}
-							</View>
- 
-							{route.name !== "settings" && (
-								<View className="flex-row items-center">
-									<Pressable
-										onPress={() => setShowSearchInput((prev) => !prev)}
-										className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
-									>
-										<Search
-											size={20}
-											className={
-												showSearchInput
-													? "text-primary"
-													: "text-muted-foreground"
-											}
-										/>
-									</Pressable>
-								</View>
-							)} 
+			screenOptions={{
+				headerShown: true,
+				tabBarStyle: {
+					backgroundColor: "#ffffff",
+					borderTopColor: "#e5e7eb",
+					borderTopWidth: 1,
+					height: Platform.OS === "ios" ? 88 : 70,
+					paddingBottom: Platform.OS === "ios" ? 28 : 8,
+				},
+				tabBarLabelStyle: {
+					fontSize: 12,
+					marginTop: 4,
+					fontWeight: "600",
+				},
+				tabBarActiveTintColor: "#3b82f6",
+				tabBarInactiveTintColor: "#9ca3af",
+				header: ({ route, options }) => (
+					<View
+						style={{ paddingTop: top + 7 }}
+						className="flex-row items-center justify-between border-border border-b bg-background px-4 pb-3"
+					>
+						<View className="flex-1 flex-row items-center gap-3">
+							{route.name === "settings" ? (
+								<Text className="font-bold text-foreground text-xl">
+									{options.title}
+								</Text>
+							) : showSearchInput ? (
+								<Input
+									placeholder={`Search ${route.name}...`}
+									value={searchQuery}
+									onChangeText={(text) => {
+										setSearchQuery(text);
+										router.setParams({ searchQuery: text });
+									}}
+									className="mr-2 h-10 flex-1"
+									autoFocus
+								/>
+							) : (
+								<Text className="font-bold text-foreground text-xl">
+									{options.title}
+								</Text>
+							)}
 						</View>
-					),
+
+						{route.name !== "settings" && (
+							<View className="flex-row items-center">
+								<Pressable
+									onPress={() => setShowSearchInput((prev) => !prev)}
+									className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
+								>
+									<Search
+										size={20}
+										className={
+											showSearchInput ? "text-primary" : "text-muted-foreground"
+										}
+									/>
+								</Pressable>
+							</View>
+						)}
+					</View>
+				),
+			}}
+		>
+			<Tabs.Screen
+				name="index"
+				options={{
+					title: "Home",
+					tabBarIcon: ({ color }) => <Home size={24} color={color} />,
 				}}
-			>
-				<Tabs.Screen
-					name="index"
-					options={{
-						title: "Home",
-						tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-					}}
-				/>
-				<Tabs.Screen
-					name="bookmarks"
-					options={{
-						title: "Bookmarks",
-						tabBarIcon: ({ color }: any) => <Bookmark size={24} color={color} />,
-					}}
-				/>
-		
-				<Tabs.Screen
-					name="rss"
-					options={{
-						title: "RSS",
-						tabBarIcon: ({ color }: any) => <Radio size={24} color={color} />,
-					}}
-				/>
-		
-				<Tabs.Screen
-					name="explore"
-					options={{
-						title: "Explore",
-						tabBarIcon: ({ color }) => <Compass size={24} color={color} />,
-					}}
-				/>
-				<Tabs.Screen
-					name="settings"
-					options={{
-						title: "Settings",
-						tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
-					}}
-				/>
-			</Tabs>
+			/>
+			<Tabs.Screen
+				name="bookmarks"
+				options={{
+					title: "Bookmarks",
+					tabBarIcon: ({ color }: any) => <Bookmark size={24} color={color} />,
+				}}
+			/>
+
+			<Tabs.Screen
+				name="rss"
+				options={{
+					title: "RSS",
+					tabBarIcon: ({ color }: any) => <Radio size={24} color={color} />,
+				}}
+			/>
+
+			<Tabs.Screen
+				name="explore"
+				options={{
+					title: "Explore",
+					tabBarIcon: ({ color }) => <Compass size={24} color={color} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="settings"
+				options={{
+					title: "Settings",
+					tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
+				}}
+			/>
+		</Tabs>
 	);
 }

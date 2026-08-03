@@ -1,18 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
-import {
-	Clock,
-	ExternalLink,
-	Filter,
-	Heart,
-	Search,
-	TrendingUp,
-	X,
-} from "lucide-react-native";
+import { ExternalLink, Filter, Search, X } from "lucide-react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	ActivityIndicator,
 	FlatList,
-	Pressable,
 	Text,
 	TextInput,
 	TouchableOpacity,

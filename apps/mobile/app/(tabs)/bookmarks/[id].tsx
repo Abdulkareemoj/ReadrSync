@@ -9,7 +9,15 @@ import {
 	Share2,
 	Trash2,
 } from "lucide-react-native";
-import { Alert, Image, Linking, Pressable, ScrollView, Share, View } from "react-native";
+import {
+	Alert,
+	Image,
+	Linking,
+	Pressable,
+	ScrollView,
+	Share,
+	View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -133,7 +141,10 @@ export default function BookmarkDetailScreen() {
 						)}
 					</View>
 					<View className="flex-1 gap-1">
-						<Text className="text-2xl font-bold text-foreground" numberOfLines={3}>
+						<Text
+							className="font-bold text-2xl text-foreground"
+							numberOfLines={3}
+						>
 							{bookmark.title}
 						</Text>
 						<Pressable onPress={handleOpenUrl}>
@@ -167,7 +178,7 @@ export default function BookmarkDetailScreen() {
 								<Text className="mb-2 font-semibold text-foreground text-sm">
 									Description
 								</Text>
-								<Text className="leading-6 text-muted-foreground">
+								<Text className="text-muted-foreground leading-6">
 									{bookmark.description}
 								</Text>
 							</View>
@@ -185,7 +196,7 @@ export default function BookmarkDetailScreen() {
 											key={`${tag}-${index}`}
 											className="rounded-md bg-secondary px-2 py-1"
 										>
-											<Text className="text-secondary-foreground text-xs font-medium">
+											<Text className="font-medium text-secondary-foreground text-xs">
 												{tag}
 											</Text>
 										</View>
@@ -199,7 +210,11 @@ export default function BookmarkDetailScreen() {
 				{/* Actions */}
 				<View className="mt-6 gap-3">
 					<Button onPress={handleOpenUrl} className="rounded-xl">
-						<Icon as={ExternalLink} size={16} className="text-primary-foreground" />
+						<Icon
+							as={ExternalLink}
+							size={16}
+							className="text-primary-foreground"
+						/>
 						<Text>Open in Browser</Text>
 					</Button>
 

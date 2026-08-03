@@ -48,7 +48,7 @@ export async function appInit() {
 							needsImage.map(async (article: any) => {
 								try {
 									const res = await fetch(article.link, {
-										headers: { "User-Agent": "BookmarkReader/1.0" },
+										headers: { "User-Agent": "ReadrSync/1.0" },
 									});
 									if (!res.ok) return;
 									const html = await res.text();
@@ -159,6 +159,9 @@ export async function appInit() {
 		console.log("[appInit] Loading initial data...");
 		await storeInstance.getState().loadInitialData();
 
+		// Sync collections from DB to persist store for backward compat
+		await syncCollectionsToPersistStore();
+
 		isInit = true;
 		console.log("[appInit] Ready");
 		return storeInstance;
@@ -171,4 +174,27 @@ export async function appInit() {
 
 export function getInitStatus() {
 	return { isInit, initError, store: storeInstance };
+}
+
+async function syncCollectionsToPersistStore() {
+	try {
+		const { useCollectionsStore: ucs } = await import("@packages/store");
+		const tree = storeInstance?.getState()?.collections;
+		if (!tree || tree.length === 0) return;
+		const flat: { id: string; name: string; parentId: string | null; position: number }[] = [];
+		const walk = (nodes: any[]) => {
+			for (const n of nodes) {
+				flat.push({ id: n.id, name: n.name, parentId: n.parentId ?? null, position: n.position ?? 0 });
+				walk(n.children ?? []);
+			}
+		};
+		walk(tree);
+		ucs.getState().setBookmarkCollections([
+			{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
+			{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
+			...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
+		]);
+	} catch (e) {
+		console.warn("[syncCollectionsToPersistStore] Failed:", e);
+	}
 }

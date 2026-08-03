@@ -1,17 +1,15 @@
 import "@/global.css";
 
-import { ThemeProvider } from "expo-router";
 import { PortalHost } from "@rn-primitives/portal";
-import { Stack } from "expo-router";
+import { Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import type React from "react";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useUniwind } from "uniwind";
 import { appInit, getInitStatus } from "@/lib/mobile-init";
 import { NAV_THEME } from "@/lib/theme";
-import React from "react";
-
 
 // Custom component to provide initialized store via context
 function StoreProvider({ children }: { children: React.ReactNode }) {

@@ -56,14 +56,14 @@ export default function FavoritesPage() {
 					title: "Favorites",
 					headerLeft: () => (
 						<Pressable onPress={() => router.back()}>
-							<ArrowLeft size={24} className="text-foreground mx-2" />
+							<ArrowLeft size={24} className="mx-2 text-foreground" />
 						</Pressable>
 					),
 				}}
 			/>
 
 			<View className="flex-row items-center justify-between px-4 pt-3 pb-2">
-				<Text className="font-bold text-xl text-foreground">
+				<Text className="font-bold text-foreground text-xl">
 					{bookmarks.length} favorite{bookmarks.length !== 1 ? "s" : ""}
 				</Text>
 				<View className="flex-row rounded-xl border border-border bg-card p-1">
@@ -102,10 +102,10 @@ export default function FavoritesPage() {
 			) : (
 				<View className="flex-1 items-center justify-center px-4">
 					<Icon as={Heart} size={48} className="mb-4 text-muted-foreground" />
-					<Text className="mb-2 font-semibold text-lg text-muted-foreground text-center">
+					<Text className="mb-2 text-center font-semibold text-lg text-muted-foreground">
 						No favorites yet
 					</Text>
-					<Text className="text-muted-foreground text-sm text-center">
+					<Text className="text-center text-muted-foreground text-sm">
 						Mark bookmarks as favorites by toggling the heart icon.
 					</Text>
 				</View>

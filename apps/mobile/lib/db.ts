@@ -1,8 +1,9 @@
-import { runMigrations, SCHEMA_VERSION } from "@packages/db";
+import { runFtsSetup, runMigrations, SCHEMA_VERSION } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import {
 	createBookmarkAgent,
+	createCollectionAgent,
 	createRssAgent,
 	createHighlightAgent,
 	type IAgents,
@@ -24,9 +25,11 @@ export async function initializeMobileAgents(): Promise<IAgents> {
 	const db = drizzle(expoDb as any, { schema }) as unknown as DB;
 
 	await runMigrations(db);
+	await runFtsSetup(db);
 	console.log(`[Mobile DB] Schema v${SCHEMA_VERSION} ready`);
 
 	const bookmarkAgent = createBookmarkAgent(db);
+	const collectionAgent = createCollectionAgent(db);
 	const rssAgent = createRssAgent(db);
 	const highlightAgent = createHighlightAgent(db);
 	const authAgent = createMobileAuthAgent(GOOGLE_OAUTH_CONFIG.clientId);
@@ -39,6 +42,7 @@ export async function initializeMobileAgents(): Promise<IAgents> {
 
 	initializedAgents = {
 		bookmarkAgent,
+		collectionAgent,
 		rssAgent,
 		highlightAgent,
 		syncAgent,
