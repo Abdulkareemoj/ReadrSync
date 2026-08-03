@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "minimal",
-    "slug": "minimal",
+    "name": "ReadrSync",
+    "slug": "ReadrSync",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "minimal",
+    "scheme": "ReadrSync",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.minimal"
+      "package": "com.anonymous.ReadrSync"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +36,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "475b0dd6-4740-4de5-bf84-a3d4cddf932f"
+      }
+    },
+    "owner": "abdulkareemoj"
   }
 }
