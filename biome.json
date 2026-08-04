@@ -16,6 +16,7 @@
 			"!**/.zed",
 			"!**/.vscode",
 			"!**/routeTree.gen.ts",
+			"!**/seed-data-json.ts",
 			"!**/src-tauri",
 			"!**/.nuxt",
 			"!bts.jsonc",
