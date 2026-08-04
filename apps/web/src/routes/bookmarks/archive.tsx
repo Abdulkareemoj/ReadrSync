@@ -99,7 +99,7 @@ function ArchivePage() {
 							</EmptyHeader>
 							<EmptyContent>
 								<p className="text-sm text-muted-foreground">
-									Coming soon — archive functionality will allow you to move
+									Coming soon, archive functionality will allow you to move
 									bookmarks to a separate view.
 								</p>
 							</EmptyContent>

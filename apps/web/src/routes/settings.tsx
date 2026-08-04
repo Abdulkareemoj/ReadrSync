@@ -1,689 +1,76 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Cloud,
-  Download,
-  GitMerge,
-  LogOut,
-  Monitor,
-  RefreshCw,
-  RotateCcw,
-  Trash2,
-  Upload,
-  AlertCircle,
-  Sun,
-  Moon,
-  Check,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useId, useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { getInitializedAgents } from "@/lib/agents";
-import { useSettingsStore } from "@/lib/store";
-import { exportSyncData, importSyncData, detectFormat } from "@/lib/sync";
-import type { ExportFormat, DetectedFormat } from "@/lib/sync";
-import { cn } from "@/lib/utils";
+import AboutSection from "@/components/settings/AboutSection";
+import AppearanceSection from "@/components/settings/AppearanceSection";
+import CloudSyncSection from "@/components/settings/CloudSyncSection";
+import DataSection from "@/components/settings/DataSection";
+import ErrorDialog from "@/components/settings/ErrorDialog";
+import { useSettings } from "@/components/settings/hooks";
+import YouTubeSection from "@/components/settings/YouTubeSection";
 
 export const Route = createFileRoute("/settings")({
-  component: SettingsComponent,
+	component: SettingsComponent,
 });
 
-// ─── Static data ───────────────────────────────────────────────────────────────
-
-const FONT_SIZES = [
-  { value: "sm", label: "Small", sample: "Aa", px: 14 },
-  { value: "md", label: "Medium", sample: "Aa", px: 16 },
-  { value: "lg", label: "Large", sample: "Aa", px: 19 },
-] as const;
-
-const THEMES = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
-] as const;
-
-// ─── Small building blocks ─────────────────────────────────────────────────────
-
-function SectionHeading({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="mb-6">
-      <h2 className="font-semibold text-lg text-foreground">{title}</h2>
-      <p className="mt-1 text-muted-foreground text-sm">{description}</p>
-    </div>
-  );
-}
-
-function Row({
-  label,
-  description,
-  children,
-  last,
-}: {
-  label: string;
-  description?: string;
-  children: React.ReactNode;
-  last?: boolean;
-}) {
-  return (
-    <>
-      <div className="flex items-center justify-between gap-6 py-4">
-        <div className="min-w-0">
-          <p className="font-medium text-sm text-foreground">{label}</p>
-          {description && (
-            <p className="mt-0.5 text-muted-foreground text-xs">{description}</p>
-          )}
-        </div>
-        <div className="shrink-0">{children}</div>
-      </div>
-      {!last && <Separator />}
-    </>
-  );
-}
-
-function StatusDot({ status }: { status: "connected" | "syncing" | "error" | "idle" }) {
-  const color =
-    status === "connected"
-      ? "bg-green-500"
-      : status === "error"
-        ? "bg-destructive"
-        : status === "syncing"
-          ? "bg-amber-500 animate-pulse"
-          : "bg-muted-foreground/40";
-  return <span className={cn("inline-block size-1.5 rounded-full", color)} />;
-}
-
-// ─── Theme card ───────────────────────────────────────────────────────────────
-
-function ThemeOption({
-  value,
-  label,
-  icon: Icon,
-  active,
-  onSelect,
-}: {
-  value: string;
-  label: string;
-  icon: React.ElementType;
-  active: boolean;
-  onSelect: () => void;
-}) {
-  const isDark = value === "dark";
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={cn(
-        "group relative flex flex-col gap-3 rounded-xl border p-3 text-left transition-all",
-        active
-          ? "border-foreground ring-1 ring-foreground"
-          : "border-border hover:border-foreground/40"
-      )}
-    >
-      <div
-        className={cn(
-          "relative h-16 w-full overflow-hidden rounded-lg",
-          value === "system"
-            ? "bg-gradient-to-br from-[oklch(0.92_0.01_260)] to-[oklch(0.18_0.02_260)]"
-            : isDark
-              ? "bg-[oklch(0.16_0.015_260)]"
-              : "bg-[oklch(0.94_0.005_260)]"
-        )}
-      >
-        <div
-          className={cn(
-            "absolute top-2.5 left-2.5 h-1.5 w-7 rounded-full",
-            isDark || value === "system" ? "bg-white/20" : "bg-black/15"
-          )}
-        />
-        <div className="absolute top-5.5 left-2.5 flex flex-col gap-1">
-          <div
-            className={cn(
-              "h-1 w-10 rounded-full",
-              isDark || value === "system" ? "bg-white/15" : "bg-black/10"
-            )}
-          />
-          <div
-            className={cn(
-              "h-1 w-7 rounded-full",
-              isDark || value === "system" ? "bg-white/15" : "bg-black/10"
-            )}
-          />
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <Icon className="size-3.5 text-muted-foreground" />
-          <span className="font-medium text-xs">{label}</span>
-        </div>
-        {active && (
-          <div className="flex size-4 items-center justify-center rounded-full bg-foreground">
-            <Check className="size-2.5 text-background" />
-          </div>
-        )}
-      </div>
-    </button>
-  );
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
-
 function SettingsComponent() {
-  const { theme, setTheme } = useTheme();
-  const setReaderTheme = useSettingsStore((state) => state.setTheme);
-  const {
-    syncStatus,
-    setSyncStatus,
-    readerFontSize,
-    setReaderFontSize,
-    isAuthenticated,
-    authEmail,
-    setAuth,
-    clearAuth,
-  } = useSettingsStore();
+	const s = useSettings();
 
-  const [importMode, setImportMode] = useState<"merge" | "replace">("merge");
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("json");
-  const [lastSync, setLastSync] = useState<string | null>(null);
-  const [showConnectDialog, setShowConnectDialog] = useState(false);
-  const [errorDialog, setErrorDialog] = useState<{ title: string; message: string } | null>(null);
-  const id = useId();
+	return (
+		<div className="min-h-screen bg-background">
+			<div className="border-b border-border px-6 py-6">
+				<h1 className="font-semibold text-2xl text-foreground">Settings</h1>
+				<p className="mt-1 text-muted-foreground text-sm">
+					Manage your reading experience and data
+				</p>
+			</div>
 
-  // ── Handlers (unchanged logic) ──────────────────────────────────────────────
+			<div className="mx-auto max-w-3xl px-6 py-8">
+				<div className="flex flex-col gap-12">
+					<AppearanceSection
+						theme={s.theme}
+						readerFontSize={s.readerFontSize}
+						onThemeChange={s.handleThemeChange}
+						onFontSizeChange={s.setReaderFontSize}
+					/>
 
-  const handleExport = async () => {
-    setSyncStatus("syncing");
-    try {
-      const result = await exportSyncData(exportFormat);
-      const blob = new Blob([result.data], { type: result.mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = result.filename;
-      a.click();
-      URL.revokeObjectURL(url);
-      setLastSync(new Date().toISOString());
-      setSyncStatus("connected");
-    } catch (e) {
-      console.error("Export failed:", e);
-      setSyncStatus("error");
-    }
-  };
+					<Separator />
 
-  const handleImport = async () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json,.opml,.html,.htm";
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      setSyncStatus("syncing");
-      try {
-        const text = await file.text();
-        const format = detectFormat(text);
-        if (format === "unknown") {
-          throw new Error("Unrecognized file format. Use JSON, OPML, or HTML bookmark files.");
-        }
-        await importSyncData(text, format, importMode);
-        setLastSync(new Date().toISOString());
-        setSyncStatus("connected");
-        window.location.reload();
-      } catch (err) {
-        console.error("Import failed:", err);
-        setSyncStatus("error");
-      }
-    };
-    input.click();
-  };
+					<DataSection
+						exportFormat={s.exportFormat}
+						importMode={s.importMode}
+						onExportFormatChange={s.setExportFormat}
+						onImportModeChange={s.setImportMode}
+						onExport={s.handleExport}
+						onImport={s.handleImport}
+						onClearCache={s.handleClearCache}
+					/>
 
-  const handleThemeChange = (value: string) => {
-    setTheme(value as "light" | "dark" | "system");
-    if (value !== "system") {
-      setReaderTheme(value as "light" | "dark");
-    }
-  };
+					<Separator />
 
-  const handleClearCache = () => {
-    if (typeof indexedDB !== "undefined") {
-      const req = indexedDB.deleteDatabase("bookmark_tool_web");
-      req.onsuccess = () => window.location.reload();
-      req.onerror = () => console.error("Failed to clear cache");
-    }
-  };
+					<CloudSyncSection
+						isAuthenticated={s.isAuthenticated}
+						authEmail={s.authEmail}
+						syncStatus={s.syncStatus}
+						statusLabel={s.statusLabel}
+						lastSync={s.lastSync}
+						showConnectDialog={s.showConnectDialog}
+						onConnectDialogChange={s.setShowConnectDialog}
+						onSignIn={s.handleSignIn}
+						onSignOut={s.handleSignOut}
+						onSyncNow={s.handleSyncNow}
+					/>
 
-  const handleSignIn = async () => {
-    try {
-      const agents = getInitializedAgents();
-      const result = await agents.authAgent.signIn("gdrive");
-      if (result.success) {
-        const info = await agents.authAgent.getUserInfo();
-        setAuth({ isAuthenticated: true, provider: "gdrive", email: info?.email ?? null });
-      } else {
-        setErrorDialog({
-          title: "Unable to connect",
-          message:
-            result.error ??
-            "Connection failed. Google Drive sync is only available on the desktop app.",
-        });
-      }
-    } catch (e) {
-      setErrorDialog({ title: "Connection error", message: (e as Error).message });
-    }
-  };
+					<Separator />
 
-  const handleSignOut = async () => {
-    try {
-      const agents = getInitializedAgents();
-      await agents.authAgent.signOut();
-    } catch {
-      /* ignore */
-    }
-    clearAuth();
-  };
+					<YouTubeSection />
 
-  useEffect(() => {
-    if (isAuthenticated) return;
-    const agents = getInitializedAgents();
-    agents.authAgent.isSignedIn().then((signedIn) => {
-      if (!signedIn) return;
-      agents.authAgent.getUserInfo().then((info) => {
-        setAuth({ isAuthenticated: true, provider: "gdrive", email: info?.email ?? null });
-      });
-    });
-  }, []);
+					<Separator />
 
-  const handleSyncNow = async () => {
-    setSyncStatus("syncing");
-    try {
-      const { getReaderStore } = await import("@packages/store");
-      const store = getReaderStore();
-      if (!store) throw new Error("Store not initialized");
-      const result = await store.getState().triggerSync();
-      setSyncStatus(result.success ? "connected" : "error");
-      setLastSync(result.syncedAt);
-    } catch (e) {
-      console.error("Sync failed:", e);
-      setSyncStatus("error");
-    }
-  };
+					<AboutSection />
+				</div>
+			</div>
 
-  const statusLabel =
-    syncStatus === "connected" ? "Connected" : syncStatus === "syncing" ? "Syncing" : syncStatus === "error" ? "Error" : "Idle";
-
-  // ── Render ───────────────────────────────────────────────────────────────────
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b border-border px-6 py-6">
-        <h1 className="font-semibold text-2xl text-foreground">Settings</h1>
-        <p className="mt-1 text-muted-foreground text-sm">
-          Manage your reading experience and data
-        </p>
-      </div>
-
-      <div className="mx-auto max-w-3xl px-6 py-8">
-        {/* Content */}
-        <div className="flex flex-col gap-12">
-          {/* Appearance */}
-          <section>
-            <SectionHeading
-              title="Appearance"
-              description="Choose how the app looks and how text is sized for reading"
-            />
-
-            <div className="flex flex-col gap-8">
-              <div>
-                <p className="mb-3 font-medium text-sm">Theme</p>
-                <div className="grid grid-cols-3 gap-3">
-                  {THEMES.map((t) => (
-                    <ThemeOption
-                      key={t.value}
-                      value={t.value}
-                      label={t.label}
-                      icon={t.icon}
-                      active={theme === t.value}
-                      onSelect={() => handleThemeChange(t.value)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-3 font-medium text-sm">Reading font size</p>
-                <ToggleGroup
-                  type="single"
-                  value={readerFontSize}
-                  onValueChange={(v) => { if (v) setReaderFontSize(v); }}
-                  className="flex gap-2"
-                >
-                  {FONT_SIZES.map((fs) => (
-                    <ToggleGroupItem
-                      key={fs.value}
-                      value={fs.value}
-                      className="flex flex-1 flex-col items-center gap-1.5 py-4 data-[state=on]:border-foreground data-[state=on]:ring-1 data-[state=on]:ring-foreground"
-                    >
-                      <span
-                        className="font-medium text-foreground"
-                        style={{ fontSize: fs.px }}
-                      >
-                        {fs.sample}
-                      </span>
-                      <span className="text-muted-foreground text-xs">{fs.label}</span>
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </div>
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* Data */}
-          <section>
-            <SectionHeading
-              title="Data"
-              description="Export, import, or clear data stored on this device"
-            />
-
-            <div>
-              <Row label="Export data" description="Download your data as JSON, OPML, or HTML" last={false}>
-                <div className="flex flex-row items-center gap-2">
-                  <Select value={exportFormat} onValueChange={(v) => setExportFormat(v as ExportFormat)}>
-                    <SelectTrigger className="w-28">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="json">JSON</SelectItem>
-                      <SelectItem value="opml">OPML</SelectItem>
-                      <SelectItem value="html">HTML</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Download data-icon="inline-start" />
-                    Export
-                  </Button>
-                </div>
-              </Row>
-              <Row label="Import data" description="Load data from JSON, OPML, or HTML bookmark files">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <RadioGroup
-                    value={importMode}
-                    onValueChange={(value) => setImportMode(value as "merge" | "replace")}
-                    className="grid w-full max-w-md grid-cols-2 gap-3"
-                  >
-                    <label
-                      htmlFor={`${id}-merge`}
-                      className={cn(
-                        "group relative flex cursor-pointer flex-col gap-2 rounded-xl border p-3 transition-all",
-                        importMode === "merge"
-                          ? "border-primary bg-primary/10 shadow-sm"
-                          : "border-border bg-background hover:border-foreground/50"
-                      )}
-                    >
-                      <RadioGroupItem
-                        value="merge"
-                        id={`${id}-merge`}
-                        className="order-1 size-5 [&_[data-slot=radio-group-indicator]>span]:size-2.5"
-                        aria-describedby={`${id}-merge-description`}
-                        aria-label="merge-import"
-                      />
-                      <div className="grid grow gap-1">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                          <GitMerge className="size-4" />
-                          Merge
-                        </div>
-                        <p
-                          id={`${id}-merge-description`}
-                          className="text-muted-foreground text-xs"
-                        >
-                          Add imported bookmarks and feeds alongside your existing data.
-                        </p>
-                      </div>
-                    </label>
-                    <label
-                      htmlFor={`${id}-replace`}
-                      className={cn(
-                        "group relative flex cursor-pointer flex-col gap-2 rounded-xl border p-3 transition-all",
-                        importMode === "replace"
-                          ? "border-primary bg-primary/10 shadow-sm"
-                          : "border-border bg-background hover:border-foreground/50"
-                      )}
-                    >
-                      <RadioGroupItem
-                        value="replace"
-                        id={`${id}-replace`}
-                        className="order-1 size-5 [&_[data-slot=radio-group-indicator]>span]:size-2.5"
-                        aria-describedby={`${id}-replace-description`}
-                        aria-label="replace-import"
-                      />
-                      <div className="grid grow gap-1">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                          <RotateCcw className="size-4" />
-                          Replace
-                        </div>
-                        <p
-                          id={`${id}-replace-description`}
-                          className="text-muted-foreground text-xs"
-                        >
-                          Replace existing data with the imported file.
-                        </p>
-                      </div>
-                    </label>
-                  </RadioGroup>
-                  <Button variant="outline" size="sm" onClick={handleImport} className="mt-3 sm:mt-0 sm:ml-auto">
-                    <Upload data-icon="inline-start" />
-                    Import
-                  </Button>
-                </div>
-              </Row>
-              <Row
-                label="Clear cache"
-                description="Remove locally cached data, feeds and bookmarks are preserved"
-                last
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearCache}
-                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <Trash2 data-icon="inline-start" />
-                  Clear
-                </Button>
-              </Row>
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* Cloud sync */}
-          <section>
-            <SectionHeading
-              title="Cloud sync"
-              description="Keep bookmarks, feeds, and reading progress in sync across your devices"
-            />
-
-            <div className="rounded-xl border border-border p-4">
-              {isAuthenticated ? (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-                      <Cloud className="size-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Google Drive</p>
-                      {authEmail && (
-                        <p className="text-muted-foreground text-xs">{authEmail}</p>
-                      )}
-                    </div>
-                  </div>
-                  <Button onClick={handleSignOut} variant="outline" size="sm">
-                    <LogOut data-icon="inline-start" />
-                    Disconnect
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <p className="text-muted-foreground text-sm">
-                    Connect Google Drive to sync across devices
-                  </p>
-                  <AlertDialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm">
-                        <Cloud data-icon="inline-start" />
-                        Connect
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogMedia>
-                          <Cloud className="size-8" />
-                        </AlertDialogMedia>
-                        <AlertDialogTitle>Connect Google Drive</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Link your Google Drive to sync bookmarks, feeds, and reading
-                          progress across devices. You'll be redirected to Google to
-                          authorize access.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowConnectDialog(false)}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <Button
-                          onClick={() => {
-                            setShowConnectDialog(false);
-                            handleSignIn();
-                          }}
-                        >
-                          <Cloud data-icon="inline-start" />
-                          Continue
-                        </Button>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              )}
-            </div>
-
-            {isAuthenticated && (
-              <div className="mt-4">
-                <Row
-                  label="Sync status"
-                  description={
-                    lastSync
-                      ? `Last synced ${new Date(lastSync).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`
-                      : undefined
-                  }
-                  last
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center gap-1.5 font-medium text-xs text-muted-foreground">
-                      <StatusDot
-                        status={
-                          syncStatus === "connected" || syncStatus === "syncing" || syncStatus === "error"
-                            ? syncStatus
-                            : "idle"
-                        }
-                      />
-                      {statusLabel}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSyncNow}
-                      disabled={syncStatus === "syncing"}
-                    >
-                      <RefreshCw
-                        data-icon="inline-start"
-                        className={syncStatus === "syncing" ? "animate-spin" : ""}
-                      />
-                      Sync now
-                    </Button>
-                  </div>
-                </Row>
-              </div>
-            )}
-          </section>
-
-          <Separator />
-
-          {/* YouTube API key (reserved for future use) */}
-          <section>
-            <SectionHeading
-              title="YouTube"
-              description="Optional YouTube Data API key for handle resolution (future feature — works without one today)"
-            />
-            <div className="rounded-xl border border-border p-4">
-              <Input
-                type="password"
-                disabled
-                placeholder="AIzaSy..."
-              />
-              <p className="mt-2 text-muted-foreground text-xs">
-                Not yet implemented. The app resolves YouTube handles automatically without an API key.
-              </p>
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* About */}
-          <section>
-            <SectionHeading title="About" description="App version and build information" />
-            <div>
-              <Row label="Version" last={false}>
-                <span className="text-muted-foreground text-sm">1.0.0</span>
-              </Row>
-              <Row label="Build" last>
-                <span className="text-muted-foreground text-sm">2024.04.12</span>
-              </Row>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      {/* Error dialog */}
-      <AlertDialog
-        open={!!errorDialog}
-        onOpenChange={(open) => {
-          if (!open) setErrorDialog(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogMedia>
-              <AlertCircle className="size-8" />
-            </AlertDialogMedia>
-            <AlertDialogTitle>{errorDialog?.title}</AlertDialogTitle>
-            <AlertDialogDescription>{errorDialog?.message}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setErrorDialog(null)}>OK</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
+			<ErrorDialog error={s.errorDialog} onClose={() => s.setErrorDialog(null)} />
+		</div>
+	);
 }

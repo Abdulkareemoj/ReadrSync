@@ -29,7 +29,7 @@ function cleanHtml(html: string): string {
 function prepareContent(raw: string): string {
 	const isHtml = /<[a-z][\s\S]*?>/i.test(raw);
 	if (isHtml) return cleanHtml(raw);
-	// Plain text — split on double newlines into paragraphs
+	// Plain text, split on double newlines into paragraphs
 	return raw
 		.split(/\n\n+/)
 		.map((p) => `<p>${p.replace(/\n/g, " ").trim()}</p>`)
@@ -290,7 +290,7 @@ function ArticleReaderComponent() {
 						</div>
 					)}
 
-					{/* Article body — rendered HTML */}
+					{/* Article body, rendered HTML */}
 					<div
 						onMouseUp={handleTextSelection}
 						className={cn(
@@ -328,7 +328,7 @@ function ArticleReaderComponent() {
 							"[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold",
 							"[&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm",
 						)}
-						// react-html-parser sanitises by default — but we also cleaned
+						// react-html-parser sanitises by default, but we also cleaned
 						// the HTML above, removing scripts/iframes/forms.
 					>
 						{HtmlParser(preparedHtml, {
