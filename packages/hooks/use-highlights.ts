@@ -1,9 +1,8 @@
 import { useReaderStore } from "@packages/store";
 import { useMemo } from "react";
 
-/**
- * Hook for accessing highlights, optionally filtered to one article.
- */
+// Hook for accessing highlights, optionally filtered to one article.
+
 export function useHighlights(articleId?: string) {
 	const allHighlights = useReaderStore((s) => s.highlights);
 

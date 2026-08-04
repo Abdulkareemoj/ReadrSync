@@ -1,15 +1,16 @@
 {
-  "name": "@packages/hooks",
-  "version": "1.0.0",
-  "main": "./index.ts",
-  "types": "./index.ts",
-  "private": true,
-  "dependencies": {
-    "@packages/store": "workspace:*",
-    "react": "^19.2.3",
-    "zustand": "^5.0.14"
-  },
-  "devDependencies": {
-    "@types/react": "^19.2.17"
-  }
+	"name": "@packages/hooks",
+	"version": "1.0.0",
+	"main": "./index.ts",
+	"types": "./index.ts",
+	"private": true,
+	"dependencies": {
+		"@packages/store": "workspace:*",
+		"@packages/agents": "workspace:*",
+		"react": "^19.2.3",
+		"zustand": "^5.0.14"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.17"
+	}
 }
