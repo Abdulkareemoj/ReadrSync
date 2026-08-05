@@ -1,4 +1,8 @@
-// Dark-only. Theme provider removed.
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+import {
+	ThemeProvider as NextThemesProvider,
+	type ThemeProviderProps,
+} from "next-themes";
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+	return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
