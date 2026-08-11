@@ -1,4 +1,4 @@
-// Google Drive API client — thin wrapper for reading/writing the sync file.
+// Google Drive API client, thin wrapper for reading/writing the sync file.
 // Uses the auth agent to get access tokens.
 
 import type { IAuthAgent, SyncData } from "@packages/agents";

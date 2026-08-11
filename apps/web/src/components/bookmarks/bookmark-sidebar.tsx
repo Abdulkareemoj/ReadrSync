@@ -1,8 +1,5 @@
 import type { CollectionTreeNode } from "@packages/agents";
-import {
-	useNavigate,
-	useRouterState,
-} from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
 	Archive,
 	Bookmark,
@@ -87,7 +84,7 @@ function CollectionListItem({
 	return (
 		<div className="flex items-center justify-between rounded-md px-1 py-0.5 hover:bg-accent/50">
 			{renaming ? (
-				<input
+				<Input
 					ref={inputRef}
 					autoFocus
 					value={renameInput}
@@ -100,7 +97,8 @@ function CollectionListItem({
 					className="h-6 flex-1 rounded bg-background px-1 text-sm outline-none ring-1 ring-border"
 				/>
 			) : (
-				<button
+				<Button
+					variant="ghost"
 					onClick={() => onSelect(collection.id)}
 					className={cn(
 						"flex min-w-0 flex-1 items-center gap-1.5 rounded px-1 py-0.5 text-left text-sm transition-colors",
@@ -111,17 +109,22 @@ function CollectionListItem({
 				>
 					<Bookmark className="size-3.5 shrink-0 text-muted-foreground" />
 					<span className="truncate">{collection.name}</span>
-				</button>
+				</Button>
 			)}
 			{!renaming && (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<button className="flex size-5 shrink-0 items-center justify-center rounded opacity-0 hover:bg-accent group-hover:opacity-100">
+						<Button className="flex size-5 shrink-0 items-center justify-center rounded opacity-0 hover:bg-accent group-hover:opacity-100">
 							<MoreHorizontal className="size-3.5" />
-						</button>
+						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-40">
-						<DropdownMenuItem onClick={() => { setRenaming(true); setRenameInput(collection.name); }}>
+						<DropdownMenuItem
+							onClick={() => {
+								setRenaming(true);
+								setRenameInput(collection.name);
+							}}
+						>
 							<Pencil className="mr-2 size-3.5" />
 							Rename
 						</DropdownMenuItem>
@@ -230,7 +233,7 @@ export function BookmarkSidebar({
 				{/* Search */}
 				{showSearch ? (
 					<div className="relative">
-						<Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+						<Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
 						<Input
 							autoFocus
 							placeholder="Search bookmarks..."
@@ -277,16 +280,18 @@ export function BookmarkSidebar({
 				<Separator />
 				<Collapsible defaultOpen className="flex flex-col gap-1">
 					<div className="flex items-center justify-between px-2">
-						<CollapsibleTrigger className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+						<CollapsibleTrigger className="flex items-center gap-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
 							<span>Collections</span>
-							<ChevronDown className="size-3.5 transition-transform ui-open:rotate-180" />
+							<ChevronDown className="size-3.5 ui-open:rotate-180 transition-transform" />
 						</CollapsibleTrigger>
-						<button
+						<Button
+							variant="ghost"
+							size="icon"
 							onClick={() => setDialogOpen(true)}
 							className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
 						>
 							<Plus className="size-3.5" />
-						</button>
+						</Button>
 					</div>
 
 					{/* New Collection Dialog */}
@@ -340,11 +345,21 @@ export function BookmarkSidebar({
 				{allTags.length > 0 && (
 					<>
 						<Separator />
-						<div className="flex flex-col gap-1.5">
+						<Collapsible defaultOpen className="flex flex-col gap-1">
 							<div className="flex items-center justify-between px-2">
-								<h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-									Tags
-								</h3>
+								<CollapsibleTrigger className="flex items-center gap-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
+									<span>Tags</span>
+									<ChevronDown className="size-3.5 ui-open:rotate-180 transition-transform" />
+								</CollapsibleTrigger>
+								<Button
+									variant="ghost"
+									size="icon"
+									onClick={() => setDialogOpen(true)}
+									className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+								>
+									<Plus className="size-3.5" />
+								</Button>
+
 								{selectedTags.length > 0 && (
 									<button
 										onClick={() => {
@@ -362,51 +377,53 @@ export function BookmarkSidebar({
 									</button>
 								)}
 							</div>
-							<div className="flex flex-wrap gap-1.5 px-1">
-								{allTags.map(({ name, count }) => {
-									const isActive = selectedTags.includes(name);
-									return (
-										<button
-											key={name}
-											onClick={() => toggleTag(name)}
-											className={cn(
-												"inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors",
-												isActive
-													? "bg-primary text-primary-foreground"
-													: "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-											)}
-										>
-											<Tag className="size-3" />
-											{name}
-											<span className="opacity-60">({count})</span>
-										</button>
-									);
-								})}
-							</div>
-						</div>
+
+							<CollapsibleContent>
+								<div className="flex flex-wrap gap-1.5 px-1">
+									{allTags.map(({ name, count }) => {
+										const isActive = selectedTags.includes(name);
+										return (
+											<button
+												key={name}
+												onClick={() => toggleTag(name)}
+												className={cn(
+													"inline-flex items-center gap-1 rounded-md px-2 py-1 font-medium text-xs transition-colors",
+													isActive
+														? "bg-primary text-primary-foreground"
+														: "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+												)}
+											>
+												<Tag className="size-3" />
+												{name}
+												<span className="opacity-60">({count})</span>
+											</button>
+										);
+									})}
+								</div>
+							</CollapsibleContent>
+						</Collapsible>
 					</>
 				)}
 
 				{/* Navigation */}
-				<>
-					<Separator />
-					<div className="flex flex-col gap-1">
-						{navItems.map((item) => {
-							const isActive = location.pathname === item.href.split("?")[0];
-							return (
-								<Button
-									key={item.label}
-									variant={isActive ? "secondary" : "ghost"}
-									className="w-full justify-start"
-									onClick={() => void navigate({ to: item.href as any })}
-								>
-									<item.icon className="mr-2 size-4" />
-									{item.label}
-								</Button>
-							);
-						})}
-					</div>
-				</>
+
+				<Separator />
+				<div className="flex flex-col gap-1">
+					{navItems.map((item) => {
+						const isActive = location.pathname === item.href.split("?")[0];
+						return (
+							<Button
+								key={item.label}
+								variant={isActive ? "secondary" : "ghost"}
+								className="w-full justify-start"
+								onClick={() => void navigate({ to: item.href as any })}
+							>
+								<item.icon className="mr-2 size-4" />
+								{item.label}
+							</Button>
+						);
+					})}
+				</div>
 			</div>
 		</ScrollArea>
 	);

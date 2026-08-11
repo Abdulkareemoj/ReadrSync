@@ -33,7 +33,7 @@ export function StoreProvider({ children }: StoreProviderProps) {
 					agents,
 				) as unknown as InitializedStore;
 
-				// refreshFeed now baked into store — no override needed
+				// refreshFeed now baked into store, no override needed
 
 				await store.getState().loadInitialData();
 

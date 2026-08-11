@@ -2,8 +2,8 @@ import { Stack } from "expo-router";
 import { Flame, Pin, Plus, TrendingUp } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, RefreshControl, ScrollView, View } from "react-native";
-import { DashboardCardMobile } from "@/components/home/dashboard-card-mobile";
 import CollectionsSection from "@/components/home/CollectionsSection";
+import { DashboardCardMobile } from "@/components/home/dashboard-card-mobile";
 import FromYourFeedsSection from "@/components/home/FromYourFeedsSection";
 import HorizontalArticleSection from "@/components/home/HorizontalArticleSection";
 import { useHomeData } from "@/components/home/hooks";
@@ -45,9 +45,9 @@ export default function Home() {
 					A quick overview of your saved content and feeds.
 				</Text>
 
-				<View className="flex-row flex-wrap justify-between gap-4">
-					{data.dashboardData.map((item: any) => (
-						<View key={item.title} className="w-[48%]">
+				<View className="flex-row flex-wrap">
+					{data.dashboardData.map((item) => (
+						<View key={item.title} className="basis-1/2 p-1">
 							<DashboardCardMobile {...item} />
 						</View>
 					))}

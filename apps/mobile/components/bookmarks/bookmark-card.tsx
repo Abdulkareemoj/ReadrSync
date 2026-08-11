@@ -45,7 +45,7 @@ function BookmarkCard({
 			className="mb-3 active:opacity-90"
 		>
 			<Card className="gap-0 overflow-hidden py-0">
-				{/* Hero Area — Favicon centered on gradient */}
+				{/* Hero Area, Favicon centered on gradient */}
 				<View className="h-32 w-full items-center justify-center bg-muted">
 					{favicon ? (
 						<View className="size-14 items-center justify-center rounded-2xl bg-background shadow-sm">
