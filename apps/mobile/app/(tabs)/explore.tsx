@@ -1,13 +1,13 @@
 import { router } from "expo-router";
 import { Bookmark, Rss, TrendingUp } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
+import ArticleCardSection from "@/components/explore/ArticleCardSection";
+import FeedDiscoveryCard from "@/components/explore/FeedDiscoveryCard";
+import FeedSearchCard from "@/components/explore/FeedSearchCard";
+import { useExploreData } from "@/components/explore/hooks";
+import YouTubeSubscribeCard from "@/components/explore/YouTubeSubscribeCard";
 import { DashboardCardMobile } from "@/components/home/dashboard-card-mobile";
 import { Text } from "@/components/ui/text";
-import ArticleCardSection from "@/components/explore/ArticleCardSection";
-import FeedDirectoryCard from "@/components/explore/FeedDirectoryCard";
-import { useExploreData } from "@/components/explore/hooks";
-import SurpriseMeCard from "@/components/explore/SurpriseMeCard";
-import YouTubeSubscribeCard from "@/components/explore/YouTubeSubscribeCard";
 
 export default function Explore() {
 	const d = useExploreData();
@@ -89,20 +89,38 @@ export default function Explore() {
 					onSubscribe={d.handleYouTubeSubscribe}
 				/>
 
-				<SurpriseMeCard
-					feeds={d.randomFeeds}
+				<FeedDiscoveryCard
+					url={d.discoverUrl}
+					onUrlChange={(text) => {
+						d.setDiscoverUrl(text);
+						d.setDiscoverError("");
+					}}
+					loading={d.discovering}
+					error={d.discoverError}
+					discoveredFeeds={d.discoveredFeeds}
 					subscribedFeeds={d.feeds}
-					onSubscribe={d.handleAddFeed}
-					onShuffle={d.handleRandomFeeds}
+					onDiscover={d.handleDiscover}
+					onToggle={d.handleToggleFeed}
 				/>
 
-				<FeedDirectoryCard
-					categories={d.categories}
-					selectedCategory={d.selectedCategory}
-					onCategoryChange={d.setSelectedCategory}
-					filteredFeeds={d.filteredFeeds}
+				<FeedSearchCard
+					query={d.searchQuery}
+					onQueryChange={(text) => {
+						d.setSearchQuery(text);
+						d.setSearchError("");
+					}}
+					loading={d.searching}
+					error={d.searchError}
+					results={d.searchResults.map((f) => ({
+						name: f.name,
+						description: f.description,
+						url: f.url,
+						category: f.category,
+						icon: f.icon,
+					}))}
 					subscribedFeeds={d.feeds}
-					onSubscribe={d.handleAddFeed}
+					onSearch={d.handleFeedSearch}
+					onToggle={d.handleToggleFeed}
 				/>
 			</View>
 		</ScrollView>

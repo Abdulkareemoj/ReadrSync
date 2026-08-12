@@ -1,8 +1,14 @@
 import type React from "react";
 import { View } from "react-native";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import SmallArticleCard from "./SmallArticleCard";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import EmptyCard from "./EmptyCard";
+import SmallArticleCard from "./SmallArticleCard";
 
 type Props = {
 	icon: React.ComponentType<{ size?: number; className?: string }>;
@@ -40,11 +46,7 @@ export default function ArticleCardSection({
 						<SmallArticleCard key={id} articleId={id} />
 					))
 				) : (
-					<EmptyCard
-						title={emptyTitle}
-						desc={emptyDesc}
-						action={emptyAction}
-					/>
+					<EmptyCard title={emptyTitle} desc={emptyDesc} action={emptyAction} />
 				)}
 			</CardContent>
 		</Card>

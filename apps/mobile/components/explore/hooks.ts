@@ -1,33 +1,33 @@
-import { useState } from "react";
 import {
-	Bookmark,
-	BookOpen,
-	Heart,
-	Rss,
-} from "lucide-react-native";
-import {
-	curatedFeedsByCategory,
-	getAllCuratedFeeds,
-	getCategories,
-	getRandomFeeds,
+	type DiscoveredFeed,
+	discoverFeedsFromUrl,
 	discoverYouTubeChannelFeed,
+	extractYouTubeHandle,
 	parseYouTubeChannelUrl,
 	resolveYouTubeHandle,
-	extractYouTubeHandle,
+	type SearchedFeed,
+	searchFeedsByKeyword,
 } from "@packages/utils";
+import { Bookmark, BookOpen, Heart, Rss } from "lucide-react-native";
+import { useState } from "react";
 import { useReaderStore } from "@/lib/store";
 
 export function useExploreData() {
 	const articles = useReaderStore((state) => state.articles);
 	const feeds = useReaderStore((state) => state.feeds);
 	const addFeed = useReaderStore((state) => state.addFeed);
+	const removeFeed = useReaderStore((state) => state.removeFeed);
 	const [youtubeUrl, setYoutubeUrl] = useState("");
 	const [youtubeLoading, setYoutubeLoading] = useState(false);
 	const [youtubeError, setYoutubeError] = useState("");
-	const [randomFeeds, setRandomFeeds] = useState(getRandomFeeds(6));
-	const [selectedCategory, setSelectedCategory] = useState<string | "all">(
-		"all",
-	);
+	const [discoverUrl, setDiscoverUrl] = useState("");
+	const [discovering, setDiscovering] = useState(false);
+	const [discoverError, setDiscoverError] = useState("");
+	const [discoveredFeeds, setDiscoveredFeeds] = useState<DiscoveredFeed[]>([]);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [searching, setSearching] = useState(false);
+	const [searchError, setSearchError] = useState("");
+	const [searchResults, setSearchResults] = useState<SearchedFeed[]>([]);
 
 	const readArticles = articles.filter((a) => a.read).length;
 	const likedArticlesCount = articles.filter((a) => a.liked).length;
@@ -69,8 +69,7 @@ export function useExploreData() {
 		.filter((a) => !a.read)
 		.sort(
 			(a, b) =>
-				new Date(b.pubDate || 0).getTime() -
-				new Date(a.pubDate || 0).getTime(),
+				new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime(),
 		)
 		.slice(0, 4)
 		.map((a) => a.id);
@@ -85,13 +84,6 @@ export function useExploreData() {
 		.slice(0, 4)
 		.map((a) => a.id);
 
-	const categories = getCategories();
-
-	const filteredFeeds =
-		selectedCategory === "all"
-			? getAllCuratedFeeds()
-			: curatedFeedsByCategory[selectedCategory] || [];
-
 	const handleAddFeed = async (url: string, title: string) => {
 		try {
 			await addFeed({ feedUrl: url, title });
@@ -100,8 +92,59 @@ export function useExploreData() {
 		}
 	};
 
-	const handleRandomFeeds = () => {
-		setRandomFeeds(getRandomFeeds(6));
+	const handleToggleFeed = async (url: string, title: string) => {
+		try {
+			const existing = feeds.find(
+				(f) => f.feedUrl.toLowerCase() === url.toLowerCase(),
+			);
+			if (existing) {
+				await removeFeed(existing.id);
+			} else {
+				await addFeed({ feedUrl: url, title });
+			}
+		} catch (e) {
+			console.error("Failed to toggle feed:", e);
+		}
+	};
+
+	const handleFeedSearch = async () => {
+		setSearchError("");
+		setSearchResults([]);
+		if (!searchQuery.trim()) return;
+		setSearching(true);
+		try {
+			const results = await searchFeedsByKeyword(searchQuery);
+			setSearchResults(results);
+			if (results.length === 0) {
+				setSearchError("No feeds found for that search.");
+			}
+		} catch (e) {
+			setSearchError(
+				e instanceof Error ? e.message : "Could not search feeds.",
+			);
+		} finally {
+			setSearching(false);
+		}
+	};
+
+	const handleDiscover = async () => {
+		setDiscoverError("");
+		setDiscoveredFeeds([]);
+		if (!discoverUrl.trim()) return;
+		setDiscovering(true);
+		try {
+			const found = await discoverFeedsFromUrl(discoverUrl);
+			setDiscoveredFeeds(found);
+			if (found.length === 0) {
+				setDiscoverError("No RSS or Atom feeds found on that page.");
+			}
+		} catch (e) {
+			setDiscoverError(
+				e instanceof Error ? e.message : "Could not discover feeds.",
+			);
+		} finally {
+			setDiscovering(false);
+		}
 	};
 
 	const handleYouTubeSubscribe = async () => {
@@ -154,18 +197,27 @@ export function useExploreData() {
 		bestArticleIds,
 		recommendedIds,
 		backlogIds,
-		categories,
-		filteredFeeds,
-		randomFeeds,
-		selectedCategory,
-		setSelectedCategory,
+		searchQuery,
+		setSearchQuery,
+		searching,
+		searchError,
+		setSearchError,
+		searchResults,
+		discoverUrl,
+		setDiscoverUrl,
+		discovering,
+		discoverError,
+		setDiscoverError,
+		discoveredFeeds,
 		youtubeUrl,
 		setYoutubeUrl,
 		youtubeLoading,
 		youtubeError,
 		setYoutubeError,
 		handleAddFeed,
-		handleRandomFeeds,
+		handleToggleFeed,
+		handleDiscover,
+		handleFeedSearch,
 		handleYouTubeSubscribe,
 	};
 }

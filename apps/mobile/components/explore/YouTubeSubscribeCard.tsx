@@ -1,6 +1,12 @@
 import { Film } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 
@@ -49,21 +55,17 @@ export default function YouTubeSubscribeCard({
 						}`}
 					>
 						<Text
-							className={`text-center text-sm font-medium ${
-								loading || !url.trim()
-									? "text-muted-foreground"
-									: "text-white"
+							className={`text-center font-medium text-sm ${
+								loading || !url.trim() ? "text-muted-foreground" : "text-white"
 							}`}
 						>
 							{loading ? "Discovering..." : "Subscribe"}
 						</Text>
 					</TouchableOpacity>
-					{error ? (
-						<Text className="text-red-500 text-xs">{error}</Text>
-					) : null}
+					{error ? <Text className="text-red-500 text-xs">{error}</Text> : null}
 					<Text className="text-muted-foreground text-xs">
-						Supports youtube.com/channel/UC..., youtube.com/@handle, or
-						bare @handle
+						Supports youtube.com/channel/UC..., youtube.com/@handle, or bare
+						@handle
 					</Text>
 				</View>
 			</CardContent>

@@ -26,11 +26,11 @@ export default function SmallArticleCard({ articleId }: { articleId: string }) {
 			<View className="p-3">
 				<View className="mb-1 flex-row items-center gap-2">
 					<View className="rounded-full bg-primary/10 px-2 py-0.5">
-						<Text className="text-primary text-[10px] font-medium">
+						<Text className="font-medium text-[10px] text-primary">
 							{feed?.title || "RSS"}
 						</Text>
 					</View>
-					<Text className="text-muted-foreground text-[10px]">
+					<Text className="text-[10px] text-muted-foreground">
 						{article.readTime || 3} min
 					</Text>
 				</View>
