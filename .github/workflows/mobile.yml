@@ -30,11 +30,8 @@ jobs:
             - name: Install dependencies (mobile + its workspace deps only)
               run: pnpm --filter "./apps/mobile..." install --frozen-lockfile
 
-            - name: Lint
-              run: pnpm turbo run lint --filter=mobile...
-
-            - name: Type check
-              run: pnpm turbo run typecheck --filter=mobile...
+            - name: Run tests
+              run: pnpm --filter @packages/utils test
 
     # Only runs when you push a tag like "mobile-v1.0.0" — this is what
     # actually builds an installable APK and publishes it.

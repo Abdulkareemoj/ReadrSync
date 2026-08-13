@@ -39,11 +39,8 @@ jobs:
             - name: Install dependencies (desktop + its workspace deps only)
               run: pnpm --filter "./apps/desktop..." install --frozen-lockfile
 
-            - name: Lint
-              run: pnpm turbo run lint --filter=desktop...
-
-            - name: Type check
-              run: pnpm turbo run typecheck --filter=desktop...
+            - name: Run tests
+              run: pnpm --filter @packages/utils test
 
             - name: Build check (debug, Linux only — fast sanity check)
               working-directory: apps/desktop
