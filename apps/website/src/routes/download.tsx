@@ -1,210 +1,159 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useInView } from "motion/react";
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/download")({
-  component: Download,
+	head: () => ({
+		meta: [
+			{ title: "Download ReadrSync, Web, desktop and mobile" },
+			{
+				name: "description",
+				content:
+					"The ReadrSync web app is live today. Desktop builds for Windows, macOS and Linux and mobile builds for iOS and Android are in development.",
+			},
+			{ property: "og:title", content: "Download ReadrSync" },
+			{
+				property: "og:description",
+				content:
+					"Use ReadrSync in any modern browser today. Desktop and mobile apps are on the way.",
+			},
+			{ property: "og:type", content: "website" },
+			{ name: "twitter:card", content: "summary_large_image" },
+		],
+	}),
+	component: Download,
 });
 
 const platforms = [
-  {
-    icon: "🌐",
-    name: "Web app",
-    version: "v0.1",
-    desc: "Use ReadrSync in any modern browser, no installation needed.",
-    status: "available" as const,
-    href: "/web",
-  },
-  {
-    icon: "🪟",
-    name: "Windows",
-    desc: "Native app for Windows 10 and later, built with Tauri.",
-    status: "dev" as const,
-  },
-  {
-    icon: "🍎",
-    name: "macOS",
-    desc: "Universal binary for Intel and Apple Silicon.",
-    status: "dev" as const,
-  },
-  {
-    icon: "🐧",
-    name: "Linux",
-    desc: "AppImage and .deb packages for Ubuntu and derivatives.",
-    status: "dev" as const,
-  },
-  {
-    icon: "📱",
-    name: "iOS",
-    desc: "iPhone and iPad app built with Expo.",
-    status: "dev" as const,
-  },
-  {
-    icon: "🤖",
-    name: "Android",
-    desc: "Android app built with Expo.",
-    status: "dev" as const,
-  },
+	{
+		name: "Web app",
+		version: "v0.1",
+		desc: "Use ReadrSync in any modern browser, no installation needed.",
+		status: "available" as const,
+		href: "/web",
+	},
+	{
+		name: "Windows",
+		desc: "Native app for Windows 10 and later, built with Tauri.",
+		status: "dev" as const,
+	},
+	{
+		name: "macOS",
+		desc: "Universal binary for Intel and Apple Silicon.",
+		status: "dev" as const,
+	},
+	{
+		name: "Linux",
+		desc: "AppImage and .deb packages for Ubuntu and derivatives.",
+		status: "dev" as const,
+	},
+	{
+		name: "iOS",
+		desc: "iPhone and iPad app built with Expo.",
+		status: "dev" as const,
+	},
+	{
+		name: "Android",
+		desc: "Android app built with Expo.",
+		status: "dev" as const,
+	},
 ];
 
-const availablePlatforms = platforms.filter((p) => p.status === "available");
-const desktopPlatforms = platforms.filter(
-  (p) => p.status === "dev" && ["Windows", "macOS", "Linux"].includes(p.name),
-);
-const mobilePlatforms = platforms.filter(
-  (p) => p.status === "dev" && ["iOS", "Android"].includes(p.name),
-);
+const groups = [
+	{
+		title: "Available now",
+		items: platforms.filter((p) => p.status === "available"),
+	},
+	{
+		title: "Desktop",
+		items: platforms.filter((p) =>
+			["Windows", "macOS", "Linux"].includes(p.name),
+		),
+	},
+	{
+		title: "Mobile",
+		items: platforms.filter((p) => ["iOS", "Android"].includes(p.name)),
+	},
+];
 
-function PlatformCard({
-  platform,
-  index,
-  inView,
-}: {
-  platform: (typeof platforms)[0];
-  index: number;
-  inView: boolean;
-}) {
-  return (
-    <motion.div
-      className="flex items-center gap-4 rounded-xl border border-border bg-gradient-to-br from-card via-card to-accent-blue/[0.02] px-5 py-4 transition-colors hover:border-border-hover"
-      initial={{ opacity: 0, y: 12 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, delay: 0.05 * index }}
-    >
-      <span className="w-10 shrink-0 text-center text-2xl">
-        {platform.icon}
-      </span>
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-[13px] text-foreground/75">
-            {platform.name}
-          </span>
-          {"version" in platform && platform.version && (
-            <span className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px] text-ink-tertiary">
-              {platform.version}
-            </span>
-          )}
-        </div>
-        <p className="mt-0.5 text-[12px] text-ink-tertiary">{platform.desc}</p>
-      </div>
-      <div className="shrink-0">
-        {platform.status === "available" ? (
-          <Link to={platform.href ?? "#"}>
-            <Button size="sm">Open app →</Button>
-          </Link>
-        ) : (
-          <span className="rounded-lg border border-border px-3 py-1.5 font-mono text-[10px] text-ink-tertiary tracking-wider">
-            Dev
-          </span>
-        )}
-      </div>
-    </motion.div>
-  );
+function PlatformRow({ platform }: { platform: (typeof platforms)[number] }) {
+	return (
+		<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-cloud border-b py-5">
+			<div className="min-w-0">
+				<div className="flex items-baseline gap-3">
+					<span className="font-medium text-[17px] text-carbon leading-[20px]">
+						{platform.name}
+					</span>
+					{"version" in platform && platform.version && (
+						<span className="text-[14px] text-pewter">{platform.version}</span>
+					)}
+				</div>
+				<p className="mt-1 text-[14px] text-graphite leading-[20px]">
+					{platform.desc}
+				</p>
+			</div>
+			<div className="shrink-0">
+				{platform.status === "available" ? (
+					<Link to={platform.href ?? "/"}>
+						<Button size="ctaNarrow">Open app</Button>
+					</Link>
+				) : (
+					<span className="text-[14px] text-silver-fog">In development</span>
+				)}
+			</div>
+		</div>
+	);
 }
 
 function Download() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.1 });
+	return (
+		<main className="bg-background">
+			<section className="px-6 pt-40 pb-16 text-center">
+				<div className="mx-auto max-w-[520px]">
+					<h1 className="text-hero">Get ReadrSync</h1>
+					<p className="mt-4 text-[14px] text-graphite leading-[20px]">
+						The web app is live and ready to use. Desktop and mobile apps are
+						available as development builds from the source repository.
+					</p>
+				</div>
+			</section>
 
-  return (
-    <main className="relative min-h-screen">
-      <div className="pointer-events-none fixed top-1/4 left-1/2 h-[60vw] w-[60vw] -translate-x-1/2 rounded-full bg-accent-blue/[0.03] blur-3xl" />
-      <section className="px-6 pt-32 pb-12 text-center">
-        <div className="mx-auto max-w-lg">
-          <motion.span
-            className="mb-4 block font-mono text-[10px] text-ink-tertiary uppercase tracking-[0.12em]"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Download
-          </motion.span>
-          <motion.h1
-            className="mb-4 font-display font-semibold text-3xl text-foreground tracking-tight sm:text-4xl"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            Get ReadrSync
-          </motion.h1>
-          <motion.p
-            className="text-[14px] text-ink-secondary leading-relaxed"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-          >
-            The web app is live and ready to use.
-            Desktop and mobile apps are available in development builds
-            from the source repository.
-          </motion.p>
-        </div>
-      </section>
+			<div className="mx-auto max-w-[720px] px-6 pb-32">
+				{groups.map((group) => (
+					<section key={group.title} className="mb-16">
+						<h2 className="font-medium text-[14px] text-pewter leading-[20px]">
+							{group.title}
+						</h2>
+						<div className="mt-2">
+							{group.items.map((platform) => (
+								<PlatformRow key={platform.name} platform={platform} />
+							))}
+						</div>
+					</section>
+				))}
 
-      <div ref={ref} className="mx-auto max-w-xl px-6 pb-24">
-        <div className="mb-4 flex items-center gap-3">
-          <span className="font-mono text-[10px] text-ink-tertiary uppercase tracking-widest">
-            Available now
-          </span>
-          <div className="flex-1 border-border border-t" />
-        </div>
-        <div className="mb-8 space-y-2">
-          {availablePlatforms.map((p, i) => (
-            <PlatformCard key={p.name} platform={p} index={i} inView={inView} />
-          ))}
-        </div>
-
-        <div className="mb-4 flex items-center gap-3">
-          <span className="font-mono text-[10px] text-ink-tertiary uppercase tracking-widest">
-            Desktop (dev builds)
-          </span>
-          <div className="flex-1 border-border border-t" />
-        </div>
-        <div className="mb-8 space-y-2">
-          {desktopPlatforms.map((p, i) => (
-            <PlatformCard key={p.name} platform={p} index={i + 1} inView={inView} />
-          ))}
-        </div>
-
-        <div className="mb-4 flex items-center gap-3">
-          <span className="font-mono text-[10px] text-ink-tertiary uppercase tracking-widest">
-            Mobile (dev builds)
-          </span>
-          <div className="flex-1 border-border border-t" />
-        </div>
-        <div className="mb-10 space-y-2">
-          {mobilePlatforms.map((p, i) => (
-            <PlatformCard key={p.name} platform={p} index={i + 4} inView={inView} />
-          ))}
-        </div>
-
-        <motion.div
-          className="rounded-xl border border-border bg-gradient-to-br from-card via-card to-accent-blue/[0.02] p-5"
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.35 }}
-        >
-          <div className="flex gap-3">
-            <span className="mt-0.5 text-base">📧</span>
-            <div className="flex-1">
-              <p className="mb-1 font-medium text-[13px] text-foreground/70">
-                Get notified when desktop apps launch
-              </p>
-              <p className="mb-4 text-[12px] text-ink-tertiary">
-                One email when each platform ships. No newsletters.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="h-9 min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 font-mono text-[12px] text-foreground/60 placeholder-ink-tertiary outline-none focus:border-accent-blue/40 focus:ring-0"
-                />
-                <Button>Notify me</Button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </main>
-  );
+				<section className="bg-light-ash px-6 py-10 text-center">
+					<h2 className="font-medium text-[17px] text-carbon leading-[20px]">
+						Get notified when the desktop apps launch
+					</h2>
+					<p className="mt-2 text-[14px] text-graphite leading-[20px]">
+						One email when each platform ships. No newsletters.
+					</p>
+					<form
+						className="mx-auto mt-6 flex max-w-[420px] flex-col items-center gap-3 sm:flex-row sm:justify-center"
+						onSubmit={(e) => e.preventDefault()}
+					>
+						<input
+							type="email"
+							placeholder="your@email.com"
+							aria-label="Email address"
+							className="h-10 w-full min-w-0 rounded-md border border-pale-silver bg-background px-4 text-[14px] text-carbon placeholder-silver-fog outline-none transition-tesla focus:border-primary sm:flex-1"
+						/>
+						<Button type="submit" size="ctaNarrow">
+							Notify me
+						</Button>
+					</form>
+				</section>
+			</div>
+		</main>
+	);
 }

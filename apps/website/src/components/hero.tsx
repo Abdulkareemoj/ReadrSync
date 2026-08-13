@@ -1,89 +1,104 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
-import { motion } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MediaPlaceholder } from "@/components/media-placeholder";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const slides = [
+	{
+		label:
+			"Product shot — ReadrSync library view on desktop, reading progress synced across shelves",
+	},
+	{
+		label:
+			"Product shot — phone and tablet side by side, resuming the same page mid-sentence",
+	},
+	{
+		label: "Product shot — highlights and notes panel syncing in real time",
+	},
+];
+
+const INTERVAL = 6000;
 
 export default function Hero() {
-  return (
-    <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 py-32 text-center">
-      <div className="pointer-events-none absolute top-[30%] left-1/2 h-[60vw] w-[60vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-blue/5 blur-3xl" />
-      <div className="pointer-events-none absolute top-[60%] left-[30%] h-[40vw] w-[40vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-blue/[0.03] blur-3xl" />
-      <div className="absolute top-0 left-1/2 h-px w-4/5 -translate-x-1/2 bg-linear-to-r from-transparent via-accent-blue/20 to-transparent" />
-      <div className="absolute bottom-0 left-1/2 h-px w-3/5 -translate-x-1/2 bg-linear-to-r from-transparent via-white/5 to-transparent" />
+	const [index, setIndex] = useState(0);
+	const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-      <motion.div
-        className="mb-8 flex items-center gap-2 rounded-full border border-border px-4 py-1.5"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-secondary" />
-        <span className="font-mono text-[11px] text-ink-secondary uppercase tracking-widest">
-          v1.0 · All platforms
-        </span>
-      </motion.div>
+	const start = useCallback(() => {
+		if (timer.current) clearInterval(timer.current);
+		timer.current = setInterval(() => {
+			setIndex((i) => (i + 1) % slides.length);
+		}, INTERVAL);
+	}, []);
 
-      <motion.h1
-        className="max-w-4xl font-display font-semibold text-[clamp(3rem,8vw,7rem)] leading-[0.9] tracking-[-0.05em] text-foreground"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.1 }}
-      >
-        Your bookmarks.
-        <br />
-        Your feeds.
-        <br />
-        <span className="text-ink-secondary">All in one place.</span>
-      </motion.h1>
+	useEffect(() => {
+		start();
+		return () => {
+			if (timer.current) clearInterval(timer.current);
+		};
+	}, [start]);
 
-      <motion.p
-        className="mx-auto mt-6 max-w-md text-[15px] text-ink-secondary leading-relaxed"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.2 }}
-      >
-        A local-first bookmark manager and RSS reader that works across desktop,
-        web, and mobile with your data always under your control.
-      </motion.p>
+	const go = useCallback(
+		(next: number) => {
+			setIndex(((next % slides.length) + slides.length) % slides.length);
+			start();
+		},
+		[start],
+	);
 
-      <motion.div
-        className="mt-10 flex flex-wrap justify-center gap-3"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.3 }}
-      >
-        <Link to="/download">
-          <Button size="xl" className="shadow-lg shadow-white/5">
-            Download, it&apos;s free
-          </Button>
-        </Link>
-        <a href="#how">
-          <Button variant="secondary" size="xl">
-            See how it works <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </a>
-      </motion.div>
+	return (
+		<section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-6 pt-28 pb-16">
+			<div className="flex flex-col items-center text-center">
+				<h1 className="text-foreground text-hero">ReadrSync</h1>
+				<p className="mt-2 text-muted-foreground text-promo">
+					Every book, every device, one page number
+				</p>
 
-      <motion.div
-        className="mt-12 flex flex-wrap justify-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-      >
-        {[
-          "SQLite · local-first",
-          "React + Tauri + Expo",
-          "Open source",
-          "Desktop · Web · Mobile",
-        ].map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full border border-border px-3 py-1 font-mono text-[10px] text-ink-tertiary uppercase tracking-widest"
-          >
-            {tag}
-          </span>
-        ))}
-      </motion.div>
-    </section>
-  );
+				<div className="mt-8 flex w-full max-w-[420px] flex-col items-center gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4">
+					<a href="/download" className="w-full sm:w-auto">
+						<Button size="cta">Get ReadrSync</Button>
+					</a>
+					<a href="#how-it-works" className="w-full sm:w-auto">
+						<Button variant="secondary" size="cta">
+							See how it works
+						</Button>
+					</a>
+				</div>
+			</div>
+
+			<div className="mt-12 w-full max-w-[1100px]">
+				<div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-light-ash sm:aspect-[16/9]">
+					{slides.map((slide, i) => (
+						<div
+							key={slide.label}
+							aria-hidden={i !== index}
+							className={cn(
+								"absolute inset-0 transition-tesla",
+								i === index ? "opacity-100" : "opacity-0",
+							)}
+						>
+							<MediaPlaceholder label={slide.label} />
+						</div>
+					))}
+				</div>
+
+				<div className="mt-4 flex items-center justify-center gap-2">
+					{slides.map((slide, i) => (
+						<button
+							key={slide.label}
+							type="button"
+							onClick={() => go(i)}
+							aria-label={`Show slide ${i + 1}`}
+							aria-current={i === index}
+							className={cn(
+								"h-1.5 rounded-sm transition-tesla",
+								i === index
+									? "w-8 bg-foreground"
+									: "w-4 bg-pale-silver hover:bg-silver-fog",
+							)}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
+	);
 }

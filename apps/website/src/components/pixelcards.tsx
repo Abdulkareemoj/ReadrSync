@@ -69,8 +69,8 @@ export function PixelCard({
 	return (
 		<div
 			className={cn(
-				"relative overflow-hidden rounded-lg border bg-card p-6",
-				color === "rose" && "border-rose-200 dark:border-rose-800",
+				"relative overflow-hidden rounded-lg border border-border bg-card p-6",
+				color === "rose" && "border-accent-blue/20",
 			)}
 		>
 			<canvas
@@ -81,7 +81,7 @@ export function PixelCard({
 			/>
 			<div className="relative z-10">
 				<div className="mb-4 font-bold text-2xl">{icon}</div>
-				<div className="font-bold text-3xl text-rose-600">{number}</div>
+				<div className="font-bold text-3xl text-accent-blue">{number}</div>
 				<div className="text-muted-foreground text-sm">{desc}</div>
 				<div className="mt-2 text-muted-foreground text-xs">{label}</div>
 			</div>

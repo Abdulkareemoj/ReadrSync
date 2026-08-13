@@ -1,51 +1,28 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-:root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #0a0a0a;
-  --card-foreground: #ffffff;
-  --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
-  --primary: #ffffff;
-  --primary-foreground: #000000;
-  --secondary: #0a0a0a;
-  --secondary-foreground: #ffffff;
-  --muted: #151515;
-  --muted-foreground: #a0a0a4;
-  --accent: #ffffff;
-  --accent-foreground: #000000;
-  --destructive: #ff4d4d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: #4a90d9;
+@custom-variant dark (&:is(.dark *));
 
-  --color-ink-secondary: #a0a0a4;
-  --color-ink-tertiary: #6c6c70;
-  --color-accent-blue: #4a90d9;
-  --color-canvas-elevated: #0a0a0a;
-  --color-canvas-overlay: #121212;
-  --color-border-hover: rgba(255, 255, 255, 0.14);
-
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: "Inter Tight", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", monospace;
-
-  --radius: 12px;
-
-  --shadow-2xs: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.7);
-  --shadow-2xl: 0 32px 80px rgba(0, 0, 0, 0.8);
-}
+/*
+ * ReadrSync design system — inspired by Tesla.
+ *
+ * Rules encoded here:
+ * - One chromatic color only: Electric Blue, reserved for primary CTAs.
+ * - No shadows, no gradients, no decorative borders.
+ * - 4px radius on interactive elements, 12px on media cards, 0 elsewhere.
+ * - Two weights only: 400 and 500.
+ * - One transition duration everywhere: 0.33s.
+ */
 
 @theme inline {
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+
+  --font-display: "Inter Tight", -apple-system, Arial, sans-serif;
+  --font-sans: "Figtree", -apple-system, Arial, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -66,75 +43,177 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-ink-secondary: var(--color-ink-secondary);
-  --color-ink-tertiary: var(--color-ink-tertiary);
-  --color-accent-blue: var(--color-accent-blue);
-  --color-canvas-elevated: var(--color-canvas-elevated);
-  --color-canvas-overlay: var(--color-canvas-overlay);
-  --color-border-hover: var(--color-border-hover);
-
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 12px);
-
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
+  /* Named palette — mirrors the design system document */
+  --color-carbon: var(--carbon);
+  --color-graphite: var(--graphite);
+  --color-pewter: var(--pewter);
+  --color-silver-fog: var(--silver-fog);
+  --color-light-ash: var(--light-ash);
+  --color-cloud: var(--cloud);
+  --color-pale-silver: var(--pale-silver);
 }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.01em;
+:root {
+  --radius: 4px;
+
+  /* Electric Blue #3E6AE1 */
+  --primary: oklch(0.5766 0.1863 266.8);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Carbon Dark #171A20 */
+  --carbon: oklch(0.2135 0.0126 265.5);
+  /* Graphite #393C41 */
+  --graphite: oklch(0.3612 0.0093 265.5);
+  /* Pewter #5C5E62 */
+  --pewter: oklch(0.4927 0.0069 265.5);
+  /* Silver Fog #8E8E8E */
+  --silver-fog: oklch(0.6645 0 0);
+  /* Light Ash #F4F4F4 */
+  --light-ash: oklch(0.9622 0 0);
+  /* Cloud Gray #EEEEEE */
+  --cloud: oklch(0.9491 0 0);
+  /* Pale Silver #D0D1D2 */
+  --pale-silver: oklch(0.8477 0.0018 265.5);
+
+  --background: oklch(1 0 0);
+  --foreground: var(--carbon);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--carbon);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--carbon);
+  --secondary: oklch(1 0 0);
+  --secondary-foreground: var(--graphite);
+  --muted: var(--light-ash);
+  --muted-foreground: var(--pewter);
+  --accent: var(--light-ash);
+  --accent-foreground: var(--carbon);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: var(--cloud);
+  --input: var(--pale-silver);
+  --ring: var(--primary);
 }
 
-::selection {
-  background-color: #4a90d9;
-  color: #ffffff;
+.dark {
+  /* Electric Blue lifts slightly so it holds against Carbon. */
+  --primary: oklch(0.6266 0.1763 266.8);
+  --primary-foreground: oklch(1 0 0);
+
+  /* The greyscale ramp inverts: Carbon becomes the page, near-white the ink. */
+  --carbon: oklch(0.9622 0 0);
+  --graphite: oklch(0.8477 0.0018 265.5);
+  --pewter: oklch(0.7 0.006 265.5);
+  --silver-fog: oklch(0.5527 0 0);
+  --light-ash: oklch(0.2597 0.0114 265.5);
+  --cloud: oklch(0.2911 0.0102 265.5);
+  --pale-silver: oklch(0.3612 0.0093 265.5);
+
+  --background: oklch(0.1735 0.0126 265.5);
+  --foreground: var(--carbon);
+  --card: oklch(0.2135 0.0126 265.5);
+  --card-foreground: var(--carbon);
+  --popover: oklch(0.2135 0.0126 265.5);
+  --popover-foreground: var(--carbon);
+  --secondary: oklch(0.2135 0.0126 265.5);
+  --secondary-foreground: var(--graphite);
+  --muted: var(--light-ash);
+  --muted-foreground: var(--pewter);
+  --accent: var(--light-ash);
+  --accent-foreground: var(--carbon);
+  --destructive: oklch(0.62 0.21 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: var(--cloud);
+  --input: var(--pale-silver);
+  --ring: var(--primary);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--color-border);
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background);
+    color: var(--graphite);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--carbon);
+    letter-spacing: normal;
   }
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
+/* The single universal timing for every interactive state change. */
+@utility transition-tesla {
+  transition:
+    color 0.33s,
+    background-color 0.33s,
+    border-color 0.33s,
+    opacity 0.33s,
+    box-shadow 0.25s;
+}
+
+/* Hero title: 40px / 500 / 48px line-height, 28px on mobile. */
+@utility text-hero {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 500;
+  letter-spacing: normal;
+
+  @media (width >= 768px) {
+    font-size: 40px;
+    line-height: 48px;
   }
 }
 
-@keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
+/* Section titles stay within the 40px ceiling. */
+@utility text-section {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 500;
+
+  @media (width >= 768px) {
+    font-size: 32px;
+    line-height: 40px;
   }
 }
 
-.animate-marquee {
-  animation: marquee var(--duration) linear infinite;
+@utility text-promo {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 400;
+
+  @media (width >= 768px) {
+    font-size: 22px;
+    line-height: 28px;
+  }
 }
 
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration) linear infinite;
+@utility wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* Frosted glass nav backdrop — opacity, never shadow. */
+@utility nav-frost {
+  background-color: color-mix(in oklab, var(--color-background) 78%, transparent);
+  backdrop-filter: blur(12px);
 }
