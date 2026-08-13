@@ -19,7 +19,7 @@ export interface SettingsState {
 	theme: "light" | "dark" | "system";
 	readerFontSize: "sm" | "md" | "lg";
 
-	// Sync (OSS — file-based, bring your own storage)
+	// Sync (OSS, file-based, bring your own storage)
 	syncProvider: SyncProvider;
 	syncStatus: SyncStatus;
 	lastSyncedAt: string | null;

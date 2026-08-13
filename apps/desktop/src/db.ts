@@ -1,7 +1,8 @@
 import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
-import * as schema from "@packages/db/src/schema";
-import type { DB } from "@packages/db/src/index";
 import { runFtsSetup, runMigrations } from "@packages/db";
+import type { DB } from "@packages/db/src/index";
+import * as schema from "@packages/db/src/schema";
+import { seedDatabase } from "@packages/db/src/seed-data";
 import {
   createBookmarkAgent,
   createCollectionAgent,
@@ -105,6 +106,9 @@ export async function initializeTauriAgents() {
 
   await runMigrations(db as unknown as DB);
   await runFtsSetup(db as unknown as DB);
+
+  // Seed dev data (no-op when the DB already has rows)
+  await seedDatabase(db);
 
   const genericDb = db as unknown as DB;
   const bookmarkAgent = createBookmarkAgent(genericDb);

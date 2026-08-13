@@ -48,3 +48,9 @@ coverage
 .cache
 tmp
 temp
+.agents/
+.windsurf
+packages/db/drizzle/
+packages/db/sqlite.db
+apps/website/src/routeTree.gen.ts
+apps/web/src/routeTree.gen.ts

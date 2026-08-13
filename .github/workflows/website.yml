@@ -1,0 +1,86 @@
+# Web App CI/CD Configuration
+
+name: Marketing Website Pipeline
+
+on:
+    push:
+        branches: [main, develop]
+        paths: ["apps/website/**", "packages/**"]
+    pull_request:
+        branches: [main, develop]
+        paths: ["apps/website/**", "packages/**"]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+                  cache: "pnpm"
+                  cache-dependency-path: pnpm-lock.yaml
+
+            - name: Install dependencies (website + its workspace deps only)
+              run: pnpm --filter "./apps/website..." install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm turbo run lint --filter=website...
+
+            - name: Type check
+              run: pnpm turbo run typecheck --filter=website...
+
+            - name: Build
+              run: pnpm turbo run build --filter=website...
+
+    build-and-deploy:
+        needs: test
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+                  cache: "pnpm"
+                  cache-dependency-path: pnpm-lock.yaml
+
+            - name: Install dependencies (website + its workspace deps only)
+              run: pnpm --filter "./apps/website..." install --frozen-lockfile
+
+            - name: Install Vercel CLI
+              run: npm install -g vercel
+
+            - name: Pull Vercel project settings
+              working-directory: apps/website
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+                  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
+              run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+            - name: Build via Vercel (uses turbo internally through vercel.json)
+              working-directory: apps/website
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+                  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
+              run: vercel build --prod --token="$VERCEL_TOKEN"
+
+            - name: Deploy prebuilt output
+              working-directory: apps/website
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+                  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
+              run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

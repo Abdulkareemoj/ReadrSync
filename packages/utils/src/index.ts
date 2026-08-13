@@ -1,36 +1,36 @@
-// Web/desktop utilities — uses extractus packages for feed/article parsing, which aren't mobile-safe due to CORS and size issues. Mobile uses custom implementations in mobile.ts.
+// Web/desktop utilities, uses extractus packages for feed/article parsing, which aren't mobile-safe due to CORS and size issues. Mobile uses custom implementations in mobile.ts.
 // Mobile uses apps/mobile/lib/rss.ts instead
 
-import { extractFromXml, extractFromJson } from "@extractus/feed-extractor";
 import { extract as extractArticle } from "@extractus/article-extractor";
+import { extractFromJson, extractFromXml } from "@extractus/feed-extractor";
 
 // Re-export everything from agents so existing imports keep working
 export {
-	createBookmarkAgent,
-	createCollectionAgent,
-	createRssAgent,
-	createHighlightAgent,
-	type IBookmarkAgent,
-	type ICollectionAgent,
-	type IRssAgent,
-	type IHighlightAgent,
-	type ISyncAgent,
-	type IAuthAgent,
-	type IAgents,
-	type Bookmark,
-	type Collection,
-	type Feed,
 	type Article,
-	type CollectionTreeNode,
-	type ParsedArticle,
-	type SyncData,
-	type SyncResult,
-	type SyncProvider,
 	type AuthProvider,
 	type AuthUserInfo,
+	type Bookmark,
+	type Collection,
+	type CollectionTreeNode,
+	createBookmarkAgent,
+	createCollectionAgent,
+	createHighlightAgent,
+	createRssAgent,
+	type Feed,
+	type IAgents,
+	type IAuthAgent,
+	type IBookmarkAgent,
+	type ICollectionAgent,
+	type IHighlightAgent,
+	type IRssAgent,
+	type ISyncAgent,
+	type ParsedArticle,
+	type SyncData,
+	type SyncProvider,
+	type SyncResult,
 } from "@packages/agents";
 
-// ─── Network ──────────────────────────────────────────────────────────────────
+//  Network
 
 const CORS_PROXIES = [
 	"https://corsproxy.io/?",
@@ -73,7 +73,7 @@ export async function fetchWithProxy(
 	throw lastError ?? new Error(`Failed to fetch: ${url}`);
 }
 
-// ─── Web RSS feed fetching (uses extractus) ───────────────────────────────────
+//  Web RSS feed fetching (uses extractus) ──
 
 /**
  * Fetch and parse a feed URL for web/desktop.
@@ -117,7 +117,7 @@ export async function fetchAndParseFeed(
 		!trimmed.startsWith("<rss") &&
 		!trimmed.startsWith("<feed")
 	) {
-		// Not XML — might be an HTML error page from the feed source
+		// Not XML, might be an HTML error page from the feed source
 		const snippet = trimmed.slice(0, 200).replace(/\s+/g, " ").trim();
 		throw new Error(
 			`Feed returned non-XML content (starts with "${snippet.slice(0, 60)}". The feed URL may not exist or the source requires a different URL format.`,
@@ -126,12 +126,16 @@ export async function fetchAndParseFeed(
 
 	const grabMediaThumb = (entry: any): any => {
 		return (
-			entry["media:thumbnail"] ?? entry["media:group"]?.["media:thumbnail"] ?? undefined
+			entry["media:thumbnail"] ??
+			entry["media:group"]?.["media:thumbnail"] ??
+			undefined
 		);
 	};
 	const grabMediaContent = (entry: any): any => {
 		return (
-			entry["media:content"] ?? entry["media:group"]?.["media:content"] ?? undefined
+			entry["media:content"] ??
+			entry["media:group"]?.["media:content"] ??
+			undefined
 		);
 	};
 	const xmlStr = (v: any): string => {
@@ -163,7 +167,7 @@ export async function fetchAndParseFeed(
 	};
 }
 
-// ─── Article content extraction (web/desktop) ─────────────────────────────────
+//  Article content extraction (web/desktop)
 
 export interface ExtractedContent {
 	content: string;
@@ -215,43 +219,68 @@ export async function extractArticleContent(
 	}
 }
 
-// ─── Re-exports ───────────────────────────────────────────────────────────────
+//  Feed auto-discovery (web/desktop uses CORS proxies via fetchWithProxy)
+
+import { createFeedDiscoverer } from "./feed-discovery";
+
+export const discoverFeedsFromUrl = createFeedDiscoverer(async (url) => {
+	const res = await fetchWithProxy(url, {
+		headers: {
+			Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+		},
+	});
+	return await res.text();
+});
+
+export type { DiscoveredFeed } from "./feed-discovery";
+
+//  Live feed search (keyword → sources → feed URLs)
+
+import { createFeedSearcher } from "./feed-search";
+
+export const searchFeedsByKeyword = createFeedSearcher(async (url) => {
+	const res = await fetchWithProxy(url, {
+		headers: {
+			Accept:
+				"application/xml, application/rss+xml, application/json;q=0.9, */*;q=0.8",
+		},
+	});
+	return await res.text();
+});
+
+export type { SearchedFeed } from "./feed-search";
+
+//  Re-exports
 
 export {
-	extractKeywords,
-	scoreArticlesByKeywords,
-	type ScoredArticle,
-} from "./recommendations";
+	type DetectedFormat,
+	detectFormat,
+	type ExportFormat,
+} from "./formats";
 
 export {
-	parseOpml,
-	extractFeedsFromOpml,
+	generateHtmlBookmarks,
+	type HtmlBookmarkEntry,
+	parseHtmlBookmarks,
+} from "./html-bookmarks";
+export {
 	extractBookmarksFromOpml,
+	extractFeedsFromOpml,
 	generateOpml,
 	type OpmlDocument,
 	type OpmlOutline,
+	parseOpml,
 } from "./opml";
-
 export {
-	parseHtmlBookmarks,
-	generateHtmlBookmarks,
-	type HtmlBookmarkEntry,
-} from "./html-bookmarks";
-
-export { detectFormat, type ExportFormat, type DetectedFormat } from "./formats";
-
-export {
-	curatedFeedsByCategory,
-	getAllCuratedFeeds,
-	getRandomFeeds,
-	getCategories,
-	type CuratedFeed,
-} from "./feed-directory";
+	extractKeywords,
+	type ScoredArticle,
+	scoreArticlesByKeywords,
+} from "./recommendations";
 
 export {
 	discoverYouTubeChannelFeed,
+	extractYouTubeHandle,
 	parseYouTubeChannelUrl,
 	resolveYouTubeHandle,
-	extractYouTubeHandle,
 	type YouTubeChannelResult,
 } from "./youtube";

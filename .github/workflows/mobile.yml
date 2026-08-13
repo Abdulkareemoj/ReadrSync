@@ -1,0 +1,86 @@
+# Mobile App CI/CD Configuration
+
+name: Mobile App Pipeline
+
+on:
+    push:
+        branches: [main, develop]
+        paths: ["apps/mobile/**", "packages/**"]
+        tags: ["mobile-v*"]
+    pull_request:
+        branches: [main, develop]
+        paths: ["apps/mobile/**", "packages/**"]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+                  cache: "pnpm"
+                  cache-dependency-path: pnpm-lock.yaml
+
+            - name: Install dependencies (mobile + its workspace deps only)
+              run: pnpm --filter "./apps/mobile..." install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm turbo run lint --filter=mobile...
+
+            - name: Type check
+              run: pnpm turbo run typecheck --filter=mobile...
+
+    # Only runs when you push a tag like "mobile-v1.0.0" — this is what
+    # actually builds an installable APK and publishes it.
+    release:
+        needs: test
+        if: startsWith(github.ref, 'refs/tags/mobile-v')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+                  cache: "pnpm"
+                  cache-dependency-path: pnpm-lock.yaml
+
+            - name: Install dependencies (mobile + its workspace deps only)
+              run: pnpm --filter "./apps/mobile..." install --frozen-lockfile
+
+            - name: Install EAS CLI
+              run: npm install -g eas-cli
+
+            - name: Trigger EAS build and wait for it to finish
+              working-directory: apps/mobile
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+              run: |
+                  eas build --platform android --profile preview \
+                    --non-interactive --wait --json > eas-build-result.json
+                  cat eas-build-result.json
+
+            - name: Download the built APK
+              working-directory: apps/mobile
+              run: |
+                  BUILD_URL=$(node -e "console.log(require('./eas-build-result.json')[0].artifacts.buildUrl)")
+                  curl -L "$BUILD_URL" -o bookmark-app.apk
+
+            - name: Attach APK to GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: apps/mobile/bookmark-app.apk
+                  generate_release_notes: true
+                  prerelease: true

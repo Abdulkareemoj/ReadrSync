@@ -1,10 +1,10 @@
-import { initializeMobileAgents } from "./db";
 import {
-	fetchFeed,
-	parseFeedXml,
-	parseFeedTitle,
 	extractArticleContent,
+	fetchFeed,
+	parseFeedTitle,
+	parseFeedXml,
 } from "@packages/utils/src/mobile";
+import { initializeMobileAgents } from "./db";
 
 let isInit = false;
 let initError: Error | null = null;
@@ -23,7 +23,7 @@ export async function appInit() {
 		storeInstance = initializeReaderStore(agents);
 
 		// Wire up mobile-specific RSS operations into the store
-		// The store's refreshFeed calls rssAgent methods — we extend it here
+		// The store's refreshFeed calls rssAgent methods, we extend it here
 		storeInstance.setState({
 			refreshFeed: async (feedId: string) => {
 				const { feeds, rssAgent } = storeInstance.getState();
@@ -71,7 +71,7 @@ export async function appInit() {
 										);
 									}
 								} catch {
-									// Silently skip — image is optional
+									// Silently skip, image is optional
 								}
 							}),
 						);
@@ -181,19 +181,31 @@ async function syncCollectionsToPersistStore() {
 		const { useCollectionsStore: ucs } = await import("@packages/store");
 		const tree = storeInstance?.getState()?.collections;
 		if (!tree || tree.length === 0) return;
-		const flat: { id: string; name: string; parentId: string | null; position: number }[] = [];
+		const flat: {
+			id: string;
+			name: string;
+			parentId: string | null;
+			position: number;
+		}[] = [];
 		const walk = (nodes: any[]) => {
 			for (const n of nodes) {
-				flat.push({ id: n.id, name: n.name, parentId: n.parentId ?? null, position: n.position ?? 0 });
+				flat.push({
+					id: n.id,
+					name: n.name,
+					parentId: n.parentId ?? null,
+					position: n.position ?? 0,
+				});
 				walk(n.children ?? []);
 			}
 		};
 		walk(tree);
-		ucs.getState().setBookmarkCollections([
-			{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
-			{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
-			...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
-		]);
+		ucs
+			.getState()
+			.setBookmarkCollections([
+				{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
+				{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
+				...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
+			]);
 	} catch (e) {
 		console.warn("[syncCollectionsToPersistStore] Failed:", e);
 	}

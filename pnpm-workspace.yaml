@@ -3,5 +3,5 @@ packages:
   - "packages/*"
 allowBuilds:
   better-sqlite3: true
-  dtrace-provider: false
+  dtrace-provider: true
   esbuild: true

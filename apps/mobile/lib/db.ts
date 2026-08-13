@@ -1,6 +1,7 @@
 import { runFtsSetup, runMigrations, SCHEMA_VERSION } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
+import { seedDatabase } from "@packages/db/src/seed-data";
 import {
 	createBookmarkAgent,
 	createCollectionAgent,
@@ -26,6 +27,10 @@ export async function initializeMobileAgents(): Promise<IAgents> {
 
 	await runMigrations(db);
 	await runFtsSetup(db);
+
+	// Seed dev data (no-op when the DB already has rows)
+	await seedDatabase(db);
+
 	console.log(`[Mobile DB] Schema v${SCHEMA_VERSION} ready`);
 
 	const bookmarkAgent = createBookmarkAgent(db);

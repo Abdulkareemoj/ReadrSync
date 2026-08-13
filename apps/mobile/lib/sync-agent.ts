@@ -1,13 +1,13 @@
 import type {
 	IAuthAgent,
 	IBookmarkAgent,
-	IRssAgent,
 	IHighlightAgent,
+	IRssAgent,
 	ISyncAgent,
 	SyncData,
 	SyncResult,
 } from "@packages/agents";
-import { uploadSyncData, downloadSyncData } from "./google-drive";
+import { downloadSyncData, uploadSyncData } from "./google-drive";
 
 /**
  * Creates a mobile sync agent.
@@ -50,10 +50,8 @@ export function createMobileSyncAgent(
 		localData: SyncData,
 		remoteData: SyncData,
 	): Promise<SyncData> => {
-		// Merge by lastUpdatedAt — newer wins
-		const bookmarkMap = new Map(
-			localData.bookmarks.map((b) => [b.id, b]),
-		);
+		// Merge by lastUpdatedAt, newer wins
+		const bookmarkMap = new Map(localData.bookmarks.map((b) => [b.id, b]));
 		for (const rb of remoteData.bookmarks) {
 			const existing = bookmarkMap.get(rb.id);
 			if (
@@ -75,9 +73,7 @@ export function createMobileSyncAgent(
 			}
 		}
 
-		const articleMap = new Map(
-			localData.articles.map((a) => [a.id, a]),
-		);
+		const articleMap = new Map(localData.articles.map((a) => [a.id, a]));
 		for (const ra of remoteData.articles) {
 			const existing = articleMap.get(ra.id);
 			if (

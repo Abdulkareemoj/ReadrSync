@@ -1,0 +1,42 @@
+{
+	"cli": {
+		"version": ">= 12.0.0",
+		"appVersionSource": "remote"
+	},
+	"build": {
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"channel": "development",
+			"android": {
+				"buildType": "apk"
+			},
+			"env": {
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "835519523150-c6dtp46k5k995of4v6qhellnlugc41ne.apps.googleusercontent.com"
+			}
+		},
+		"preview": {
+			"distribution": "internal",
+			"channel": "preview",
+			"android": {
+				"buildType": "apk"
+			},
+			"env": {
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "835519523150-c6dtp46k5k995of4v6qhellnlugc41ne.apps.googleusercontent.com"
+			}
+		},
+		"production": {
+			"autoIncrement": true,
+			"channel": "production",
+			"android": {
+				"buildType": "app-bundle"
+			},
+			"ios": {
+				"distribution": "store"
+			}
+		}
+	},
+	"submit": {
+		"production": {}
+	}
+}

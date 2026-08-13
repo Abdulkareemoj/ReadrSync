@@ -1,26 +1,27 @@
-// @packages/agents/src/index.ts
-// Pure database agents — no extractus, no network calls beyond what's needed
+// Pure database agents, no extractus, no network calls beyond what's needed
 // Safe for all platforms including React Native / Hermes
 
 import type { DB } from "@packages/db/src/index";
 import type {
+	Annotation,
+	Article,
+	Bookmark,
+	Collection,
+	Feed,
+	Highlight,
 	NewArticle,
 	NewBookmark,
 	NewFeed,
-	Bookmark,
-	Feed,
-	Article,
-	Highlight,
-	Annotation,
 } from "@packages/db/src/schema";
 import {
+	annotations,
 	articles,
 	bookmarks,
+	collections,
 	feeds,
 	highlights,
-	annotations,
 } from "@packages/db/src/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, like, lte, sql } from "drizzle-orm";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -50,7 +51,51 @@ function now(): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type { Bookmark, Feed, Article };
+export type { Article, Bookmark, Collection, Feed };
+
+// ─── Collection Tree Types ─────────────────────────────────────────────────────
+
+export interface CollectionTreeNode {
+	id: string;
+	name: string;
+	parentId: string | null;
+	position: number;
+	createdAt: string;
+	updatedAt: string;
+	bookmarkCount: number;
+	children: CollectionTreeNode[];
+}
+
+// ─── Filter Types ──────────────────────────────────────────────────────────────
+
+export interface BookmarkFilterOptions {
+	collectionId?: string;
+	tags?: string[];
+	favorite?: boolean;
+	liked?: boolean;
+	saved?: boolean;
+	search?: string;
+	dateAddedFrom?: string;
+	dateAddedTo?: string;
+	offset?: number;
+	limit?: number;
+	orderBy?: "dateAdded" | "title" | "lastUpdatedAt";
+	orderDir?: "asc" | "desc";
+}
+
+export interface ArticleFilterOptions {
+	feedId?: string;
+	read?: boolean;
+	liked?: boolean;
+	saved?: boolean;
+	search?: string;
+	pubDateFrom?: string;
+	pubDateTo?: string;
+	offset?: number;
+	limit?: number;
+	orderBy?: "pubDate" | "title" | "lastUpdatedAt";
+	orderDir?: "asc" | "desc";
+}
 
 // ─── Sync Types ───────────────────────────────────────────────────────────────
 
@@ -110,10 +155,7 @@ export interface ISyncAgent {
 	startAutoSync(intervalMs: number): void;
 	stopAutoSync(): void;
 	exportToFile(): Promise<string>;
-	importFromFile(
-		data: SyncData,
-		mode: "merge" | "replace",
-	): Promise<void>;
+	importFromFile(data: SyncData, mode: "merge" | "replace"): Promise<void>;
 	getSyncFilePath(): string | null;
 }
 
@@ -131,12 +173,33 @@ export interface ParsedArticle {
 	lastUpdatedAt: string;
 }
 
+// ─── Collection Agent ─────────────────────────────────────────────────────────
+
+export interface ICollectionAgent {
+	createCollection(name: string, parentId?: string | null): Promise<Collection>;
+	renameCollection(id: string, name: string): Promise<Collection>;
+	deleteCollection(id: string): Promise<void>;
+	moveCollection(
+		id: string,
+		newParentId: string | null,
+		position?: number,
+	): Promise<Collection>;
+	setCollectionPosition(id: string, position: number): Promise<Collection>;
+	getCollection(id: string): Promise<Collection | undefined>;
+	listCollections(): Promise<Collection[]>;
+	getCollectionTree(): Promise<CollectionTreeNode[]>;
+	getCollectionBookmarkCount(id: string): Promise<number>;
+	getDescendantIds(id: string): Promise<string[]>;
+}
+
 // ─── Bookmark Agent ───────────────────────────────────────────────────────────
 
 export interface IBookmarkAgent {
 	addBookmark(data: Omit<NewBookmark, "id" | "dateAdded">): Promise<Bookmark>;
 	getBookmark(id: string): Promise<Bookmark | undefined>;
 	listBookmarks(collectionId?: string): Promise<Bookmark[]>;
+	listBookmarksFiltered(options?: BookmarkFilterOptions): Promise<Bookmark[]>;
+	searchBookmarks(query: string): Promise<Bookmark[]>;
 	updateBookmark(
 		id: string,
 		data: Partial<Omit<NewBookmark, "id">>,
@@ -146,6 +209,67 @@ export interface IBookmarkAgent {
 	toggleLiked(id: string): Promise<void>;
 	toggleSaved(id: string): Promise<void>;
 	addTag(id: string, tag: string): Promise<void>;
+}
+
+function buildBookmarkQuery(q: any, options?: BookmarkFilterOptions): any {
+	const conditions: any[] = [];
+
+	if (options?.collectionId && options.collectionId !== "all") {
+		conditions.push(eq(bookmarks.collectionId, options.collectionId));
+	}
+	if (options?.tags && options.tags.length > 0) {
+		// Tag filtering via JSON array contains, check each tag
+		const tagConditions = options.tags.map(
+			(tag) => sql`${bookmarks.tags} LIKE ${`%"${tag}"%`}`,
+		);
+		conditions.push(sql`(${and(...tagConditions)})`);
+	}
+	if (options?.favorite !== undefined) {
+		conditions.push(eq(bookmarks.favorite, options.favorite));
+	}
+	if (options?.liked !== undefined) {
+		conditions.push(eq(bookmarks.liked, options.liked));
+	}
+	if (options?.saved !== undefined) {
+		conditions.push(eq(bookmarks.saved, options.saved));
+	}
+	if (options?.search) {
+		const term = `%${options.search.replace(/[%_]/g, "\\$&")}%`;
+		conditions.push(
+			sql`(${like(bookmarks.title, term)} OR ${like(bookmarks.url, term)} OR ${like(bookmarks.description, term)})`,
+		);
+	}
+	if (options?.dateAddedFrom) {
+		conditions.push(gte(bookmarks.dateAdded, options.dateAddedFrom));
+	}
+	if (options?.dateAddedTo) {
+		conditions.push(lte(bookmarks.dateAdded, options.dateAddedTo));
+	}
+
+	let query = q.select().from(bookmarks);
+	if (conditions.length > 0) {
+		query = query.where(and(...conditions));
+	}
+
+	// Sorting
+	const orderCol =
+		options?.orderBy === "title"
+			? bookmarks.title
+			: options?.orderBy === "lastUpdatedAt"
+				? bookmarks.lastUpdatedAt
+				: bookmarks.dateAdded;
+	const orderFn = options?.orderDir === "asc" ? asc : desc;
+	query = query.orderBy(orderFn(orderCol));
+
+	// Pagination
+	if (options?.offset !== undefined) {
+		query = query.offset(options.offset);
+	}
+	if (options?.limit !== undefined) {
+		query = query.limit(options.limit);
+	}
+
+	return query;
 }
 
 export function createBookmarkAgent(db: DB): IBookmarkAgent {
@@ -180,6 +304,35 @@ export function createBookmarkAgent(db: DB): IBookmarkAgent {
 					.where(eq(bookmarks.collectionId, collectionId));
 			}
 			return q.select().from(bookmarks);
+		},
+		listBookmarksFiltered: async (options) => {
+			return buildBookmarkQuery(q, options);
+		},
+		searchBookmarks: async (query) => {
+			try {
+				// Try FTS search first (FTS5 where available, FTS4 fallback)
+				const ftsQuery = query.replace(/[^a-zA-Z0-9\s]/g, "").trim();
+				if (ftsQuery) {
+					const result = await q.all(
+						sql`SELECT b.* FROM bookmarks b
+              INNER JOIN bookmarks_fts fts ON b.rowid = fts.rowid
+              WHERE bookmarks_fts MATCH ${ftsQuery}
+              ORDER BY b.date_added DESC`,
+					);
+					if (result.length > 0) return result as Bookmark[];
+				}
+			} catch {
+				// FTS not available, fall through to LIKE search
+			}
+			// Fallback: multi-field LIKE search
+			const term = `%${query.replace(/[%_]/g, "\\$&")}%`;
+			return q
+				.select()
+				.from(bookmarks)
+				.where(
+					sql`(${like(bookmarks.title, term)} OR ${like(bookmarks.url, term)} OR ${like(bookmarks.description, term)})`,
+				)
+				.orderBy(desc(bookmarks.dateAdded));
 		},
 		updateBookmark: async (id, data) => {
 			const [row] = await q
@@ -252,7 +405,7 @@ export interface IRssAgent {
 	addFeed(data: Omit<NewFeed, "id">): Promise<Feed>;
 	removeFeed(id: string): Promise<void>;
 	listFeeds(): Promise<Feed[]>;
-	// refreshFeed is platform-specific — handled by the store layer
+	// refreshFeed is platform-specific, handled by the store layer
 	// which calls insertArticles after platform-specific parsing
 	insertArticles(parsed: ParsedArticle[]): Promise<Article[]>;
 	updateFeedMeta(
@@ -260,6 +413,8 @@ export interface IRssAgent {
 		meta: { title?: string; lastFetched?: string; unreadCount?: number },
 	): Promise<void>;
 	listArticles(feedId?: string): Promise<Article[]>;
+	listArticlesFiltered(options?: ArticleFilterOptions): Promise<Article[]>;
+	searchArticles(query: string): Promise<Article[]>;
 	markArticleRead(id: string, read: boolean, readAt?: string): Promise<void>;
 	toggleArticleLike(id: string): Promise<void>;
 	toggleArticleSave(id: string): Promise<void>;
@@ -268,6 +423,60 @@ export interface IRssAgent {
 		fullContent: string,
 		imageUrl?: string | null,
 	): Promise<void>;
+}
+
+function buildArticleQuery(q: any, options?: ArticleFilterOptions): any {
+	const conditions: any[] = [];
+
+	if (options?.feedId) {
+		conditions.push(eq(articles.feedId, options.feedId));
+	}
+	if (options?.read !== undefined) {
+		conditions.push(eq(articles.read, options.read));
+	}
+	if (options?.liked !== undefined) {
+		conditions.push(eq(articles.liked, options.liked));
+	}
+	if (options?.saved !== undefined) {
+		conditions.push(eq(articles.saved, options.saved));
+	}
+	if (options?.search) {
+		const term = `%${options.search.replace(/[%_]/g, "\\$&")}%`;
+		conditions.push(
+			sql`(${like(articles.title, term)} OR ${like(articles.link, term)} OR ${like(articles.contentSnippet, term)})`,
+		);
+	}
+	if (options?.pubDateFrom) {
+		conditions.push(gte(articles.pubDate, options.pubDateFrom));
+	}
+	if (options?.pubDateTo) {
+		conditions.push(lte(articles.pubDate, options.pubDateTo));
+	}
+
+	let query = q.select().from(articles);
+	if (conditions.length > 0) {
+		query = query.where(and(...conditions));
+	}
+
+	// Sorting
+	const orderCol =
+		options?.orderBy === "title"
+			? articles.title
+			: options?.orderBy === "lastUpdatedAt"
+				? articles.lastUpdatedAt
+				: articles.pubDate;
+	const orderFn = options?.orderDir === "asc" ? asc : desc;
+	query = query.orderBy(orderFn(orderCol));
+
+	// Pagination
+	if (options?.offset !== undefined) {
+		query = query.offset(options.offset);
+	}
+	if (options?.limit !== undefined) {
+		query = query.limit(options.limit);
+	}
+
+	return query;
 }
 
 export function createRssAgent(db: DB): IRssAgent {
@@ -354,6 +563,35 @@ export function createRssAgent(db: DB): IRssAgent {
 				return q.select().from(articles).where(eq(articles.feedId, feedId));
 			return q.select().from(articles);
 		},
+		listArticlesFiltered: async (options) => {
+			return buildArticleQuery(q, options);
+		},
+		searchArticles: async (query) => {
+			try {
+				// Try FTS search first (FTS5 where available, FTS4 fallback)
+				const ftsQuery = query.replace(/[^a-zA-Z0-9\s]/g, "").trim();
+				if (ftsQuery) {
+					const result = await q.all(
+						sql`SELECT a.* FROM articles a
+              INNER JOIN articles_fts fts ON a.rowid = fts.rowid
+              WHERE articles_fts MATCH ${ftsQuery}
+              ORDER BY a.pub_date DESC`,
+					);
+					if (result.length > 0) return result as Article[];
+				}
+			} catch {
+				// FTS not available, fall through to LIKE search
+			}
+			// Fallback: multi-field LIKE search
+			const term = `%${query.replace(/[%_]/g, "\\$&")}%`;
+			return q
+				.select()
+				.from(articles)
+				.where(
+					sql`(${like(articles.title, term)} OR ${like(articles.link, term)} OR ${like(articles.contentSnippet, term)})`,
+				)
+				.orderBy(desc(articles.pubDate));
+		},
 		markArticleRead: async (id, read, readAt) => {
 			await q
 				.update(articles)
@@ -395,6 +633,222 @@ export function createRssAgent(db: DB): IRssAgent {
 				.where(eq(articles.id, id));
 		},
 	};
+}
+
+// ─── Collection Agent ─────────────────────────────────────────────────────────
+
+export function createCollectionAgent(db: DB): ICollectionAgent {
+	const q = db as any;
+
+	return {
+		createCollection: async (name, parentId) => {
+			const id = slugify(name);
+			const existing = await q
+				.select()
+				.from(collections)
+				.where(eq(collections.id, id))
+				.limit(1);
+			if (existing.length > 0) {
+				throw new Error(`Collection "${name}" already exists.`);
+			}
+			// Get next position at the target parent level
+			const siblings: Collection[] = parentId
+				? await q
+						.select()
+						.from(collections)
+						.where(eq(collections.parentId, parentId))
+				: await q
+						.select()
+						.from(collections)
+						.where(sql`${collections.parentId} IS NULL`);
+			const position = siblings.length;
+
+			const [row] = await q
+				.insert(collections)
+				.values({
+					id,
+					name,
+					parentId: parentId ?? null,
+					position,
+					createdAt: now(),
+					updatedAt: now(),
+				})
+				.returning();
+			if (!row) throw new Error("Failed to create collection.");
+			return row;
+		},
+
+		renameCollection: async (id, name) => {
+			const [row] = await q
+				.update(collections)
+				.set({ name, updatedAt: now() })
+				.where(eq(collections.id, id))
+				.returning();
+			if (!row) throw new Error(`Collection ${id} not found.`);
+			return row;
+		},
+
+		deleteCollection: async (id) => {
+			// Move child collections up to the deleted collection's parent
+			const col = await q
+				.select()
+				.from(collections)
+				.where(eq(collections.id, id))
+				.limit(1);
+			if (!col.length) throw new Error(`Collection ${id} not found.`);
+			const parentId = col[0].parentId;
+
+			// Reparent children
+			await q
+				.update(collections)
+				.set({ parentId, updatedAt: now() })
+				.where(eq(collections.parentId, id));
+
+			// Move bookmarks in this collection to parent (or inbox if root)
+			const targetId = parentId ?? "inbox";
+			await q
+				.update(bookmarks)
+				.set({ collectionId: targetId, lastUpdatedAt: now() })
+				.where(eq(bookmarks.collectionId, id));
+
+			// Delete the collection
+			await q.delete(collections).where(eq(collections.id, id));
+		},
+
+		moveCollection: async (id, newParentId, position) => {
+			const siblings: Collection[] = newParentId
+				? await q
+						.select()
+						.from(collections)
+						.where(
+							and(
+								eq(collections.parentId, newParentId),
+								sql`${collections.id} != ${id}`,
+							),
+						)
+						.orderBy(collections.position)
+				: await q
+						.select()
+						.from(collections)
+						.where(
+							and(
+								sql`${collections.parentId} IS NULL`,
+								sql`${collections.id} != ${id}`,
+							),
+						)
+						.orderBy(collections.position);
+
+			const pos = position ?? siblings.length;
+
+			// Shift positions of siblings at or after the target position
+			for (const sibling of siblings) {
+				if (sibling.position >= pos) {
+					await q
+						.update(collections)
+						.set({ position: sibling.position + 1, updatedAt: now() })
+						.where(eq(collections.id, sibling.id));
+				}
+			}
+
+			const [row] = await q
+				.update(collections)
+				.set({
+					parentId: newParentId ?? null,
+					position: pos,
+					updatedAt: now(),
+				})
+				.where(eq(collections.id, id))
+				.returning();
+			if (!row) throw new Error(`Collection ${id} not found.`);
+			return row;
+		},
+
+		setCollectionPosition: async (id, position) => {
+			const [row] = await q
+				.update(collections)
+				.set({ position, updatedAt: now() })
+				.where(eq(collections.id, id))
+				.returning();
+			if (!row) throw new Error(`Collection ${id} not found.`);
+			return row;
+		},
+
+		getCollection: async (id) => {
+			const [row] = await q
+				.select()
+				.from(collections)
+				.where(eq(collections.id, id))
+				.limit(1);
+			return row;
+		},
+
+		listCollections: async () => {
+			return q
+				.select()
+				.from(collections)
+				.orderBy(collections.position, collections.createdAt);
+		},
+
+		getCollectionTree: async () => {
+			const all = await q
+				.select()
+				.from(collections)
+				.orderBy(collections.position, collections.createdAt);
+
+			// Get bookmark counts for all collections
+			const counts = await q.all(
+				sql`SELECT collection_id, COUNT(*) as cnt FROM bookmarks GROUP BY collection_id`,
+			);
+			const countMap = new Map<string, number>();
+			for (const row of counts) {
+				countMap.set(row.collection_id, row.cnt);
+			}
+
+			const buildTree = (parentId: string | null): CollectionTreeNode[] => {
+				return all
+					.filter((c: Collection) => c.parentId === parentId)
+					.map((c: Collection) => ({
+						...c,
+						bookmarkCount: countMap.get(c.id) ?? 0,
+						children: buildTree(c.id),
+					}));
+			};
+
+			return buildTree(null);
+		},
+
+		getCollectionBookmarkCount: async (id) => {
+			const [row] = await q.all(
+				sql`SELECT COUNT(*) as cnt FROM bookmarks WHERE collection_id = ${id}`,
+			);
+			return row?.cnt ?? 0;
+		},
+
+		getDescendantIds: async (id) => {
+			const result: string[] = [];
+			const collect = async (parentId: string) => {
+				const children: Collection[] = await q
+					.select()
+					.from(collections)
+					.where(eq(collections.parentId, parentId));
+				for (const child of children) {
+					result.push(child.id);
+					await collect(child.id);
+				}
+			};
+			await collect(id);
+			return result;
+		},
+	};
+}
+
+function slugify(input: string): string {
+	return input
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9\s-]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-");
 }
 
 // ─── Highlight Agent ─────────────────────────────────────────────────────────
@@ -483,6 +937,7 @@ export function createHighlightAgent(db: DB): IHighlightAgent {
 
 export interface IAgents {
 	bookmarkAgent: IBookmarkAgent;
+	collectionAgent: ICollectionAgent;
 	rssAgent: IRssAgent;
 	highlightAgent: IHighlightAgent;
 	syncAgent: ISyncAgent;

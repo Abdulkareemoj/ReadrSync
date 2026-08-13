@@ -85,7 +85,7 @@ const useSearchSuggestions = (query: string) => {
 };
 
 // Mobile-optimized bookmarks screen with UX enhancements
-export function MobileBookmarksScreen({
+export default function MobileBookmarksScreen({
 	filter = "all",
 	tags,
 }: MobileBookmarksScreenProps) {

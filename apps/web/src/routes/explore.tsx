@@ -1,33 +1,35 @@
-﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import {
+	type DiscoveredFeed,
+	discoverFeedsFromUrl,
+	discoverYouTubeChannelFeed,
+	parseYouTubeChannelUrl,
+	type SearchedFeed,
+	searchFeedsByKeyword,
+} from "@packages/utils";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
 	Bookmark,
 	BookOpen,
+	Check,
 	Film,
 	Heart,
+	Link2,
 	Plus,
 	Rss,
 	Search,
-	Shuffle,
 	TrendingUp,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
 import { useState } from "react";
+import ArticleCard from "@/components/rss/article-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ArticleCard from "@/components/rss/article-card";
-import {
-	curatedFeedsByCategory,
-	getAllCuratedFeeds,
-	getCategories,
-	getRandomFeeds,
-	discoverYouTubeChannelFeed,
-	parseYouTubeChannelUrl,
-} from "@packages/utils";
 import { useReaderStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/explore")({
 	component: Explore,
@@ -92,6 +94,94 @@ function SectionCard({
 	);
 }
 
+type FeedSource = {
+	name: string;
+	description: string;
+	url: string;
+	category: string;
+	icon: string;
+};
+
+function FeedToggleButton({
+	subscribed,
+	onToggle,
+}: {
+	subscribed: boolean;
+	onToggle: () => void;
+}) {
+	return (
+		<motion.button
+			type="button"
+			whileTap={{ scale: 0.8 }}
+			onClick={onToggle}
+			aria-label={subscribed ? "Unsubscribe" : "Subscribe"}
+			title={subscribed ? "Unsubscribe" : "Subscribe"}
+			className={cn(
+				"flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors",
+				subscribed
+					? "border-primary/40 bg-primary/10 text-primary"
+					: "border-border bg-muted/40 text-muted-foreground hover:bg-accent",
+			)}
+		>
+			<AnimatePresence mode="wait" initial={false}>
+				{subscribed ? (
+					<motion.span
+						key="check"
+						initial={{ scale: 0, rotate: -90 }}
+						animate={{ scale: 1, rotate: 0 }}
+						exit={{ scale: 0, opacity: 0 }}
+						transition={{ type: "spring", stiffness: 500, damping: 25 }}
+					>
+						<Check data-icon="inline-start" />
+					</motion.span>
+				) : (
+					<motion.span
+						key="plus"
+						initial={{ scale: 0 }}
+						animate={{ scale: 1 }}
+						exit={{ scale: 0, opacity: 0 }}
+						transition={{ duration: 0.12 }}
+					>
+						<Plus data-icon="inline-start" />
+					</motion.span>
+				)}
+			</AnimatePresence>
+		</motion.button>
+	);
+}
+
+function FeedRow({
+	feed,
+	subscribed,
+	onToggle,
+}: {
+	feed: FeedSource;
+	subscribed: boolean;
+	onToggle: () => void;
+}) {
+	return (
+		<div className="flex items-center gap-3 rounded-lg border bg-card px-3.5 py-3 transition-colors hover:bg-accent">
+			<div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-sm">
+				{feed.icon}
+			</div>
+			<div className="min-w-0 flex-1">
+				<div className="flex min-w-0 items-center gap-2">
+					<span className="truncate font-medium text-foreground text-sm">
+						{feed.name}
+					</span>
+					<Badge variant="secondary" className="shrink-0 text-[10px]">
+						{feed.category}
+					</Badge>
+				</div>
+				<p className="mt-0.5 truncate text-muted-foreground text-sm">
+					{feed.description}
+				</p>
+			</div>
+			<FeedToggleButton subscribed={subscribed} onToggle={onToggle} />
+		</div>
+	);
+}
+
 function ArticleList({ ids }: { ids: string[] }) {
 	const navigate = useNavigate();
 	const articles = useReaderStore((state) => state.articles);
@@ -143,14 +233,18 @@ function Explore() {
 	const articles = useReaderStore((state) => state.articles);
 	const feeds = useReaderStore((state) => state.feeds);
 	const addFeed = useReaderStore((state) => state.addFeed);
-	const [discoverSearch, setDiscoverSearch] = useState("");
+	const removeFeed = useReaderStore((state) => state.removeFeed);
+	const [discoverUrl, setDiscoverUrl] = useState("");
+	const [discovering, setDiscovering] = useState(false);
+	const [discoverError, setDiscoverError] = useState("");
+	const [discoveredFeeds, setDiscoveredFeeds] = useState<DiscoveredFeed[]>([]);
 	const [youtubeUrl, setYoutubeUrl] = useState("");
 	const [youtubeLoading, setYoutubeLoading] = useState(false);
 	const [youtubeError, setYoutubeError] = useState("");
-	const [randomFeeds, setRandomFeeds] = useState(getRandomFeeds(6));
-	const [selectedCategory, setSelectedCategory] = useState<string | "all">(
-		"all",
-	);
+	const [feedSearch, setFeedSearch] = useState("");
+	const [searching, setSearching] = useState(false);
+	const [searchError, setSearchError] = useState("");
+	const [searchResults, setSearchResults] = useState<SearchedFeed[]>([]);
 
 	const readArticles = articles.filter((a) => a.read).length;
 	const likedArticlesCount = articles.filter((a) => a.liked).length;
@@ -199,27 +293,59 @@ function Explore() {
 		.slice(0, 4)
 		.map((a) => a.id);
 
-	const categories = getCategories();
-
-	const filteredFeeds =
-		selectedCategory === "all"
-			? getAllCuratedFeeds()
-			: curatedFeedsByCategory[selectedCategory] || [];
-
-	const searchedFeeds = discoverSearch
-		? filteredFeeds.filter(
-				(f) =>
-					f.name.toLowerCase().includes(discoverSearch.toLowerCase()) ||
-					f.description.toLowerCase().includes(discoverSearch.toLowerCase()),
-			)
-		: filteredFeeds;
+	const isSubscribed = (url: string) => feeds.some((f) => f.feedUrl === url);
 
 	const handleAddFeed = async (url: string, title: string) => {
 		await addFeed({ feedUrl: url, title });
 	};
 
-	const handleRandomFeeds = () => {
-		setRandomFeeds(getRandomFeeds(6));
+	const handleToggleFeed = async (url: string, title: string) => {
+		const existing = feeds.find((f) => f.feedUrl === url);
+		if (existing) {
+			await removeFeed(existing.id);
+		} else {
+			await handleAddFeed(url, title);
+		}
+	};
+
+	const handleFeedSearch = async () => {
+		setSearchError("");
+		setSearchResults([]);
+		if (!feedSearch.trim()) return;
+		setSearching(true);
+		try {
+			const results = await searchFeedsByKeyword(feedSearch);
+			setSearchResults(results);
+			if (results.length === 0) {
+				setSearchError("No feeds found for that search.");
+			}
+		} catch (e) {
+			setSearchError(
+				e instanceof Error ? e.message : "Could not search feeds. Try again.",
+			);
+		} finally {
+			setSearching(false);
+		}
+	};
+
+	const handleDiscover = async () => {
+		setDiscoverError("");
+		setDiscoveredFeeds([]);
+		if (!discoverUrl.trim()) return;
+		setDiscovering(true);
+		try {
+			const found = await discoverFeedsFromUrl(discoverUrl);
+			setDiscoveredFeeds(found);
+			if (found.length === 0) {
+				setDiscoverError("No RSS or Atom feeds found on that page.");
+			}
+		} catch (e) {
+			setDiscoverError(
+				e instanceof Error ? e.message : "Could not discover feeds.",
+			);
+		} finally {
+			setDiscovering(false);
+		}
 	};
 
 	const handleYouTubeSubscribe = async () => {
@@ -239,8 +365,7 @@ function Explore() {
 			// Try platform-specific handle resolver if available (e.g. Tauri Rust command)
 			let resolvedUrl = feedInfo.feedUrl;
 			if (feedInfo.requiresChannelId) {
-				const platformResolve = (window as any)
-					.__RESOLVE_YOUTUBE_HANDLE__ as
+				const platformResolve = (window as any).__RESOLVE_YOUTUBE_HANDLE__ as
 					| ((handle: string) => Promise<string | null>)
 					| undefined;
 				if (platformResolve) {
@@ -265,9 +390,9 @@ function Explore() {
 	};
 
 	return (
-		<div className="p-4 md:p-8 overflow-x-hidden">
-			<div id="overview" className=" is-shown mb-6">
-				<h1 className=" truncate font-semibold text-2xl text-foreground">
+		<div className="overflow-x-hidden p-4 md:p-8">
+			<div id="overview" className="is-shown mb-6">
+				<h1 className="truncate font-semibold text-2xl text-foreground">
 					Explore
 				</h1>
 				<p className="mt-1 text-muted-foreground">
@@ -359,7 +484,7 @@ function Explore() {
 			</section>
 
 			{/* YouTube Subscription */}
-			<Card id="youtube" className="mb-6 rounded-xl w-full">
+			<Card id="youtube" className="mb-6 w-full rounded-xl">
 				<CardHeader className="flex flex-col gap-1">
 					<CardTitle className="flex items-center gap-2 text-base">
 						<Film data-icon="inline-start" className="text-red-500" />
@@ -370,7 +495,7 @@ function Explore() {
 					</p>
 				</CardHeader>
 				<CardContent>
-					<div className="flex gap-2 min-w-0">
+					<div className="flex min-w-0 gap-2">
 						<Input
 							placeholder="e.g. https://youtube.com/@mkbhd"
 							value={youtubeUrl}
@@ -381,7 +506,7 @@ function Explore() {
 							onKeyDown={(e) => {
 								if (e.key === "Enter") handleYouTubeSubscribe();
 							}}
-							className="flex-1 min-w-0"
+							className="min-w-0 flex-1"
 						/>
 						<Button
 							onClick={handleYouTubeSubscribe}
@@ -400,167 +525,127 @@ function Explore() {
 				</CardContent>
 			</Card>
 
-			{/* Surprise Me */}
-			<Card id="surprise" className="mb-6 rounded-xl w-full">
+			{/* Discover by URL */}
+			<Card id="discover" className="mb-6 w-full rounded-xl">
 				<CardHeader className="flex flex-col gap-1">
 					<CardTitle className="flex items-center gap-2 text-base">
-						<Shuffle data-icon="inline-start" className="text-primary" />
-						<span>Surprise Me</span>
+						<Link2 data-icon="inline-start" className="text-primary" />
+						<span>Discover Feeds</span>
 					</CardTitle>
 					<p className="text-muted-foreground text-sm">
-						Not sure what to follow? Try a random pick
+						Paste any site URL and we'll auto-detect its RSS, Atom, or JSON
+						feeds
 					</p>
 				</CardHeader>
 				<CardContent>
-					<div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-						{randomFeeds.map((feed) => {
-							const alreadySubscribed = feeds.some(
-								(f) => f.feedUrl === feed.url,
-							);
-							return (
-								<div
-									key={feed.name}
-									className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 transition-colors hover:bg-accent"
-								>
-									<div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-sm">
-										{feed.icon}
-									</div>
-									<div className="min-w-0 flex-1">
-										<div className="flex min-w-0 items-center gap-2">
-											<span className="truncate font-medium text-foreground text-sm">
-												{feed.name}
-											</span>
-											<Badge
-												variant="secondary"
-												className="text-[10px] shrink-0"
-											>
-												{feed.category}
-											</Badge>
-										</div>
-										<p className="mt-0.5 truncate text-muted-foreground text-sm">
-											{feed.description}
-										</p>
-									</div>
-									<Button
-										type="button"
-										variant={alreadySubscribed ? "secondary" : "ghost"}
-										size="icon"
-										className="size-8 shrink-0"
-										disabled={alreadySubscribed}
-										onClick={() => handleAddFeed(feed.url, feed.name)}
-									>
-										<Plus data-icon="inline-start" />
-									</Button>
-								</div>
-							);
-						})}
+					<div className="flex min-w-0 gap-2">
+						<Input
+							placeholder="e.g. https://www.theverge.com"
+							value={discoverUrl}
+							onChange={(e) => {
+								setDiscoverUrl(e.target.value);
+								setDiscoverError("");
+							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") handleDiscover();
+							}}
+							className="min-w-0 flex-1"
+						/>
+						<Button
+							onClick={handleDiscover}
+							disabled={discovering || !discoverUrl.trim()}
+						>
+							{discovering ? <Spinner className="size-4" /> : "Discover"}
+						</Button>
 					</div>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={handleRandomFeeds}
-						className="w-full"
-					>
-						<Shuffle data-icon="inline-start" className="mr-2" />
-						Shuffle
-					</Button>
+					{discoverError && (
+						<p className="mt-2 text-red-500 text-sm">{discoverError}</p>
+					)}
+					{discoveredFeeds.length > 0 && (
+						<div className="mt-4 grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+							{discoveredFeeds.map((feed) => (
+								<FeedRow
+									key={feed.url}
+									feed={{
+										name: feed.title,
+										description: feed.url,
+										url: feed.url,
+										category: feed.type.toUpperCase(),
+										icon: feed.type === "atom" ? "📄" : "📡",
+									}}
+									subscribed={isSubscribed(feed.url)}
+									onToggle={() => handleToggleFeed(feed.url, feed.title)}
+								/>
+							))}
+						</div>
+					)}
 				</CardContent>
 			</Card>
 
-			{/* Feed Directory */}
-			{/* <Card id="directory" className="rounded-xl w-full">
+			{/* Search Feeds */}
+			<Card id="directory" className="mb-6 w-full rounded-xl">
 				<CardHeader className="flex flex-col gap-1">
 					<CardTitle className="flex items-center gap-2 text-base">
 						<TrendingUp data-icon="inline-start" className="text-primary" />
-						<span>Feed Directory</span>
+						<span>Search Feeds</span>
 					</CardTitle>
 					<p className="text-muted-foreground text-sm">
-						Browse curated sources worth following
+						Search the web for feeds worth following
 					</p>
 				</CardHeader>
 				<CardContent>
-					<div className="mb-4 flex items-center gap-2">
-						<div className="relative flex-1 min-w-0">
+					<div className="mb-4 flex min-w-0 gap-2">
+						<div className="relative min-w-0 flex-1">
 							<Search
 								data-icon="inline-start"
-								className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+								className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
 							/>
 							<Input
-								placeholder="Search feeds..."
-								value={discoverSearch}
-								onChange={(e) => setDiscoverSearch(e.target.value)}
-								className="pl-9 w-full min-w-0"
+								placeholder="e.g. machine learning, cooking, finance"
+								value={feedSearch}
+								onChange={(e) => {
+									setFeedSearch(e.target.value);
+									setSearchError("");
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") handleFeedSearch();
+								}}
+								className="w-full min-w-0 pl-9"
 							/>
 						</div>
-					</div>
-
-					<Tabs
-						value={selectedCategory}
-						onValueChange={(v) => setSelectedCategory(v)}
-						className="w-full"
-					>
-						<div className="mb-4 overflow-x-auto scrollbar-none">
-							<TabsList>
-								<TabsTrigger value="all">All</TabsTrigger>
-								{categories.map((cat) => (
-									<TabsTrigger key={cat} value={cat}>
-										{cat}
-									</TabsTrigger>
-								))}
-							</TabsList>
-						</div>
-
-						<TabsContent
-							value={selectedCategory}
-							className="mt-0 min-h-[300px]"
+						<Button
+							onClick={handleFeedSearch}
+							disabled={searching || !feedSearch.trim()}
 						>
-							<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 w-full">
-								{searchedFeeds.map((feed) => {
-									const alreadySubscribed = feeds.some(
-										(f) => f.feedUrl === feed.url,
-									);
-									return (
-										<div
-											key={feed.name}
-											className="flex items-center gap-3 rounded-lg border bg-card px-3.5 py-3 transition-colors hover:bg-accent"
-										>
-											<div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-sm">
-												{feed.icon}
-											</div>
-											<div className="min-w-0 flex-1">
-												<div className="flex min-w-0 items-center gap-2">
-													<span className="truncate font-medium text-foreground text-sm">
-														{feed.name}
-													</span>
-													<Badge
-														variant="secondary"
-														className="text-[10px] shrink-0"
-													>
-														{feed.category}
-													</Badge>
-												</div>
-												<p className="mt-0.5 truncate text-muted-foreground text-sm">
-													{feed.description}
-												</p>
-											</div>
-											<Button
-												type="button"
-												variant={alreadySubscribed ? "secondary" : "ghost"}
-												size="icon"
-												className="size-8 shrink-0"
-												disabled={alreadySubscribed}
-												onClick={() => handleAddFeed(feed.url, feed.name)}
-											>
-												<Plus data-icon="inline-start" />
-											</Button>
-										</div>
-									);
-								})}
-							</div>
-						</TabsContent>
-					</Tabs>
+							{searching ? <Spinner className="size-4" /> : "Search"}
+						</Button>
+					</div>
+					{searchError && (
+						<p className="mb-3 text-red-500 text-sm">{searchError}</p>
+					)}
+					<div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+						{searchResults.map((feed) => (
+							<FeedRow
+								key={feed.url}
+								feed={{
+									name: feed.name,
+									description: feed.description,
+									url: feed.url,
+									category: feed.category,
+									icon: feed.icon,
+								}}
+								subscribed={isSubscribed(feed.url)}
+								onToggle={() => handleToggleFeed(feed.url, feed.name)}
+							/>
+						))}
+						{!searching && searchResults.length === 0 && !searchError && (
+							<p className="col-span-full py-8 text-center text-muted-foreground text-sm">
+								Search by topic to discover feeds you can follow.
+							</p>
+						)}
+					</div>
 				</CardContent>
-			</Card> */}
+			</Card>
 		</div>
 	);
 }

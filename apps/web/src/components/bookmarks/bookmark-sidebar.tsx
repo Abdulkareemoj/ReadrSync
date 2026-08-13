@@ -361,7 +361,7 @@ export function BookmarkSidebar({
 								</Button>
 
 								{selectedTags.length > 0 && (
-									<button
+									<Button
 										onClick={() => {
 											void navigate({
 												search: (prev: any) => ({
@@ -374,7 +374,7 @@ export function BookmarkSidebar({
 										className="text-[10px] text-muted-foreground hover:text-foreground"
 									>
 										Clear
-									</button>
+									</Button>
 								)}
 							</div>
 
@@ -383,7 +383,7 @@ export function BookmarkSidebar({
 									{allTags.map(({ name, count }) => {
 										const isActive = selectedTags.includes(name);
 										return (
-											<button
+											<Button
 												key={name}
 												onClick={() => toggleTag(name)}
 												className={cn(
@@ -396,7 +396,7 @@ export function BookmarkSidebar({
 												<Tag className="size-3" />
 												{name}
 												<span className="opacity-60">({count})</span>
-											</button>
+											</Button>
 										);
 									})}
 								</div>

@@ -1,11 +1,24 @@
-/* This file is responsible for running database migrations and also keeps track to make sure the apps are running the correct schema version. It also provides the SQL statements needed to create the tables, which is used by the web/mobile implementations that don't have filesystem access to run separate migration scripts.
- * This allows us to initialize the web/mobile database without filesystem access
- * The schema source is in packages/db/src/schema.ts
+/**
+ * This file is responsible for running database migrations and also keeps track
+ * to make sure the apps are running the correct schema version. It also provides
+ * the SQL statements needed to create the tables, which is used by the
+ * web/desktop/mobile implementations that don't have filesystem access to run
+ * separate migration scripts.
+ *
+ * NOTE: this intentionally does NOT use drizzle-orm's `migrate()` from
+ * "drizzle-orm/libsql/migrator", that reads migration SQL files from disk via
+ * node:fs/node:path, which is unavailable in the browser (Vite) and React
+ * Native. Instead we apply idempotent CREATE TABLE statements plus a
+ * versioned ALTER TABLE list directly against whatever drizzle sqlite-ish
+ * `db` instance each platform already constructs.
  */
 
 import { sql } from "drizzle-orm";
-import type { DB } from "./index";
-import { getCreateTableStatements, SCHEMA_VERSION } from "./schema-to-sql";
+import {
+	getCreateTableStatements,
+	getSchemaVersion,
+	SCHEMA_VERSION,
+} from "./schema-to-sql";
 
 // Add new migrations here as you evolve the schema.
 // Each entry runs only when the DB version is below its version number.
@@ -42,11 +55,12 @@ const MIGRATIONS: { version: number; statements: string[] }[] = [
 	},
 ];
 
-export async function runMigrations(db: DB): Promise<void> {
+export async function runMigrations(db: any): Promise<void> {
+	console.log("Running migrations...");
+
 	// Create tables for fresh installs
-	const statements = getCreateTableStatements();
-	for (const sqlStmt of statements) {
-		await db.run(sql.raw(sqlStmt));
+	for (const stmt of getCreateTableStatements()) {
+		await db.run(sql.raw(stmt));
 	}
 
 	// Get current DB version
@@ -60,7 +74,7 @@ export async function runMigrations(db: DB): Promise<void> {
 			try {
 				await db.run(sql.raw(stmt));
 			} catch {
-				// Column already exists — safe to ignore on ALTER TABLE
+				// Column already exists, safe to ignore on ALTER TABLE
 			}
 		}
 
@@ -72,22 +86,12 @@ export async function runMigrations(db: DB): Promise<void> {
 		);
 		console.log(`[DB] Migrated to schema version ${migration.version}`);
 	}
-}
 
-export async function getSchemaVersion(db: DB): Promise<number> {
-	try {
-		const result = await db.all<{ version: number }>(
-			"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1",
-		);
-		return result[0]?.version ?? 0;
-	} catch {
-		return 0;
-	}
+	// Mark the schema as fully current so needsMigration() reports correctly.
+	await db.run(
+		sql.raw(
+			`INSERT OR REPLACE INTO schema_version (version) VALUES (${SCHEMA_VERSION})`,
+		),
+	);
+	console.log("Migrations completed successfully");
 }
-
-export async function needsMigration(db: DB): Promise<boolean> {
-	const currentVersion = await getSchemaVersion(db);
-	return currentVersion < SCHEMA_VERSION;
-}
-
-export { getCreateTableStatements, SCHEMA_VERSION };

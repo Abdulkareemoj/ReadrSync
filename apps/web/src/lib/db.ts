@@ -1,4 +1,11 @@
 import {
+	createBookmarkAgent,
+	createCollectionAgent,
+	createHighlightAgent,
+	createRssAgent,
+	type IAgents,
+} from "@packages/agents";
+import {
 	getCreateTableStatements,
 	runFtsSetup,
 	runMigrations,
@@ -6,18 +13,12 @@ import {
 } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
-import {
-	createBookmarkAgent,
-	createCollectionAgent,
-	createRssAgent,
-	createHighlightAgent,
-	type IAgents,
-} from "@packages/agents";
-import { createWebSyncAgent } from "@/lib/sync-agent";
-import { createWebAuthAgent } from "@/lib/auth-agent";
+import { seedDatabase } from "@packages/db/src/seed-data";
 import { drizzle } from "drizzle-orm/sql-js";
 import type { Database } from "sql.js";
 import initSqlJs from "sql.js";
+import { createWebAuthAgent } from "@/lib/auth-agent";
+import { createWebSyncAgent } from "@/lib/sync-agent";
 
 const DB_NAME = "bookmark_tool_web.db";
 
@@ -26,21 +27,34 @@ const IDB_STORE = "sqlite";
 const IDB_KEY = DB_NAME;
 
 function openIdb() {
-	return new Promise<IDBDatabase>((resolve, reject) => {
-		const req = indexedDB.open(IDB_DB_NAME, 1);
-		req.onupgradeneeded = () => {
-			const db = req.result;
-			if (!db.objectStoreNames.contains(IDB_STORE)) {
-				db.createObjectStore(IDB_STORE);
-			}
-		};
-		req.onsuccess = () => resolve(req.result);
-		req.onerror = () => reject(req.error);
+	if (typeof indexedDB === "undefined") {
+		return Promise.resolve(null);
+	}
+
+	return new Promise<IDBDatabase | null>((resolve) => {
+		try {
+			const req = indexedDB.open(IDB_DB_NAME, 1);
+			req.onupgradeneeded = () => {
+				const db = req.result;
+				if (!db.objectStoreNames.contains(IDB_STORE)) {
+					db.createObjectStore(IDB_STORE);
+				}
+			};
+			req.onsuccess = () => resolve(req.result);
+			req.onerror = () => resolve(null);
+			req.onblocked = () => resolve(null);
+		} catch {
+			resolve(null);
+		}
 	});
 }
 
 async function idbGet(key: string) {
 	const db = await openIdb();
+	if (!db) {
+		return undefined;
+	}
+
 	try {
 		return await new Promise<ArrayBuffer | undefined>((resolve, reject) => {
 			const tx = db.transaction(IDB_STORE, "readonly");
@@ -56,6 +70,10 @@ async function idbGet(key: string) {
 
 async function idbSet(key: string, value: ArrayBuffer) {
 	const db = await openIdb();
+	if (!db) {
+		return;
+	}
+
 	try {
 		await new Promise<void>((resolve, reject) => {
 			const tx = db.transaction(IDB_STORE, "readwrite");
@@ -74,6 +92,7 @@ function setupPersistence(client: Database) {
 	let dirty = false;
 	let saveTimer: number | null = null;
 	let saving = false;
+	let persistenceDisabled = false;
 
 	const persistNow = async () => {
 		if (saving) return;
@@ -82,8 +101,29 @@ function setupPersistence(client: Database) {
 		try {
 			const data = client.export();
 			const copy = data.slice().buffer;
-			await idbSet(IDB_KEY, copy);
-			dirty = false;
+			try {
+				if (persistenceDisabled) return;
+				await idbSet(IDB_KEY, copy);
+				dirty = false;
+			} catch (e: any) {
+				// If we're out of quota, disable further persistence attempts and
+				// continue running in-memory. Don't throw so initialization can continue.
+				const isQuotaError =
+					e &&
+					(e.name === "QuotaExceededError" ||
+						e.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+						e.code === 22);
+				if (isQuotaError) {
+					persistenceDisabled = true;
+					console.warn(
+						"Persistence disabled: IndexedDB quota exceeded. Clear site data to restore persistence.",
+						e,
+					);
+					// leave dirty=true so we don't mark as successfully saved
+					return;
+				}
+				throw e;
+			}
 		} finally {
 			saving = false;
 		}
@@ -91,6 +131,7 @@ function setupPersistence(client: Database) {
 
 	const schedulePersist = () => {
 		dirty = true;
+		if (persistenceDisabled) return;
 		if (saveTimer) return;
 		saveTimer = window.setTimeout(() => {
 			saveTimer = null;
@@ -180,7 +221,9 @@ export async function initializeWebAgents() {
 	// 4. Initialize Drizzle client
 	const db = drizzle(client, { schema });
 
-	// 5. Initialize agents with the Drizzle client
+	// 5. Seed dev data (no-op when the DB already has rows)
+	await seedDatabase(db);
+	await persistNow();
 	// We assert the type to the generic DB union type for agent compatibility
 	const genericDb = db as unknown as DB;
 	const bookmarkAgent = createBookmarkAgent(genericDb);

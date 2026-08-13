@@ -1,5 +1,5 @@
 import type { Feed } from "@packages/store";
-import { Rss, Trash2 } from "lucide-react";
+import { Bookmark, Rss, Trash2 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { AddFeedDialog } from "@/components/rss/add-feed-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -29,12 +29,12 @@ export function FeedSidebar({
 				{/* Add Feed Dialog */}
 				<AddFeedDialog />
 			</div>
-			<ScrollArea className="flex-1 ">
+			<ScrollArea className="flex-1 px-4">
 				<div className="flex flex-col gap-1">
 					{/* All Articles Link */}
 					<Button
 						variant={selectedFeedId === null ? "secondary" : "ghost"}
-						className="w-full justify-start "
+						className="mx-7 w-max justify-start"
 						onClick={() => onSelectFeed(null)}
 					>
 						<Rss data-icon="inline-start" />
@@ -49,7 +49,6 @@ export function FeedSidebar({
 							{totalUnread}
 						</Badge>
 					</Button>
-
 					<Separator className="my-2" />
 
 					{/* Individual Feeds */}
@@ -60,15 +59,17 @@ export function FeedSidebar({
 						>
 							<Button
 								variant={selectedFeedId === feed.id ? "secondary" : "ghost"}
-								className="w-full justify-start pr-2"
+								className="mx-4 flex items-center justify-start gap-2"
 								onClick={() => onSelectFeed(feed.id)}
 							>
-								<span className="truncate">{feed.title}</span>
+								<span className="min-w-0 flex-1 truncate text-left">
+									{feed.title}
+								</span>
 								{feed.unreadCount > 0 && (
 									<Badge
 										variant="secondary"
 										className={cn(
-											"ml-auto",
+											"ml-auto shrink-0",
 											selectedFeedId === feed.id &&
 												"bg-primary text-primary-foreground",
 										)}
