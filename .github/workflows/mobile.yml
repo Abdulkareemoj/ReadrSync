@@ -28,7 +28,7 @@ jobs:
                   cache-dependency-path: pnpm-lock.yaml
 
             - name: Install dependencies (mobile + its workspace deps only)
-              run: pnpm --filter "./apps/mobile..." install --frozen-lockfile
+              run: pnpm --filter "./apps/mobile..." --filter "@packages/utils" install --frozen-lockfile
 
             - name: Run tests
               run: pnpm --filter @packages/utils test
