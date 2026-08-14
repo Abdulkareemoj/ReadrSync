@@ -10,8 +10,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import type { ExportFormat } from "@/lib/sync";
+import { cn } from "@/lib/utils";
 import Row from "./Row";
 import SectionHeading from "./SectionHeading";
 
@@ -48,16 +48,14 @@ export default function DataSection({
 					<div className="flex items-center justify-between">
 						<div>
 							<p className="font-medium text-sm">Export data</p>
-							<p className="text-muted-foreground text-xs mt-0.5">
+							<p className="mt-0.5 text-muted-foreground text-xs">
 								Download your data as JSON, OPML, or HTML
 							</p>
 						</div>
 						<div className="flex items-center gap-2">
 							<Select
 								value={exportFormat}
-								onValueChange={(v) =>
-									onExportFormatChange(v as ExportFormat)
-								}
+								onValueChange={(v) => onExportFormatChange(v as ExportFormat)}
 							>
 								<SelectTrigger className="w-28">
 									<SelectValue />
@@ -80,7 +78,7 @@ export default function DataSection({
 					<div className="flex items-center justify-between">
 						<div>
 							<p className="font-medium text-sm">Import data</p>
-							<p className="text-muted-foreground text-xs mt-0.5">
+							<p className="mt-0.5 text-muted-foreground text-xs">
 								Load from JSON, OPML, or HTML bookmark files
 							</p>
 						</div>
@@ -91,7 +89,7 @@ export default function DataSection({
 					</div>
 					<Separator className="my-4" />
 					<div>
-						<p className="mb-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+						<p className="mb-3 font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
 							Import mode
 						</p>
 						<RadioGroup
@@ -117,13 +115,13 @@ export default function DataSection({
 									aria-describedby={`${id}-merge-description`}
 								/>
 								<div className="min-w-0">
-									<div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+									<div className="flex items-center gap-1.5 font-medium text-foreground text-sm">
 										<GitMerge className="size-3.5" />
 										Merge
 									</div>
 									<p
 										id={`${id}-merge-description`}
-										className="text-muted-foreground text-xs mt-0.5"
+										className="mt-0.5 text-muted-foreground text-xs"
 									>
 										Add imported data alongside existing content.
 									</p>
@@ -145,13 +143,13 @@ export default function DataSection({
 									aria-describedby={`${id}-replace-description`}
 								/>
 								<div className="min-w-0">
-									<div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+									<div className="flex items-center gap-1.5 font-medium text-foreground text-sm">
 										<RotateCcw className="size-3.5" />
 										Replace
 									</div>
 									<p
 										id={`${id}-replace-description`}
-										className="text-muted-foreground text-xs mt-0.5"
+										className="mt-0.5 text-muted-foreground text-xs"
 									>
 										Replace existing data with the imported file.
 									</p>

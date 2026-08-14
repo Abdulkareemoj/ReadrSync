@@ -42,8 +42,8 @@ function FavoritesPage() {
 						<Heart className="size-4" />
 					</div>
 					<div>
-						<h1 className="text-sm font-semibold">Favorites</h1>
-						<p className="text-xs text-muted-foreground">
+						<h1 className="font-semibold text-sm">Favorites</h1>
+						<p className="text-muted-foreground text-xs">
 							{stats.total} bookmark{stats.total !== 1 ? "s" : ""}
 						</p>
 					</div>
@@ -105,7 +105,7 @@ function FavoritesPage() {
 								</EmptyDescription>
 							</EmptyHeader>
 							<EmptyContent>
-								<p className="text-sm text-muted-foreground">
+								<p className="text-muted-foreground text-sm">
 									Bookmarks marked as favorites will appear on this page.
 								</p>
 							</EmptyContent>

@@ -172,7 +172,9 @@ export function BookmarkSidebar({
 		const tagMap = new Map<string, number>();
 		bookmarks.forEach((b) => {
 			if (b.tags && Array.isArray(b.tags)) {
-				b.tags.forEach((t) => tagMap.set(t, (tagMap.get(t) || 0) + 1));
+				b.tags.forEach((t) => {
+					tagMap.set(t, (tagMap.get(t) || 0) + 1);
+				});
 			}
 		});
 		return Array.from(tagMap.entries())

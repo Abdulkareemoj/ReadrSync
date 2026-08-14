@@ -1,16 +1,16 @@
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system/legacy";
-import { Alert } from "react-native";
 import type { ExportFormat } from "@packages/utils";
 import {
 	detectFormat,
-	generateOpml,
-	generateHtmlBookmarks,
-	parseOpml,
-	extractFeedsFromOpml,
 	extractBookmarksFromOpml,
+	extractFeedsFromOpml,
+	generateHtmlBookmarks,
+	generateOpml,
 	parseHtmlBookmarks,
+	parseOpml,
 } from "@packages/utils";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system/legacy";
+import { Alert } from "react-native";
 import { getInitializedAgents } from "@/lib/agents";
 import { useSettingsStore } from "@/lib/store";
 
@@ -82,7 +82,14 @@ export function useCloudSync() {
 		}
 	};
 
-	return { isAuthenticated, authEmail, syncStatus, handleSignIn, handleSignOut, handleSyncNow };
+	return {
+		isAuthenticated,
+		authEmail,
+		syncStatus,
+		handleSignIn,
+		handleSignOut,
+		handleSyncNow,
+	};
 }
 
 export function useDataActions() {

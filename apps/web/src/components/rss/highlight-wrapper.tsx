@@ -1,10 +1,9 @@
+import type { Highlight } from "@packages/store";
 import type React from "react";
-
 import { useCallback, useRef, useState } from "react";
 import AnnotationPanel from "@/components/annotation-panel";
 import HighlightMenu from "@/components/rss/highlight-menu";
 import { useHighlights } from "@/hooks/use-highlights";
-import type { Highlight } from "@packages/store";
 
 interface HighlightWrapperProps {
 	children: React.ReactNode;
@@ -95,6 +94,7 @@ export default function HighlightWrapper({
 	};
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: mouseup text-selection for highlights, not an interaction control
 		<div ref={contentRef} onMouseUp={handleTextSelection} className="relative">
 			{children}
 

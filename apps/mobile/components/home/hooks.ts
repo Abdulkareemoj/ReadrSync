@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { Bookmark, Clock, Compass, Rss } from "lucide-react-native";
 import { useCollectionsStore } from "@packages/store";
+import { Bookmark, Clock, Compass, Rss } from "lucide-react-native";
+import { useMemo } from "react";
 import { useReaderStore } from "@/lib/store";
 
 export function useHomeData() {
@@ -70,7 +70,8 @@ export function useHomeData() {
 	const bookmarksThisWeek = bookmarks.filter((b) => b.createdAt >= weekAgo);
 	const articlesThisWeek = articles.filter((a) => a.pubDate >= weekAgo);
 
-	const hasTodayActivity = bookmarksToday.length > 0 || articlesToday.length > 0;
+	const hasTodayActivity =
+		bookmarksToday.length > 0 || articlesToday.length > 0;
 	const bookmarksTodayCount = bookmarksToday.length;
 	const articlesTodayCount = articlesToday.length;
 

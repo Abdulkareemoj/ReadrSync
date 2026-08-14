@@ -1,3 +1,4 @@
+import { useCollectionsStore } from "@packages/store";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import MultipleSelector, { type Option } from "@/components/ui/multi-select";
 import { Spinner } from "@/components/ui/spinner";
 import { useTags } from "@/hooks/use-tags";
-import { useCollectionsStore } from "@packages/store";
 import { useReaderStore } from "@/lib/store";
 
 // Define the form schema with Zod

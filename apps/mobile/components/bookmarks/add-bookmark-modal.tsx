@@ -1,8 +1,8 @@
+import { useForm } from "@tanstack/react-form";
+import { Plus } from "lucide-react-native";
 import * as React from "react";
 import { ActivityIndicator, View } from "react-native";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { Plus } from "lucide-react-native";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Text } from "@/components/ui/text";
-import { useCollectionsStore } from "@/lib/store";
 import type { Option } from "@/components/ui/multi-select";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Text } from "@/components/ui/text";
 import { useTags } from "@/hooks/use-tags";
 import { fetchBookmarkMetadata } from "@/lib/metadata";
+import { useCollectionsStore } from "@/lib/store";
 
 const bookmarkSchema = z.object({
 	url: z.url("Please enter a valid URL"),
@@ -158,7 +158,7 @@ export function AddBookmarkModal({ onAddBookmark }: AddBookmarkModalProps) {
 										keyboardType="url"
 									/>
 									{isLoading && (
-										<View className="absolute right-3 top-3">
+										<View className="absolute top-3 right-3">
 											<ActivityIndicator size="small" />
 										</View>
 									)}

@@ -1,6 +1,6 @@
+import type { ArticleFilterOptions } from "@packages/agents";
 import { useReaderStore } from "@packages/store";
 import { useMemo } from "react";
-import type { ArticleFilterOptions } from "@packages/agents";
 
 /**
  * Hook for accessing feed and article data.

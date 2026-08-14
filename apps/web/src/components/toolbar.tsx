@@ -23,17 +23,16 @@ export default function Toolbar() {
 			<div className="flex h-16 items-center justify-between px-4 md:px-6">
 				{/* Left Section */}
 				<div className="...">
-				{state === "collapsed" && (
-					<Button
-						onClick={toggleSidebar}
-						aria-label="Open sidebar"
-						title="Open sidebar (⌘B)"
-						className="cursor-pointer transition-opacity hover:opacity-80"
-					>
+					{state === "collapsed" && (
+						<Button
+							onClick={toggleSidebar}
+							aria-label="Open sidebar"
+							title="Open sidebar (⌘B)"
+							className="cursor-pointer transition-opacity hover:opacity-80"
+						>
 							<BookOpenText className="size-4" />
-					</Button>
-				)}
-					
+						</Button>
+					)}
 				</div>
 
 				{/* Center Section - Search */}

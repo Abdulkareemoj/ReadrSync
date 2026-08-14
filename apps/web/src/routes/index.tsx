@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { DashboardCard } from "@/components/home/dashboard-card";
 import ArticleGridSection from "@/components/home/ArticleGridSection";
 import CollectionsSection from "@/components/home/CollectionsSection";
+import { DashboardCard } from "@/components/home/dashboard-card";
 import FromYourFeedsSection from "@/components/home/FromYourFeedsSection";
 import { useHomeData } from "@/components/home/hooks";
 import PinnedItemsSection from "@/components/home/PinnedItemsSection";
@@ -63,12 +63,32 @@ function DashboardComponent() {
 				/>
 
 				<CollectionsSection collections={d.bookmarkCollections} />
-				<ArticleGridSection title="Daily Highlights" articles={d.dailyHighlights} feeds={d.feeds} navigate={navigate} />
-				<ArticleGridSection title="Trending This Week" articles={d.trendingArticles} feeds={d.feeds} navigate={navigate} />
+				<ArticleGridSection
+					title="Daily Highlights"
+					articles={d.dailyHighlights}
+					feeds={d.feeds}
+					navigate={navigate}
+				/>
+				<ArticleGridSection
+					title="Trending This Week"
+					articles={d.trendingArticles}
+					feeds={d.feeds}
+					navigate={navigate}
+				/>
 				<ReadingStreakSection streak={d.currentStreak} />
-				<ReadingStatsSection totalRead={d.totalRead} totalLiked={d.totalLiked} totalSaved={d.totalSaved} />
-				<PinnedItemsSection bookmarks={d.pinnedBookmarks} articles={d.pinnedArticles} />
-				<FromYourFeedsSection articlesByFeed={d.articlesByFeed} navigate={navigate} />
+				<ReadingStatsSection
+					totalRead={d.totalRead}
+					totalLiked={d.totalLiked}
+					totalSaved={d.totalSaved}
+				/>
+				<PinnedItemsSection
+					bookmarks={d.pinnedBookmarks}
+					articles={d.pinnedArticles}
+				/>
+				<FromYourFeedsSection
+					articlesByFeed={d.articlesByFeed}
+					navigate={navigate}
+				/>
 			</div>
 
 			<RecentActivitySection

@@ -33,18 +33,19 @@ export function Marquee({
 			)}
 		>
 			{Array.from({ length: repeat }, (_, i) => (
-					<div
-						key={`marquee-${i}`}
-						className={cn("flex shrink-0 justify-around [gap:var(--gap)]", {
-							"animate-marquee flex-row": !vertical,
-							"animate-marquee-vertical flex-col": vertical,
-							"group-hover:[animation-play-state:paused]": pauseOnHover,
-							"[animation-direction:reverse]": reverse,
-						})}
-					>
-						{children}
-					</div>
-				))}
+				<div
+					// biome-ignore lint/suspicious/noArrayIndexKey: identical repeated marquee copies, no natural key
+					key={`marquee-${i}`}
+					className={cn("flex shrink-0 justify-around [gap:var(--gap)]", {
+						"animate-marquee flex-row": !vertical,
+						"animate-marquee-vertical flex-col": vertical,
+						"group-hover:[animation-play-state:paused]": pauseOnHover,
+						"[animation-direction:reverse]": reverse,
+					})}
+				>
+					{children}
+				</div>
+			))}
 		</div>
 	);
 }

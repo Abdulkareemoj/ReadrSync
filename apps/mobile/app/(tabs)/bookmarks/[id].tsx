@@ -191,9 +191,9 @@ export default function BookmarkDetailScreen() {
 									Tags
 								</Text>
 								<View className="flex-row flex-wrap gap-2">
-									{bookmark.tags.map((tag: string, index: number) => (
+									{bookmark.tags.map((tag: string) => (
 										<View
-											key={`${tag}-${index}`}
+											key={tag}
 											className="rounded-md bg-secondary px-2 py-1"
 										>
 											<Text className="font-medium text-secondary-foreground text-xs">

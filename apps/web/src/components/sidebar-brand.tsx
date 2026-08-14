@@ -16,7 +16,9 @@ export function SidebarBrand() {
 				<SidebarMenuButton
 					size="lg"
 					onClick={toggleSidebar}
-					tooltip={isCollapsed ? "Expand sidebar (⌘B)" : "Collapse sidebar (⌘B)"}
+					tooltip={
+						isCollapsed ? "Expand sidebar (⌘B)" : "Collapse sidebar (⌘B)"
+					}
 					className="cursor-pointer justify-center hover:bg-sidebar-accent/60"
 				>
 					<div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -25,7 +27,7 @@ export function SidebarBrand() {
 					</div>
 
 					{!isCollapsed && (
-						<span className="truncate text-sm font-semibold tracking-tight">
+						<span className="truncate font-semibold text-sm tracking-tight">
 							ReadrSync
 						</span>
 					)}

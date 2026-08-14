@@ -1,5 +1,5 @@
-import { Text, View } from "react-native";
 import { Trash2 } from "lucide-react-native";
+import { Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";

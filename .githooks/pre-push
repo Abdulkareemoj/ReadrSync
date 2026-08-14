@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Pre-push hook: run Biome lint on the whole repo.
+# Fails the push if any Biome errors exist (warnings/infos are non-blocking).
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "$ROOT_DIR" || exit 1
+
+echo "Running Biome lint (pnpm lint)..."
+status=0
+if command -v pnpm >/dev/null 2>&1; then
+    pnpm lint
+    status=$?
+elif command -v npx >/dev/null 2>&1; then
+    npx biome ci .
+    status=$?
+elif [ -x "node_modules/@biomejs/biome/bin/biome" ]; then
+    node node_modules/@biomejs/biome/bin/biome ci .
+    status=$?
+else
+    echo "Error: could not locate Biome (pnpm/npx/node_modules not available)."
+    exit 1
+fi
+
+if [ "$status" -ne 0 ]; then
+    echo ""
+    echo "Push blocked: Biome lint failed. Fix the errors above, then re-push."
+    echo "Tip: run 'pnpm check' to auto-fix what Biome can fix."
+    exit 1
+fi
+
+echo "Biome lint passed."

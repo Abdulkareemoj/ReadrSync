@@ -1,5 +1,5 @@
-import { getInitializedMobileAgents } from "@/lib/db";
 import type { IAgents } from "@packages/utils";
+import { getInitializedMobileAgents } from "@/lib/db";
 
 // This file serves as a helper to access the globally initialized agents
 // after `initializeMobileAgents()` has been called in the application entry point.
@@ -9,5 +9,5 @@ import type { IAgents } from "@packages/utils";
  * Must only be called after the agents have been successfully initialized.
  */
 export function getInitializedAgents(): IAgents {
-  return getInitializedMobileAgents();
+	return getInitializedMobileAgents();
 }

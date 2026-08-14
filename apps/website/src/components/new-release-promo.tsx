@@ -58,7 +58,7 @@ export function NewReleasePromo() {
 						</div>
 
 						{/* Stroked text wordmark */}
-						<h1
+						<div
 							className="pointer-events-none absolute inset-x-0 mt-[120px] text-center font-semibold text-[100px] text-transparent sm:mt-[30px] sm:text-[190px]"
 							style={{
 								WebkitTextStroke: "1px currentColor",
@@ -67,13 +67,13 @@ export function NewReleasePromo() {
 							aria-hidden="true"
 						>
 							ReadrSync
-						</h1>
-						<h1
+						</div>
+						<div
 							className="pointer-events-none absolute inset-x-0 mt-[120px] text-center font-semibold text-[100px] text-neutral-950 sm:mt-[30px] sm:text-[190px]"
 							aria-hidden="true"
 						>
 							ReadrSync
-						</h1>
+						</div>
 					</div>
 				</div>
 			</div>

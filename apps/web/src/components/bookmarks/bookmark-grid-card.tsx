@@ -125,7 +125,7 @@ export function BookmarkGridCard({
 				</DropdownMenu>
 			</div>
 
-			<button
+			<Button
 				type="button"
 				className="w-full cursor-pointer text-left"
 				onClick={onClick}
@@ -155,7 +155,7 @@ export function BookmarkGridCard({
 				<div className="flex flex-col gap-2 p-4">
 					<h3 className="line-clamp-1 font-medium">{title}</h3>
 					{description && (
-						<p className="line-clamp-2 text-sm text-muted-foreground">
+						<p className="line-clamp-2 text-muted-foreground text-sm">
 							{description}
 						</p>
 					)}
@@ -165,7 +165,7 @@ export function BookmarkGridCard({
 								<Badge
 									key={tag}
 									variant="secondary"
-									className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+									className="rounded-md px-1.5 py-0.5 font-medium text-[10px]"
 								>
 									{tag}
 								</Badge>
@@ -178,7 +178,7 @@ export function BookmarkGridCard({
 						</div>
 					)}
 				</div>
-			</button>
+			</Button>
 		</div>
 	);
 }

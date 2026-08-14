@@ -9,8 +9,8 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useReaderStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { ConfirmationDialog } from "../confirmation-dialog";
 
 interface BookmarkDisplayProps {
@@ -50,14 +50,14 @@ export default function BookmarkDisplay({
 	return (
 		<article className="mx-auto w-full max-w-3xl px-4 py-8 md:px-8 md:py-12">
 			<div className="mb-6 flex items-center justify-between">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => window.history.back()}
-					>
-						<ArrowLeft data-icon="inline-start" />
-						Back
-					</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => window.history.back()}
+				>
+					<ArrowLeft data-icon="inline-start" />
+					Back
+				</Button>
 				<div className="flex items-center gap-1">
 					<Button
 						variant="ghost"
@@ -146,8 +146,8 @@ export default function BookmarkDisplay({
 				)}
 
 				{tags.length > 0 && (
-					<div className="border-t border-border py-6">
-						<p className="mb-3 font-semibold text-sm text-muted-foreground">
+					<div className="border-border border-t py-6">
+						<p className="mb-3 font-semibold text-muted-foreground text-sm">
 							Tags
 						</p>
 						<div className="flex flex-wrap gap-2">

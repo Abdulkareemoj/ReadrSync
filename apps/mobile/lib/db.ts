@@ -1,19 +1,19 @@
+import {
+	createBookmarkAgent,
+	createCollectionAgent,
+	createHighlightAgent,
+	createRssAgent,
+	type IAgents,
+} from "@packages/agents";
 import { runFtsSetup, runMigrations, SCHEMA_VERSION } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import { seedDatabase } from "@packages/db/src/seed-data";
-import {
-	createBookmarkAgent,
-	createCollectionAgent,
-	createRssAgent,
-	createHighlightAgent,
-	type IAgents,
-} from "@packages/agents";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseAsync } from "expo-sqlite";
 import { createMobileAuthAgent } from "./auth-agent";
-import { createMobileSyncAgent } from "./sync-agent";
 import { GOOGLE_OAUTH_CONFIG } from "./auth-config";
+import { createMobileSyncAgent } from "./sync-agent";
 
 const DB_NAME = "bookmark_tool.db";
 

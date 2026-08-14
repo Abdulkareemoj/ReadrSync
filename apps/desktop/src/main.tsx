@@ -1,12 +1,12 @@
 import "../../web/src/styles.css";
 
+import { initializeReaderStore } from "@packages/store";
+import { RouterProvider } from "@tanstack/react-router";
+import { invoke } from "@tauri-apps/api/core";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "@tanstack/react-router";
 import { getRouter } from "../../web/src/router";
 import { initializeTauriAgents } from "./db";
-import { initializeReaderStore } from "@packages/store";
-import { invoke } from "@tauri-apps/api/core";
 
 async function bootstrap() {
 	const agents = await initializeTauriAgents();

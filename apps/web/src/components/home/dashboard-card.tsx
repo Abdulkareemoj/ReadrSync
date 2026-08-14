@@ -9,6 +9,7 @@ function PopNumber({ value }: { value: number }) {
 		<span className="t-digit-group is-animating" key={value}>
 			{str.split("").map((ch, i) => (
 				<span
+					// biome-ignore lint/suspicious/noArrayIndexKey: digit positions may repeat (e.g. 100), index is the stable key
 					key={i}
 					className="t-digit"
 					data-stagger={

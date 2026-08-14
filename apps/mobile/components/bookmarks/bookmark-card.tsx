@@ -82,7 +82,7 @@ function BookmarkCard({
 									key={tag}
 									className="rounded-md bg-secondary px-1.5 py-0.5"
 								>
-									<Text className="text-secondary-foreground text-[10px] font-medium">
+									<Text className="font-medium text-[10px] text-secondary-foreground">
 										{tag}
 									</Text>
 								</View>

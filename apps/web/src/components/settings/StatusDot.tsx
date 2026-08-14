@@ -7,12 +7,10 @@ const colors = {
 	idle: "bg-muted-foreground/40",
 } as const;
 
-export default function StatusDot({
-	status,
-}: {
-	status: keyof typeof colors;
-}) {
+export default function StatusDot({ status }: { status: keyof typeof colors }) {
 	return (
-		<span className={cn("inline-block size-1.5 rounded-full", colors[status])} />
+		<span
+			className={cn("inline-block size-1.5 rounded-full", colors[status])}
+		/>
 	);
 }

@@ -1,8 +1,8 @@
+import { useForm } from "@tanstack/react-form";
+import { Check, Trash2 } from "lucide-react-native";
 import * as React from "react";
 import { View } from "react-native";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { Check, Trash2 } from "lucide-react-native";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -18,17 +18,17 @@ import { Text } from "@/components/ui/text";
 
 const editFeedSchema = z.object({
 	title: z.string().min(1, "Title is required"),
-	feedUrl: z.url("Please enter a valid RSS feed URL").min(1, "URL is required").refine(
-			(url) => {
-				try {
-					const urlObj = new URL(url);
-					return urlObj.hostname.includes(".");
-				} catch {
-					return false;
-				}
-			},
-			"Please enter a valid domain (e.g., https://example.com/feed.xml)"
-		),
+	feedUrl: z
+		.url("Please enter a valid RSS feed URL")
+		.min(1, "URL is required")
+		.refine((url) => {
+			try {
+				const urlObj = new URL(url);
+				return urlObj.hostname.includes(".");
+			} catch {
+				return false;
+			}
+		}, "Please enter a valid domain (e.g., https://example.com/feed.xml)"),
 });
 
 interface EditFeedModalProps {
@@ -145,7 +145,7 @@ export function EditFeedModal({
 				</View>
 
 				<DialogFooter>
-					<View className="flex flex-col gap-2 w-full">
+					<View className="flex w-full flex-col gap-2">
 						<form.Subscribe
 							selector={(state) => ({
 								values: state.values,
@@ -154,7 +154,9 @@ export function EditFeedModal({
 							children={(state) => (
 								<Button
 									onPress={() => form.handleSubmit()}
-									disabled={state.values.title.trim() === "" || state.isSubmitting}
+									disabled={
+										state.values.title.trim() === "" || state.isSubmitting
+									}
 									className="w-full"
 								>
 									<Check size={18} color="white" className="mr-2" />

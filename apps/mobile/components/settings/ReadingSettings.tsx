@@ -1,6 +1,12 @@
 import { Text, View } from "react-native";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useSettingsStore } from "@/lib/store";
 import { FONT_SIZES } from "./constants";
@@ -26,8 +32,7 @@ export default function ReadingSettings() {
 							FONT_SIZES.find((fs) => fs.value === readerFontSize)?.label ?? "",
 					}}
 					onValueChange={(option) => {
-						if (option)
-							setReaderFontSize(option.value as "sm" | "md" | "lg");
+						if (option) setReaderFontSize(option.value as "sm" | "md" | "lg");
 					}}
 				>
 					<SelectTrigger className="w-full">

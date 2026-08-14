@@ -1,6 +1,6 @@
+import { Cloud, LogOut } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { Cloud, LogOut } from "lucide-react-native";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,7 +27,8 @@ export default function CloudSyncSettings() {
 						Cloud sync
 					</Text>
 					<Text className="text-muted-foreground text-sm">
-						Keep bookmarks, feeds, and reading progress in sync across your devices
+						Keep bookmarks, feeds, and reading progress in sync across your
+						devices
 					</Text>
 				</View>
 				<Separator className="mb-4" />
@@ -70,16 +71,34 @@ export default function CloudSyncSettings() {
 							<Text className="font-medium text-sm">Sync status</Text>
 							{lastSync && (
 								<Text className="text-muted-foreground text-xs">
-									Last synced {new Date(lastSync).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+									Last synced{" "}
+									{new Date(lastSync).toLocaleDateString(undefined, {
+										month: "short",
+										day: "numeric",
+										hour: "numeric",
+										minute: "2-digit",
+									})}
 								</Text>
 							)}
 						</View>
 						<View className="flex-row items-center gap-2">
 							<Badge
-								variant={syncStatus === "connected" ? "default" : syncStatus === "error" ? "destructive" : "secondary"}
+								variant={
+									syncStatus === "connected"
+										? "default"
+										: syncStatus === "error"
+											? "destructive"
+											: "secondary"
+								}
 							>
 								<Text className="text-xs">
-									{syncStatus === "connected" ? "Connected" : syncStatus === "syncing" ? "Syncing" : syncStatus === "error" ? "Error" : "Idle"}
+									{syncStatus === "connected"
+										? "Connected"
+										: syncStatus === "syncing"
+											? "Syncing"
+											: syncStatus === "error"
+												? "Error"
+												: "Idle"}
 								</Text>
 							</Badge>
 							<Button

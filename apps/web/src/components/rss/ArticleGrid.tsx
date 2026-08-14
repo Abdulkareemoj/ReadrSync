@@ -39,9 +39,15 @@ export default function ArticleGrid({
 						<div className="flex justify-center">
 							<div className="flex size-12 items-center justify-center rounded-full bg-muted">
 								{hasNoFeeds ? (
-									<Rss data-icon="inline-start" className="text-muted-foreground" />
+									<Rss
+										data-icon="inline-start"
+										className="text-muted-foreground"
+									/>
 								) : (
-									<Check data-icon="inline-start" className="text-muted-foreground" />
+									<Check
+										data-icon="inline-start"
+										className="text-muted-foreground"
+									/>
 								)}
 							</div>
 						</div>

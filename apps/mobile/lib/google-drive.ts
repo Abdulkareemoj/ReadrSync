@@ -32,9 +32,7 @@ async function request(
  * Find the sync file in Google Drive.
  * Searches specifically for files created by this app (drive.file scope).
  */
-async function findSyncFile(
-	accessToken: string,
-): Promise<DriveFile | null> {
+async function findSyncFile(accessToken: string): Promise<DriveFile | null> {
 	const params = new URLSearchParams({
 		q: `name='${DRIVE_SYNC_FILENAME}' and trashed=false`,
 		spaces: "drive",
@@ -42,10 +40,7 @@ async function findSyncFile(
 		pageSize: "1",
 	});
 
-	const res = await request(
-		accessToken,
-		`${DRIVE_API_BASE}/files?${params}`,
-	);
+	const res = await request(accessToken, `${DRIVE_API_BASE}/files?${params}`);
 	if (!res.ok) return null;
 
 	const data = await res.json();
@@ -100,17 +95,14 @@ async function createSyncFile(
 			fileContent +
 			closeDelimiter;
 
-		const res = await fetch(
-			`${DRIVE_UPLOAD_BASE}/files?uploadType=multipart`,
-			{
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					"Content-Type": `multipart/related; boundary=${boundary}`,
-				},
-				body,
+		const res = await fetch(`${DRIVE_UPLOAD_BASE}/files?uploadType=multipart`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"Content-Type": `multipart/related; boundary=${boundary}`,
 			},
-		);
+			body,
+		});
 
 		if (!res.ok) return null;
 		return res.json();

@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 type Props = {
 	value: string;
@@ -19,7 +20,7 @@ export default function ThemeOption({
 	const isDark = value === "dark";
 
 	return (
-		<button
+		<Button
 			type="button"
 			onClick={onSelect}
 			className={cn(
@@ -71,6 +72,6 @@ export default function ThemeOption({
 					</div>
 				)}
 			</div>
-		</button>
+		</Button>
 	);
 }

@@ -12,7 +12,6 @@ import {
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,6 +19,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { cn } from "@/lib/utils";
 import { ConfirmationDialog } from "../confirmation-dialog";
 
@@ -85,7 +90,7 @@ function BookmarkListItem({
 								<Badge
 									key={tag}
 									variant="secondary"
-									className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+									className="rounded-md px-1.5 py-0.5 font-medium text-[10px]"
 								>
 									{tag}
 								</Badge>
@@ -98,7 +103,7 @@ function BookmarkListItem({
 						</div>
 					)}
 				</div>
-				<p className="truncate text-sm text-muted-foreground">
+				<p className="truncate text-muted-foreground text-sm">
 					{bookmark.url ?? "No URL"}
 				</p>
 			</div>

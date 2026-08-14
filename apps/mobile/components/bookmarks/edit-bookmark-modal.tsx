@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Text } from "@/components/ui/text";
 import type { Option } from "@/components/ui/multi-select";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Text } from "@/components/ui/text";
 import { useTags } from "@/hooks/use-tags";
 import { useCollectionsStore, useReaderStore } from "@/lib/store";
 

@@ -56,7 +56,7 @@ export default function CloudSyncSection({
 								<Cloud className="size-5 text-primary" />
 							</div>
 							<div>
-								<p className="text-sm font-medium">Google Drive</p>
+								<p className="font-medium text-sm">Google Drive</p>
 								{authEmail && (
 									<p className="text-muted-foreground text-xs">{authEmail}</p>
 								)}
@@ -89,9 +89,9 @@ export default function CloudSyncSection({
 									</AlertDialogMedia>
 									<AlertDialogTitle>Connect Google Drive</AlertDialogTitle>
 									<AlertDialogDescription>
-										Link your Google Drive to sync bookmarks, feeds, and
-										reading progress across devices. You'll be redirected to
-										Google to authorize access.
+										Link your Google Drive to sync bookmarks, feeds, and reading
+										progress across devices. You'll be redirected to Google to
+										authorize access.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
@@ -123,7 +123,7 @@ export default function CloudSyncSection({
 						last
 					>
 						<div className="flex items-center gap-3">
-							<span className="inline-flex items-center gap-1.5 font-medium text-xs text-muted-foreground">
+							<span className="inline-flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
 								<StatusDot status={syncStatus} />
 								{statusLabel}
 							</span>

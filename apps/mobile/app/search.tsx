@@ -76,7 +76,7 @@ const useSearchSuggestions = (query: string) => {
 				!seen.has(bookmark.title)
 			) {
 				suggestions.push(bookmark.title);
-				seen.add(book.title);
+				seen.add(bookmark.title);
 			}
 		});
 
@@ -215,9 +215,9 @@ export default function MobileBookmarksScreen({
 				{/* Search suggestions */}
 				{suggestions.length > 0 && (
 					<View className="mt-2 rounded-lg border border-gray-200 bg-white shadow-sm">
-						{suggestions.map((suggestion, index) => (
+						{suggestions.map((suggestion) => (
 							<TouchableOpacity
-								key={index}
+								key={suggestion}
 								onPress={() => applySuggestion(suggestion)}
 								className="flex-row items-center border-gray-100 border-b px-3 py-2.5 last:border-b-0 hover:bg-gray-50 active:bg-gray-100"
 							>
@@ -245,9 +245,9 @@ export default function MobileBookmarksScreen({
 							</TouchableOpacity>
 						</View>
 						<View className="flex-row flex-wrap gap-2">
-							{searchHistory.map((item, index) => (
+							{searchHistory.map((item) => (
 								<TouchableOpacity
-									key={index}
+									key={item}
 									onPress={() => handleSearch(item)}
 									className="rounded-full bg-gray-100 px-3 py-1.5 active:bg-gray-200"
 								>

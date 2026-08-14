@@ -59,17 +59,11 @@ export default function HomeArticleCard({ article, feed }: Props) {
 					</Text>
 				</View>
 
-				<Text
-					className="mb-1 font-semibold text-base"
-					numberOfLines={2}
-				>
+				<Text className="mb-1 font-semibold text-base" numberOfLines={2}>
 					{article.title}
 				</Text>
 
-				<Text
-					className="mb-2 text-muted-foreground text-xs"
-					numberOfLines={2}
-				>
+				<Text className="mb-2 text-muted-foreground text-xs" numberOfLines={2}>
 					{article.contentSnippet || article.content || ""}
 				</Text>
 

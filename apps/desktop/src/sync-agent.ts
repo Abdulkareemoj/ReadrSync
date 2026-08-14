@@ -1,14 +1,14 @@
-import { appDataDir } from "@tauri-apps/api/path";
-import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import type {
+	IAuthAgent,
+	IBookmarkAgent,
+	IHighlightAgent,
+	IRssAgent,
 	ISyncAgent,
 	SyncData,
 	SyncResult,
-	IAuthAgent,
-	IBookmarkAgent,
-	IRssAgent,
-	IHighlightAgent,
 } from "@packages/agents";
+import { appDataDir } from "@tauri-apps/api/path";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import * as Drive from "./google-drive";
 
 const SYNC_FILE = "sync.json";

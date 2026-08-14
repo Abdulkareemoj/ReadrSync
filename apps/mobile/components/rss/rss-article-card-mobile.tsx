@@ -53,7 +53,7 @@ function RssArticleCardMobileBase({
 					<CardContent className="flex-1 p-3">
 						<Text
 							className={cn(
-								"text-sm text-foreground leading-snug",
+								"text-foreground text-sm leading-snug",
 								article.read ? "font-medium" : "font-semibold",
 							)}
 							numberOfLines={3}
@@ -73,16 +73,16 @@ function RssArticleCardMobileBase({
 
 				{/* Footer bar */}
 				<View className="flex-row items-center justify-between border-border/50 border-t px-4 py-1.5">
-					<View className="flex-row items-center gap-2 shrink-1 min-w-0">
-						<LinkIcon size={12} className="text-muted-foreground shrink-0" />
+					<View className="min-w-0 shrink-1 flex-row items-center gap-2">
+						<LinkIcon size={12} className="shrink-0 text-muted-foreground" />
 						<Text
-							className="font-medium text-muted-foreground text-xs shrink-1"
+							className="shrink-1 font-medium text-muted-foreground text-xs"
 							numberOfLines={1}
 						>
 							{feedTitle}
 						</Text>
-						<Text className="text-muted-foreground text-xs shrink-0">·</Text>
-						<Text className="text-muted-foreground text-xs shrink-0">
+						<Text className="shrink-0 text-muted-foreground text-xs">·</Text>
+						<Text className="shrink-0 text-muted-foreground text-xs">
 							{article.pubDate
 								? new Date(article.pubDate).toLocaleDateString(undefined, {
 										month: "short",
@@ -92,7 +92,7 @@ function RssArticleCardMobileBase({
 						</Text>
 					</View>
 
-					<View className="flex-row items-center gap-0.5 shrink-0">
+					<View className="shrink-0 flex-row items-center gap-0.5">
 						<Pressable
 							onPress={() => onToggleLike(article.id)}
 							className="rounded-md p-1.5 active:bg-accent"

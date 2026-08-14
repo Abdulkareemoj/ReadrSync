@@ -42,16 +42,31 @@ export function StoreProvider({ children }: StoreProviderProps) {
 					const { useCollectionsStore } = await import("@packages/store");
 					const tree = store.getState().collections;
 					if (tree.length > 0) {
-						const flat: { id: string; name: string; parentId: string | null; position: number }[] = [];
+						const flat: {
+							id: string;
+							name: string;
+							parentId: string | null;
+							position: number;
+						}[] = [];
 						const walk = (nodes: any[]) => {
 							for (const n of nodes) {
-								flat.push({ id: n.id, name: n.name, parentId: n.parentId ?? null, position: n.position ?? 0 });
+								flat.push({
+									id: n.id,
+									name: n.name,
+									parentId: n.parentId ?? null,
+									position: n.position ?? 0,
+								});
 								walk(n.children ?? []);
 							}
 						};
 						walk(tree);
 						useCollectionsStore.getState().setBookmarkCollections([
-							{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
+							{
+								id: "all",
+								name: "All Bookmarks",
+								parentId: null,
+								position: 0,
+							},
 							{ id: "inbox", name: "Inbox", parentId: null, position: 1 },
 							...flat.filter((c) => c.id !== "all" && c.id !== "inbox"),
 						]);

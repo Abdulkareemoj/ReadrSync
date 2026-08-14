@@ -5,10 +5,10 @@ import HtmlParser from "react-html-parser";
 import AnnotationPanel from "@/components/annotation-panel";
 import HighlightMenu from "@/components/rss/highlight-menu";
 import { Button } from "@/components/ui/button";
-import { useReaderStore, useSettingsStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 import { useFeeds } from "@/hooks/use-feeds";
 import { useHighlights } from "@/hooks/use-highlights";
+import { useReaderStore, useSettingsStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rss/article/$id")({
 	component: ArticleReaderComponent,
@@ -151,6 +151,23 @@ function ArticleReaderComponent() {
 	const currentHighlight = highlights.find(
 		(h: any) => h.id === currentHighlightId,
 	);
+
+	const rawContent = article?.content || article?.contentSnippet || "";
+	const preparedHtml = useMemo(() => prepareContent(rawContent), [rawContent]);
+	const wordCount = rawContent
+		.replace(/<[^>]*>/g, " ")
+		.split(/\s+/)
+		.filter(Boolean).length;
+	const readTime = Math.max(1, Math.ceil(wordCount / 220));
+
+	const date = article?.pubDate
+		? new Date(article.pubDate).toLocaleDateString(undefined, {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+			})
+		: "";
+
 	if (!article) {
 		return (
 			<div className="flex min-h-screen items-center justify-center">
@@ -163,24 +180,6 @@ function ArticleReaderComponent() {
 			</div>
 		);
 	}
-
-	const rawContent = article.content || article.contentSnippet || "";
-	const preparedHtml = useMemo(() => prepareContent(rawContent), [rawContent]);
-	console.log("fullContent:", article.fullContent?.slice(0, 100));
-	console.log("content:", article.content?.slice(0, 100));
-	const wordCount = rawContent
-		.replace(/<[^>]*>/g, " ")
-		.split(/\s+/)
-		.filter(Boolean).length;
-	const readTime = Math.max(1, Math.ceil(wordCount / 220));
-
-	const date = article.pubDate
-		? new Date(article.pubDate).toLocaleDateString(undefined, {
-				year: "numeric",
-				month: "long",
-				day: "numeric",
-			})
-		: "";
 
 	return (
 		<div className="flex min-h-screen flex-col bg-background">
@@ -242,7 +241,7 @@ function ArticleReaderComponent() {
 				<div className="mx-auto max-w-3xl px-5 py-10">
 					{/* Feed label */}
 					{feed?.title && (
-						<p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
+						<p className="mb-3 font-semibold text-primary text-xs uppercase tracking-widest">
 							{feed.title}
 						</p>
 					)}
@@ -271,7 +270,7 @@ function ArticleReaderComponent() {
 									href={article.link}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="truncate max-w-[200px] hover:text-foreground transition-colors hover:underline"
+									className="max-w-[200px] truncate transition-colors hover:text-foreground hover:underline"
 								>
 									{new URL(article.link).hostname}
 								</a>
@@ -285,12 +284,13 @@ function ArticleReaderComponent() {
 							<img
 								src={article.imageUrl}
 								alt={article.title}
-								className="h-auto w-full object-cover max-h-96"
+								className="h-auto max-h-96 w-full object-cover"
 							/>
 						</div>
 					)}
 
 					{/* Article body, rendered HTML */}
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: mouseup text-selection for highlights, not an interaction control */}
 					<div
 						onMouseUp={handleTextSelection}
 						className={cn(
@@ -302,22 +302,22 @@ function ArticleReaderComponent() {
 							// Headings
 							"[&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:font-bold [&_h1]:text-3xl [&_h1]:text-foreground",
 							"[&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:font-bold [&_h2]:text-2xl [&_h2]:text-foreground",
-							"[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:font-semibold [&_h3]:text-xl [&_h3]:text-foreground",
-							"[&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:font-semibold [&_h4]:text-lg [&_h4]:text-foreground",
+							"[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:text-xl",
+							"[&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:font-semibold [&_h4]:text-foreground [&_h4]:text-lg",
 							// Links
-							"[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:opacity-80",
+							"[&_a:hover]:opacity-80 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2",
 							// Lists
 							"[&_ul]:mb-5 [&_ul]:ml-6 [&_ul]:list-disc [&_ul_li]:mb-1.5",
 							"[&_ol]:mb-5 [&_ol]:ml-6 [&_ol]:list-decimal [&_ol_li]:mb-1.5",
 							// Blockquote
-							"[&_blockquote]:my-6 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-5 [&_blockquote]:italic [&_blockquote]:text-muted-foreground",
+							"[&_blockquote]:my-6 [&_blockquote]:border-primary [&_blockquote]:border-l-4 [&_blockquote]:pl-5 [&_blockquote]:text-muted-foreground [&_blockquote]:italic",
 							// Code
-							"[&_code]:rounded [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_code]:text-foreground",
+							"[&_code]:rounded [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-foreground [&_code]:text-sm",
 							"[&_pre]:mb-5 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-muted [&_pre]:p-4",
 							"[&_pre_code]:bg-transparent [&_pre_code]:p-0",
 							// Images
-							"[&_img]:my-6 [&_img]:rounded-xl [&_img]:max-w-full [&_img]:h-auto",
-							"[&_figure]:my-6 [&_figcaption]:mt-2 [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-muted-foreground",
+							"[&_img]:my-6 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl",
+							"[&_figcaption]:mt-2 [&_figcaption]:text-center [&_figcaption]:text-muted-foreground [&_figcaption]:text-sm [&_figure]:my-6",
 							// HR
 							"[&_hr]:my-8 [&_hr]:border-border",
 							// Strong / em
@@ -325,7 +325,7 @@ function ArticleReaderComponent() {
 							"[&_em]:italic",
 							// Table
 							"[&_table]:mb-5 [&_table]:w-full [&_table]:border-collapse",
-							"[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold",
+							"[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm",
 							"[&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm",
 						)}
 						// react-html-parser sanitises by default, but we also cleaned
@@ -411,7 +411,7 @@ function ArticleReaderComponent() {
 								href={article.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+								className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 font-medium text-foreground text-sm transition-colors hover:bg-muted"
 							>
 								<ExternalLink className="size-4" />
 								Read on {feed?.title ?? new URL(article.link).hostname}

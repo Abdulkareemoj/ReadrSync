@@ -1,11 +1,11 @@
 import { getTableConfig } from "drizzle-orm/sqlite-core";
 import {
+	annotations,
 	articles,
 	bookmarks,
 	feeds,
-	schemaVersion,
 	highlights,
-	annotations,
+	schemaVersion,
 } from "../src/schema";
 
 const tables = [

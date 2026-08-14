@@ -1,19 +1,18 @@
 import type {
-	IAuthAgent,
 	AuthProvider,
 	AuthResult,
 	AuthUserInfo,
+	IAuthAgent,
 } from "@packages/agents";
-
-import * as WebBrowser from "expo-web-browser";
-import * as SecureStore from "expo-secure-store";
-import * as Crypto from "expo-crypto";
 import {
-	makeRedirectUri,
 	exchangeCodeAsync,
+	makeRedirectUri,
 	revokeAsync,
 	type TokenResponseConfig,
 } from "expo-auth-session";
+import * as Crypto from "expo-crypto";
+import * as SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
 
 // ─── Google OAuth Discovery ──────────────────────────────────────────────────
 
@@ -51,18 +50,13 @@ async function generateCodeVerifier(): Promise<string> {
 	return result;
 }
 
-async function generateCodeChallenge(
-	verifier: string,
-): Promise<string> {
+async function generateCodeChallenge(verifier: string): Promise<string> {
 	const hashBase64 = await Crypto.digestStringAsync(
 		Crypto.CryptoDigestAlgorithm.SHA256,
 		verifier,
 		{ encoding: Crypto.CryptoEncoding.BASE64 },
 	);
-	return hashBase64
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=+$/, "");
+	return hashBase64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 // ─── Token Persistence ────────────────────────────────────────────────────────
@@ -70,10 +64,7 @@ async function generateCodeChallenge(
 async function storeTokens(config: TokenResponseConfig) {
 	await Promise.all([
 		SecureStore.setItemAsync(KEYS.accessToken, config.accessToken),
-		SecureStore.setItemAsync(
-			KEYS.refreshToken,
-			config.refreshToken ?? "",
-		),
+		SecureStore.setItemAsync(KEYS.refreshToken, config.refreshToken ?? ""),
 		SecureStore.setItemAsync(
 			KEYS.expiresAt,
 			String(config.expiresIn ? Date.now() + config.expiresIn * 1000 : 0),
@@ -83,7 +74,9 @@ async function storeTokens(config: TokenResponseConfig) {
 
 async function clearTokens() {
 	await Promise.all(
-		Object.values(KEYS).map((k) => SecureStore.deleteItemAsync(k).catch(() => {})),
+		Object.values(KEYS).map((k) =>
+			SecureStore.deleteItemAsync(k).catch(() => {}),
+		),
 	);
 }
 
@@ -245,9 +238,7 @@ export function createMobileAuthAgent(clientId: string): IAuthAgent {
 						provider,
 						accessToken: null,
 						error:
-							result.type === "cancel"
-								? "Sign in cancelled"
-								: "Sign in failed",
+							result.type === "cancel" ? "Sign in cancelled" : "Sign in failed",
 					};
 				}
 
@@ -308,10 +299,7 @@ export function createMobileAuthAgent(clientId: string): IAuthAgent {
 			const token = await getStoredAccessToken();
 			if (token) {
 				try {
-					await revokeAsync(
-						{ token, clientId },
-						GOOGLE_DISCOVERY,
-					);
+					await revokeAsync({ token, clientId }, GOOGLE_DISCOVERY);
 				} catch {
 					// Best-effort revoke
 				}

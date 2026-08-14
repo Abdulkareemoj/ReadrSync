@@ -1,6 +1,6 @@
 import { BookmarkIcon, Heart, LayoutGrid, List, Tag } from "lucide-react";
-import type { AddBookmarkDialog } from "./add-bookmark-dialog";
 import { Button } from "@/components/ui/button";
+import type { AddBookmarkDialog } from "./add-bookmark-dialog";
 
 type Props = {
 	stats: { total: number; favorites: number; tagsCount: number };
@@ -22,7 +22,7 @@ export default function BookmarksHeader({
 			<div className="flex items-center gap-4">{addBookmarkDialog}</div>
 			<div className="flex items-center gap-2">
 				{stats.total > 0 && (
-					<div className="mr-4 flex items-center gap-4 text-sm text-muted-foreground">
+					<div className="mr-4 flex items-center gap-4 text-muted-foreground text-sm">
 						<span className="flex items-center gap-1">
 							<BookmarkIcon className="size-3.5" />
 							{stats.total}

@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import type { StoreApi, UseBoundStore } from "zustand";
 import type {
+	CollectionTreeNode,
+	IAuthAgent,
 	IBookmarkAgent,
 	ICollectionAgent,
-	IRssAgent,
 	IHighlightAgent,
+	IRssAgent,
 	ISyncAgent,
-	IAuthAgent,
 	SyncResult,
-	CollectionTreeNode,
 } from "@packages/agents";
+import type { StoreApi, UseBoundStore } from "zustand";
+import { create } from "zustand";
 
 // Types
 export interface Highlight {
@@ -82,7 +82,11 @@ export interface ReaderState {
 	createCollection: (name: string, parentId?: string | null) => Promise<void>;
 	renameCollection: (id: string, name: string) => Promise<void>;
 	deleteCollection: (id: string) => Promise<void>;
-	moveCollection: (id: string, newParentId: string | null, position?: number) => Promise<void>;
+	moveCollection: (
+		id: string,
+		newParentId: string | null,
+		position?: number,
+	) => Promise<void>;
 }
 
 // Helpers
@@ -272,38 +276,39 @@ export const createReaderStore = (
 							obj?.["$url"] ?? obj?.["@_url"] ?? obj?.url;
 						const str = (v: any) => toStr(v) || "";
 						return {
-						feedId: id,
-						title: str(entry.title) || "(untitled)",
-						link: str(entry.link) || str(entry.id) || "",
-						content:
-							str(entry.content) ||
-							str(entry.description) ||
-							str(entry["content:encoded"]) ||
-							"",
-						contentSnippet: (
-							str(entry.description) ||
-							str(entry.content) ||
-							str(entry["content:encoded"]) || ""
-						)
-							.replace(/<[^>]*>/g, "")
-							.slice(0, 500),
-						imageUrl:
-							(typeof entry.image === "string"
-								? entry.image
-								: entry.image?.url) ||
-							attrUrl(entry.enclosures?.[0]) ||
-							attrUrl(mediaContent) ||
-							attrUrl(mediaThumb) ||
-							undefined,
-						pubDate: entry.published
-							? new Date(entry.published).toISOString()
-							: new Date().toISOString(),
-						read: false,
-						liked: false,
-						saved: false,
-						lastUpdatedAt: new Date().toISOString(),
-					};
-				})
+							feedId: id,
+							title: str(entry.title) || "(untitled)",
+							link: str(entry.link) || str(entry.id) || "",
+							content:
+								str(entry.content) ||
+								str(entry.description) ||
+								str(entry["content:encoded"]) ||
+								"",
+							contentSnippet: (
+								str(entry.description) ||
+								str(entry.content) ||
+								str(entry["content:encoded"]) ||
+								""
+							)
+								.replace(/<[^>]*>/g, "")
+								.slice(0, 500),
+							imageUrl:
+								(typeof entry.image === "string"
+									? entry.image
+									: entry.image?.url) ||
+								attrUrl(entry.enclosures?.[0]) ||
+								attrUrl(mediaContent) ||
+								attrUrl(mediaThumb) ||
+								undefined,
+							pubDate: entry.published
+								? new Date(entry.published).toISOString()
+								: new Date().toISOString(),
+							read: false,
+							liked: false,
+							saved: false,
+							lastUpdatedAt: new Date().toISOString(),
+						};
+					})
 					.filter((p: any) => p.link);
 
 				if (parsed.length > 0) {
@@ -312,9 +317,7 @@ export const createReaderStore = (
 
 				const feedTitle = result.title || feed.title;
 				const allArticles = await rssAgent.listArticles(id);
-				const unreadCount = allArticles.filter(
-					(a: any) => !a.read,
-				).length;
+				const unreadCount = allArticles.filter((a: any) => !a.read).length;
 				await rssAgent.updateFeedMeta(id, {
 					title: feedTitle,
 					lastFetched: new Date().toISOString(),
@@ -432,20 +435,27 @@ export const createReaderStore = (
 		const result = await syncAgent.sync();
 		if (result.success) {
 			const { bookmarkAgent, rssAgent, highlightAgent } = get();
-			const [bookmarks, tree, feeds, articles, dbHighlights] = await Promise.all([
-				bookmarkAgent.listBookmarks(),
-				collectionAgent.getCollectionTree(),
-				rssAgent.listFeeds(),
-				rssAgent.listArticles(),
-				highlightAgent.listHighlights(),
-			]);
+			const [bookmarks, tree, feeds, articles, dbHighlights] =
+				await Promise.all([
+					bookmarkAgent.listBookmarks(),
+					collectionAgent.getCollectionTree(),
+					rssAgent.listFeeds(),
+					rssAgent.listArticles(),
+					highlightAgent.listHighlights(),
+				]);
 			const highlightsWithAnnotations = await Promise.all(
 				dbHighlights.map(async (h) => {
 					const anns = await highlightAgent.listAnnotations(h.id);
 					return { ...h, annotations: anns };
 				}),
 			);
-			set(() => ({ bookmarks, collections: tree, feeds, articles, highlights: highlightsWithAnnotations }));
+			set(() => ({
+				bookmarks,
+				collections: tree,
+				feeds,
+				articles,
+				highlights: highlightsWithAnnotations,
+			}));
 		}
 		return result;
 	},
@@ -478,5 +488,5 @@ export function getReaderStore() {
 	return readerStore;
 }
 
-export * from "./settings-store";
 export * from "./collections-store";
+export * from "./settings-store";

@@ -1,8 +1,8 @@
-import type { ExportFormat, DetectedFormat } from "@packages/utils";
+import type { DetectedFormat, ExportFormat } from "@packages/utils";
 import { detectFormat } from "@packages/utils";
 import { getInitializedAgents } from "./agents";
 
-export type { ExportFormat, DetectedFormat };
+export type { DetectedFormat, ExportFormat };
 export { detectFormat };
 
 export interface SyncData {

@@ -1,7 +1,7 @@
+import { Monitor, Moon, Sun } from "lucide-react-native";
 import { useId } from "react";
 import { Text, View } from "react-native";
 import { Uniwind, useUniwind } from "uniwind";
-import { Monitor, Moon, Sun } from "lucide-react-native";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { Label } from "@/components/ui/label";
@@ -9,9 +9,27 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSettingsStore } from "@/lib/store";
 
 const THEMES = [
-	{ value: "light", label: "Light", desc: "Bright and clean", icon: Sun, iconClass: "text-yellow-500" },
-	{ value: "dark", label: "Dark", desc: "Easy on the eyes", icon: Moon, iconClass: "text-blue-500" },
-	{ value: "system", label: "System", desc: "Follows device", icon: Monitor, iconClass: "text-muted-foreground" },
+	{
+		value: "light",
+		label: "Light",
+		desc: "Bright and clean",
+		icon: Sun,
+		iconClass: "text-yellow-500",
+	},
+	{
+		value: "dark",
+		label: "Dark",
+		desc: "Easy on the eyes",
+		icon: Moon,
+		iconClass: "text-blue-500",
+	},
+	{
+		value: "system",
+		label: "System",
+		desc: "Follows device",
+		icon: Monitor,
+		iconClass: "text-muted-foreground",
+	},
 ] as const;
 
 export default function ThemeSettings() {

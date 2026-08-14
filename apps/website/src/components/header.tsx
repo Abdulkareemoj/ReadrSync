@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Download, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,6 @@ export default function Header() {
 	const [open, setOpen] = useState(false);
 	// Only pages that open on full-bleed hero photography get a transparent nav.
 	const [overHero, setOverHero] = useState(false);
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
 
 	useEffect(() => {
 		setOverHero(Boolean(document.querySelector("[data-hero]")));
@@ -25,7 +24,7 @@ export default function Header() {
 		onScroll();
 		window.addEventListener("scroll", onScroll, { passive: true });
 		return () => window.removeEventListener("scroll", onScroll);
-	}, [pathname]);
+	}, []);
 
 	const solid = scrolled || open || !overHero;
 

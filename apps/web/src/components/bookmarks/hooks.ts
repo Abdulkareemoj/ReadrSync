@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { useCollectionsStore } from "@packages/store";
+import { useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import { useReaderStore } from "@/lib/store";
 
@@ -43,7 +43,9 @@ export function useBookmarksPage(filter: string, tagsParam: string) {
 		const tagSet = new Set<string>();
 		bookmarks.forEach((b) => {
 			if (b.tags && Array.isArray(b.tags)) {
-				b.tags.forEach((t) => tagSet.add(t));
+				b.tags.forEach((t) => {
+					tagSet.add(t);
+				});
 			}
 		});
 		return Array.from(tagSet).sort();

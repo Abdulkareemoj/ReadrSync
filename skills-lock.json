@@ -1,44 +1,44 @@
 {
-  "version": 1,
-  "skills": {
-    "biome": {
-      "source": "bobmatnyc/claude-mpm-skills",
-      "sourceType": "github",
-      "skillPath": "toolchains/javascript/tooling/biome/SKILL.md",
-      "computedHash": "2d89865ec243a4e5d395554750d083f258486ea85c07767fdb71265c87b1dd3b"
-    },
-    "biomejs": {
-      "source": "aiko-atami/biomejs-skill",
-      "sourceType": "github",
-      "skillPath": "skills/biomejs/SKILL.md",
-      "computedHash": "61ec6892179fdf17f07004ce3188e246a99b2531de1604ea27c1677c2ff50b62"
-    },
-    "react-native-animations": {
-      "source": "pluginagentmarketplace/custom-plugin-react-native",
-      "sourceType": "github",
-      "computedHash": "ced8f430c7df78961404e2a0b7db8b2a6cc8fa571b1f0b7c40ad5399a4663f2f"
-    },
-    "react-native-best-practices": {
-      "source": "callstackincubator/agent-skills",
-      "sourceType": "github",
-      "computedHash": "345f35977611eb5242e5d14d291d351fe30e614aacc1b1aaa63b1dd83c68a388"
-    },
-    "shadcn": {
-      "source": "shadcn/ui",
-      "sourceType": "github",
-      "skillPath": "skills/shadcn/SKILL.md",
-      "computedHash": "f0fdd03f4755cbb3b57e20fe6fd4a97c00d34e6780187b6559316986e8d848db"
-    },
-    "transitions-dev": {
-      "source": "Jakubantalik/transitions.dev",
-      "sourceType": "github",
-      "skillPath": "skills/transitions-dev/SKILL.md",
-      "computedHash": "3e054fc65e5cfced994aea3b120edd5abb1059c32af56a297d60910f266a53d1"
-    },
-    "vercel-react-native-skills": {
-      "source": "vercel-labs/agent-skills",
-      "sourceType": "github",
-      "computedHash": "41d24eafa7c3d82e270439808f7cfbc4d51aeb2d14f2809a2267c16275784d06"
-    }
-  }
+	"version": 1,
+	"skills": {
+		"biome": {
+			"source": "bobmatnyc/claude-mpm-skills",
+			"sourceType": "github",
+			"skillPath": "toolchains/javascript/tooling/biome/SKILL.md",
+			"computedHash": "2d89865ec243a4e5d395554750d083f258486ea85c07767fdb71265c87b1dd3b"
+		},
+		"biomejs": {
+			"source": "aiko-atami/biomejs-skill",
+			"sourceType": "github",
+			"skillPath": "skills/biomejs/SKILL.md",
+			"computedHash": "61ec6892179fdf17f07004ce3188e246a99b2531de1604ea27c1677c2ff50b62"
+		},
+		"react-native-animations": {
+			"source": "pluginagentmarketplace/custom-plugin-react-native",
+			"sourceType": "github",
+			"computedHash": "ced8f430c7df78961404e2a0b7db8b2a6cc8fa571b1f0b7c40ad5399a4663f2f"
+		},
+		"react-native-best-practices": {
+			"source": "callstackincubator/agent-skills",
+			"sourceType": "github",
+			"computedHash": "345f35977611eb5242e5d14d291d351fe30e614aacc1b1aaa63b1dd83c68a388"
+		},
+		"shadcn": {
+			"source": "shadcn/ui",
+			"sourceType": "github",
+			"skillPath": "skills/shadcn/SKILL.md",
+			"computedHash": "f0fdd03f4755cbb3b57e20fe6fd4a97c00d34e6780187b6559316986e8d848db"
+		},
+		"transitions-dev": {
+			"source": "Jakubantalik/transitions.dev",
+			"sourceType": "github",
+			"skillPath": "skills/transitions-dev/SKILL.md",
+			"computedHash": "3e054fc65e5cfced994aea3b120edd5abb1059c32af56a297d60910f266a53d1"
+		},
+		"vercel-react-native-skills": {
+			"source": "vercel-labs/agent-skills",
+			"sourceType": "github",
+			"computedHash": "41d24eafa7c3d82e270439808f7cfbc4d51aeb2d14f2809a2267c16275784d06"
+		}
+	}
 }

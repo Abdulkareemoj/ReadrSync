@@ -1,11 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import {
+	Activity,
+	Bookmark,
+	Film,
+	List,
+	Shuffle,
+	Sparkles,
+	TrendingUp,
+} from "lucide-react";
+import {
 	SidebarGroup,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Activity, TrendingUp, Sparkles, Bookmark, Film, Shuffle, List } from "lucide-react";
 
 const exploreItems = [
 	{
@@ -44,11 +52,9 @@ const exploreItems = [
 		icon: List,
 	},
 ];
- 
-export function ExploreSidebar(){
- 
+
+export function ExploreSidebar() {
 	return (
-		
 		<SidebarGroup>
 			<SidebarMenu>
 				{exploreItems.map((item) => (
@@ -64,5 +70,4 @@ export function ExploreSidebar(){
 			</SidebarMenu>
 		</SidebarGroup>
 	);
-
 }

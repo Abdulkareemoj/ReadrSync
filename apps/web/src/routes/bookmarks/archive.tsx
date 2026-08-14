@@ -35,8 +35,8 @@ function ArchivePage() {
 						<Archive className="size-4" />
 					</div>
 					<div>
-						<h1 className="text-sm font-semibold">Archive</h1>
-						<p className="text-xs text-muted-foreground">
+						<h1 className="font-semibold text-sm">Archive</h1>
+						<p className="text-muted-foreground text-xs">
 							{bookmarks.length} bookmark{bookmarks.length !== 1 ? "s" : ""}
 						</p>
 					</div>
@@ -98,7 +98,7 @@ function ArchivePage() {
 								</EmptyDescription>
 							</EmptyHeader>
 							<EmptyContent>
-								<p className="text-sm text-muted-foreground">
+								<p className="text-muted-foreground text-sm">
 									Coming soon, archive functionality will allow you to move
 									bookmarks to a separate view.
 								</p>

@@ -1,135 +1,135 @@
-import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
 import { runFtsSetup, runMigrations } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import { seedDatabase } from "@packages/db/src/seed-data";
 import {
-  createBookmarkAgent,
-  createCollectionAgent,
-  createRssAgent,
-  createHighlightAgent,
+	createBookmarkAgent,
+	createCollectionAgent,
+	createHighlightAgent,
+	createRssAgent,
 } from "@packages/utils";
-import { drizzle } from "drizzle-orm/sql-js";
 import { appDataDir } from "@tauri-apps/api/path";
-import { readFile, writeFile, mkdir } from "@tauri-apps/plugin-fs";
-import { createDesktopSyncAgent } from "./sync-agent";
+import { mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
+import { drizzle } from "drizzle-orm/sql-js";
+import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
 import { createDesktopAuthAgent } from "./auth-agent";
+import { createDesktopSyncAgent } from "./sync-agent";
 
 const DB_FILENAME = "bookmark_tool.db";
 
 let initializedAgents: {
-  bookmarkAgent: ReturnType<typeof createBookmarkAgent>;
-  collectionAgent: ReturnType<typeof createCollectionAgent>;
-  rssAgent: ReturnType<typeof createRssAgent>;
-  highlightAgent: ReturnType<typeof createHighlightAgent>;
-  syncAgent: ReturnType<typeof createDesktopSyncAgent>;
-  authAgent: ReturnType<typeof createDesktopAuthAgent>;
+	bookmarkAgent: ReturnType<typeof createBookmarkAgent>;
+	collectionAgent: ReturnType<typeof createCollectionAgent>;
+	rssAgent: ReturnType<typeof createRssAgent>;
+	highlightAgent: ReturnType<typeof createHighlightAgent>;
+	syncAgent: ReturnType<typeof createDesktopSyncAgent>;
+	authAgent: ReturnType<typeof createDesktopAuthAgent>;
 } | null = null;
 
 async function getDbPath(): Promise<string> {
-  const dir = await appDataDir();
-  try {
-    await mkdir(dir, { recursive: true });
-  } catch {
-    // dir may already exist
-  }
-  return `${dir}/${DB_FILENAME}`;
+	const dir = await appDataDir();
+	try {
+		await mkdir(dir, { recursive: true });
+	} catch {
+		// dir may already exist
+	}
+	return `${dir}/${DB_FILENAME}`;
 }
 
 function setupAutoPersist(sqlJsDb: SqlJsDatabase) {
-  let dirty = false;
-  let saveTimer: ReturnType<typeof setTimeout> | null = null;
+	let dirty = false;
+	let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const persistNow = async () => {
-    const dbPath = await getDbPath();
-    const data = sqlJsDb.export();
-    await writeFile(dbPath, data);
-    dirty = false;
-  };
+	const persistNow = async () => {
+		const dbPath = await getDbPath();
+		const data = sqlJsDb.export();
+		await writeFile(dbPath, data);
+		dirty = false;
+	};
 
-  const schedulePersist = () => {
-    dirty = true;
-    if (saveTimer) return;
-    saveTimer = setTimeout(() => {
-      saveTimer = null;
-      persistNow().catch((e) => console.error("[DB] Persist failed:", e));
-    }, 500);
-  };
+	const schedulePersist = () => {
+		dirty = true;
+		if (saveTimer) return;
+		saveTimer = setTimeout(() => {
+			saveTimer = null;
+			persistNow().catch((e) => console.error("[DB] Persist failed:", e));
+		}, 500);
+	};
 
-  const wrapWrite = <T extends (...args: any[]) => any>(fn: T) => {
-    return (...args: Parameters<T>): ReturnType<T> => {
-      const res = fn(...args);
-      schedulePersist();
-      return res;
-    };
-  };
+	const wrapWrite = <T extends (...args: any[]) => any>(fn: T) => {
+		return (...args: Parameters<T>): ReturnType<T> => {
+			const res = fn(...args);
+			schedulePersist();
+			return res;
+		};
+	};
 
-  const anyClient = sqlJsDb as any;
-  if (typeof anyClient.run === "function") {
-    anyClient.run = wrapWrite(anyClient.run.bind(sqlJsDb));
-  }
-  if (typeof anyClient.exec === "function") {
-    anyClient.exec = wrapWrite(anyClient.exec.bind(sqlJsDb));
-  }
+	const anyClient = sqlJsDb as any;
+	if (typeof anyClient.run === "function") {
+		anyClient.run = wrapWrite(anyClient.run.bind(sqlJsDb));
+	}
+	if (typeof anyClient.exec === "function") {
+		anyClient.exec = wrapWrite(anyClient.exec.bind(sqlJsDb));
+	}
 
-  // Persist before window closes
-  window.addEventListener("beforeunload", () => {
-    if (dirty) persistNow();
-  });
+	// Persist before window closes
+	window.addEventListener("beforeunload", () => {
+		if (dirty) persistNow();
+	});
 
-  return { persistNow };
+	return { persistNow };
 }
 
 export async function initializeTauriAgents() {
-  if (initializedAgents) {
-    return initializedAgents;
-  }
+	if (initializedAgents) {
+		return initializedAgents;
+	}
 
-  const SQL = await initSqlJs({
-    locateFile: (file: string) => `/sql-wasm.wasm`,
-  });
+	const SQL = await initSqlJs({
+		locateFile: (file: string) => "/sql-wasm.wasm",
+	});
 
-  // Load existing DB or create new one
-  let sqlJsDb: SqlJsDatabase;
-  try {
-    const dbPath = await getDbPath();
-    const buffer = await readFile(dbPath);
-    sqlJsDb = new SQL.Database(buffer);
-  } catch {
-    sqlJsDb = new SQL.Database();
-  }
+	// Load existing DB or create new one
+	let sqlJsDb: SqlJsDatabase;
+	try {
+		const dbPath = await getDbPath();
+		const buffer = await readFile(dbPath);
+		sqlJsDb = new SQL.Database(buffer);
+	} catch {
+		sqlJsDb = new SQL.Database();
+	}
 
-  // Set up auto-persistence
-  setupAutoPersist(sqlJsDb);
+	// Set up auto-persistence
+	setupAutoPersist(sqlJsDb);
 
-  const db = drizzle(sqlJsDb, { schema });
+	const db = drizzle(sqlJsDb, { schema });
 
-  await runMigrations(db as unknown as DB);
-  await runFtsSetup(db as unknown as DB);
+	await runMigrations(db as unknown as DB);
+	await runFtsSetup(db as unknown as DB);
 
-  // Seed dev data (no-op when the DB already has rows)
-  await seedDatabase(db);
+	// Seed dev data (no-op when the DB already has rows)
+	await seedDatabase(db);
 
-  const genericDb = db as unknown as DB;
-  const bookmarkAgent = createBookmarkAgent(genericDb);
-  const collectionAgent = createCollectionAgent(genericDb);
-  const rssAgent = createRssAgent(genericDb);
-  const highlightAgent = createHighlightAgent(genericDb);
-  const authAgent = createDesktopAuthAgent();
-  const syncAgent = createDesktopSyncAgent(
-    authAgent,
-    bookmarkAgent,
-    rssAgent,
-    highlightAgent,
-  );
+	const genericDb = db as unknown as DB;
+	const bookmarkAgent = createBookmarkAgent(genericDb);
+	const collectionAgent = createCollectionAgent(genericDb);
+	const rssAgent = createRssAgent(genericDb);
+	const highlightAgent = createHighlightAgent(genericDb);
+	const authAgent = createDesktopAuthAgent();
+	const syncAgent = createDesktopSyncAgent(
+		authAgent,
+		bookmarkAgent,
+		rssAgent,
+		highlightAgent,
+	);
 
-  initializedAgents = {
-    bookmarkAgent,
-    collectionAgent,
-    rssAgent,
-    highlightAgent,
-    syncAgent,
-    authAgent,
-  };
-  return initializedAgents;
+	initializedAgents = {
+		bookmarkAgent,
+		collectionAgent,
+		rssAgent,
+		highlightAgent,
+		syncAgent,
+		authAgent,
+	};
+	return initializedAgents;
 }

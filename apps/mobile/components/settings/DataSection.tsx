@@ -1,12 +1,18 @@
+import type { ExportFormat } from "@packages/utils";
+import { Download, Upload } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { Download, Upload } from "lucide-react-native";
-import type { ExportFormat } from "@packages/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useDataActions } from "./hooks";
@@ -18,10 +24,10 @@ export default function DataSection() {
 
 	return (
 		<View className="mb-4">
-			<Text className="mb-3 font-semibold text-foreground text-lg px-1">
+			<Text className="mb-3 px-1 font-semibold text-foreground text-lg">
 				Data
 			</Text>
-			<Text className="mb-4 text-muted-foreground text-sm px-1">
+			<Text className="mb-4 px-1 text-muted-foreground text-sm">
 				Export, import, or manage data stored on this device
 			</Text>
 
@@ -31,7 +37,7 @@ export default function DataSection() {
 					<View className="flex-row items-center justify-between">
 						<View className="shrink-1 pr-3">
 							<Text className="font-medium text-sm">Export data</Text>
-							<Text className="text-muted-foreground text-xs mt-0.5">
+							<Text className="mt-0.5 text-muted-foreground text-xs">
 								Download your data as JSON, OPML, or HTML
 							</Text>
 						</View>
@@ -45,9 +51,15 @@ export default function DataSection() {
 										<SelectValue placeholder={""} />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="json" label="JSON">JSON</SelectItem>
-										<SelectItem value="opml" label="OPML">OPML</SelectItem>
-										<SelectItem value="html" label="HTML">HTML</SelectItem>
+										<SelectItem value="json" label="JSON">
+											JSON
+										</SelectItem>
+										<SelectItem value="opml" label="OPML">
+											OPML
+										</SelectItem>
+										<SelectItem value="html" label="HTML">
+											HTML
+										</SelectItem>
 									</SelectContent>
 								</Select>
 							</View>
@@ -68,10 +80,10 @@ export default function DataSection() {
 			{/* Import card */}
 			<Card>
 				<View className="p-4">
-					<View className="flex-row items-center justify-between mb-4">
+					<View className="mb-4 flex-row items-center justify-between">
 						<View className="shrink-1 pr-3">
 							<Text className="font-medium text-sm">Import data</Text>
-							<Text className="text-muted-foreground text-xs mt-0.5">
+							<Text className="mt-0.5 text-muted-foreground text-xs">
 								Load from JSON, OPML, or HTML bookmark files
 							</Text>
 						</View>
@@ -87,7 +99,7 @@ export default function DataSection() {
 					</View>
 					<Separator className="mb-4" />
 					<View>
-						<Text className="mb-3 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+						<Text className="mb-3 font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
 							Import mode
 						</Text>
 						<RadioGroup
@@ -103,12 +115,16 @@ export default function DataSection() {
 											: "border-border",
 									)}
 								>
-									<RadioGroupItem value="merge" id="merge-mob" className="mt-0.5" />
+									<RadioGroupItem
+										value="merge"
+										id="merge-mob"
+										className="mt-0.5"
+									/>
 									<View className="min-w-0 shrink-1">
-										<Text className="text-sm font-medium text-foreground">
+										<Text className="font-medium text-foreground text-sm">
 											Merge
 										</Text>
-										<Text className="text-muted-foreground text-xs mt-0.5">
+										<Text className="mt-0.5 text-muted-foreground text-xs">
 											Add alongside existing data
 										</Text>
 									</View>
@@ -121,12 +137,16 @@ export default function DataSection() {
 											: "border-border",
 									)}
 								>
-									<RadioGroupItem value="replace" id="replace-mob" className="mt-0.5" />
+									<RadioGroupItem
+										value="replace"
+										id="replace-mob"
+										className="mt-0.5"
+									/>
 									<View className="min-w-0 shrink-1">
-										<Text className="text-sm font-medium text-foreground">
+										<Text className="font-medium text-foreground text-sm">
 											Replace
 										</Text>
-										<Text className="text-muted-foreground text-xs mt-0.5">
+										<Text className="mt-0.5 text-muted-foreground text-xs">
 											Replace existing with imported
 										</Text>
 									</View>

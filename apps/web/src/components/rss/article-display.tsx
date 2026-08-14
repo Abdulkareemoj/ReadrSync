@@ -1,3 +1,4 @@
+import type { Highlight } from "@packages/store";
 import {
 	ArrowLeft,
 	Bookmark,
@@ -11,9 +12,8 @@ import AnnotationPanel from "@/components/annotation-panel";
 import HighlightMenu from "@/components/rss/highlight-menu";
 import TagPill from "@/components/tag-pill";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useHighlights } from "@/hooks/use-highlights";
-import type { Highlight } from "@packages/store";
+import { cn } from "@/lib/utils";
 import ArticleRenderer from "./article-renderer";
 
 interface ArticleDisplayProps {
@@ -223,6 +223,7 @@ export default function ArticleDisplay({
 				</div>
 
 				{/* Article Content */}
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: mouseup text-selection for highlights, not an interaction control */}
 				<div onMouseUp={handleTextSelection}>
 					<ArticleRenderer content={content} />
 				</div>

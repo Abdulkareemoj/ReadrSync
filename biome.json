@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -9,6 +9,7 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**",
+			"!**/*.css",
 			"!**/.next",
 			"!**/dist",
 			"!**/.turbo",
@@ -36,9 +37,10 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"correctness": {
-				"useExhaustiveDependencies": "info"
+				"useExhaustiveDependencies": "info",
+				"noChildrenProp": "off"
 			},
 			"nursery": {
 				"useSortedClasses": {
@@ -63,6 +65,30 @@
 			}
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["apps/web/src/components/ui/**"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useSemanticElements": "warn",
+						"useFocusableInteractive": "warn",
+						"useAriaPropsForRole": "warn",
+						"noStaticElementInteractions": "warn",
+						"useKeyWithClickEvents": "warn",
+						"useButtonType": "warn",
+						"noRedundantRoles": "warn"
+					},
+					"security": {
+						"noDangerouslySetInnerHtml": "warn"
+					},
+					"suspicious": {
+						"noArrayIndexKey": "warn"
+					}
+				}
+			}
+		}
+	],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"

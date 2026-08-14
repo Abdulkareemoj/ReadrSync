@@ -1,6 +1,6 @@
+import { useMemo } from "react";
 import type { Option } from "@/components/ui/multi-select";
 import { useReaderStore } from "@/lib/store";
-import { useMemo } from "react";
 
 export function useTags() {
 	const { bookmarks } = useReaderStore((state) => state);
@@ -21,7 +21,10 @@ export function useTags() {
 			.map((tag) => ({ value: tag, label: tag }));
 	}, [bookmarks]);
 
-	const uniqueTags = useMemo(() => tagOptions.map((o) => o.value), [tagOptions]);
+	const uniqueTags = useMemo(
+		() => tagOptions.map((o) => o.value),
+		[tagOptions],
+	);
 
 	return { tagOptions, uniqueTags };
 }

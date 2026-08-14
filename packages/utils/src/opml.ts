@@ -1,4 +1,4 @@
-import { XMLParser, XMLBuilder } from "fast-xml-parser";
+import { XMLBuilder, XMLParser } from "fast-xml-parser";
 
 export interface OpmlOutline {
 	text?: string;
@@ -46,9 +46,7 @@ export function parseOpml(xml: string): OpmlDocument {
 	};
 }
 
-function normalizeOutlines(
-	items: any[],
-): OpmlOutline[] {
+function normalizeOutlines(items: any[]): OpmlOutline[] {
 	const result: OpmlOutline[] = [];
 	for (const item of items) {
 		const outline: OpmlOutline = {
@@ -70,9 +68,10 @@ function normalizeOutlines(
 	return result;
 }
 
-function flattenOutlines(
-	outlines: OpmlOutline[],
-): { feeds: OpmlOutline[]; bookmarks: OpmlOutline[] } {
+function flattenOutlines(outlines: OpmlOutline[]): {
+	feeds: OpmlOutline[];
+	bookmarks: OpmlOutline[];
+} {
 	const feeds: OpmlOutline[] = [];
 	const bookmarks: OpmlOutline[] = [];
 	for (const o of outlines) {
@@ -131,7 +130,9 @@ function outlineToXml(o: OpmlOutline, indent: string): string {
 
 	if (o.outline) {
 		const children = Array.isArray(o.outline) ? o.outline : [o.outline];
-		const inner = children.map((c) => outlineToXml(c, indent + "  ")).join("\n");
+		const inner = children
+			.map((c) => outlineToXml(c, indent + "  "))
+			.join("\n");
 		return `${indent}<outline ${attrs.join(" ")}>\n${inner}\n${indent}</outline>`;
 	}
 	return `${indent}<outline ${attrs.join(" ")}/>`;

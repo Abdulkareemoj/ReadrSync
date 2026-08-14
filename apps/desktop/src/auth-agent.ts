@@ -1,12 +1,12 @@
 import type {
-	IAuthAgent,
 	AuthProvider,
 	AuthResult,
 	AuthUserInfo,
+	IAuthAgent,
 } from "@packages/agents";
 import { invoke } from "@tauri-apps/api/core";
 import { appDataDir } from "@tauri-apps/api/path";
-import { writeTextFile, readTextFile, mkdir } from "@tauri-apps/plugin-fs";
+import { mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 
@@ -73,14 +73,20 @@ async function clearTokens(): Promise<void> {
 }
 
 function getClientId(): string {
-	if (typeof import.meta !== "undefined" && import.meta.env?.VITE_GOOGLE_DESKTOP_CLIENT_ID) {
+	if (
+		typeof import.meta !== "undefined" &&
+		import.meta.env?.VITE_GOOGLE_DESKTOP_CLIENT_ID
+	) {
 		return import.meta.env.VITE_GOOGLE_DESKTOP_CLIENT_ID;
 	}
 	return "";
 }
 
 function getClientSecret(): string {
-	if (typeof import.meta !== "undefined" && import.meta.env?.VITE_GOOGLE_DESKTOP_SECRET_ID) {
+	if (
+		typeof import.meta !== "undefined" &&
+		import.meta.env?.VITE_GOOGLE_DESKTOP_SECRET_ID
+	) {
 		return import.meta.env.VITE_GOOGLE_DESKTOP_SECRET_ID;
 	}
 	return "";

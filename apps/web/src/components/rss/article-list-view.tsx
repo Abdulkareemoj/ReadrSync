@@ -1,7 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import ArticleCard from "@/components/rss/article-card";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyTitle,
+} from "@/components/ui/empty";
 
 interface Article {
 	id: string;

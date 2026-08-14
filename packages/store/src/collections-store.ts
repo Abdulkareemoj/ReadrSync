@@ -45,7 +45,12 @@ export const useCollectionsStore = create<CollectionsState>()(
 					return {
 						bookmarkCollections: [
 							...state.bookmarkCollections,
-							{ id, name, parentId: null, position: state.bookmarkCollections.length },
+							{
+								id,
+								name,
+								parentId: null,
+								position: state.bookmarkCollections.length,
+							},
 						],
 					};
 				}),
@@ -62,12 +67,17 @@ export const useCollectionsStore = create<CollectionsState>()(
 					return {
 						rssCollections: [
 							...state.rssCollections,
-							{ id, name, parentId: null, position: state.rssCollections.length },
+							{
+								id,
+								name,
+								parentId: null,
+								position: state.rssCollections.length,
+							},
 						],
 					};
 				}),
 		}),
-		{ 
+		{
 			name: "collections-store",
 		},
 	),

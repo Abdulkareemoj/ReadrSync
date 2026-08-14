@@ -2,6 +2,7 @@ import { Bookmark, Heart, Rss, Share2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
 interface ArticleCardProps {
 	id: string;
 	title: string;
@@ -40,6 +41,7 @@ export default function ArticleCard({
 }: ArticleCardProps) {
 	const imageSrc = imageData || imageUrl;
 	return (
+		// biome-ignore lint/a11y/useKeyWithClickEvents: whole-card click with nested action buttons; cannot be a single button element
 		<article
 			onClick={onClick}
 			className="group cursor-pointer rounded-lg border border-border bg-card transition-colors hover:bg-card/80"

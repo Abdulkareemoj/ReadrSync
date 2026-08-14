@@ -1,4 +1,3 @@
-
 import type { IBookmarkAgent, IRssAgent } from "./index";
 
 export interface IAgents {

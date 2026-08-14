@@ -1,13 +1,8 @@
-import { cn } from "@/lib/utils";
 import { Check, Plus, X } from "lucide-react-native";
-import React, {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, TextInput, View } from "react-native";
+import { cn } from "@/lib/utils";
 import { Text } from "./text";
 
 export interface Option {
@@ -242,7 +237,7 @@ export function MultiSelect({
 		<View className={cn("w-full", className)}>
 			<View
 				className={cn(
-					"border-input min-h-[44px] flex-row flex-wrap items-center gap-1.5 rounded-md border bg-background px-2 py-2",
+					"min-h-[44px] flex-row flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-2 py-2",
 					isOpen && "border-ring",
 					disabled && "opacity-50",
 				)}
@@ -251,11 +246,11 @@ export function MultiSelect({
 					<View
 						key={option.value}
 						className={cn(
-							"flex-row items-center gap-1 rounded-md border bg-card py-1 pl-2 pr-1",
+							"flex-row items-center gap-1 rounded-md border bg-card py-1 pr-1 pl-2",
 							badgeClassName,
 						)}
 					>
-						<Text className="text-xs font-medium text-foreground">
+						<Text className="font-medium text-foreground text-xs">
 							{option.label}
 						</Text>
 						{!option.fixed && (
@@ -293,7 +288,7 @@ export function MultiSelect({
 					}
 					placeholderTextColor="#9ca3af"
 					className={cn(
-						"flex-1 px-1 py-0.5 text-sm text-foreground",
+						"flex-1 px-1 py-0.5 text-foreground text-sm",
 						selected.length > 0 ? "min-w-[80px]" : "",
 					)}
 					{...inputProps}
@@ -310,7 +305,7 @@ export function MultiSelect({
 			</View>
 
 			{isOpen && (
-				<View className="border-input mt-1 max-h-48 overflow-hidden rounded-md border bg-background shadow-lg">
+				<View className="mt-1 max-h-48 overflow-hidden rounded-md border border-input bg-background shadow-lg">
 					{isLoading && loadingIndicator ? (
 						<View className="items-center justify-center py-8">
 							{loadingIndicator}
@@ -324,7 +319,7 @@ export function MultiSelect({
 								shouldShowEmpty ? (
 									<View className="items-center py-8">
 										{emptyIndicator || (
-											<Text className="text-sm text-muted-foreground">
+											<Text className="text-muted-foreground text-sm">
 												No results found
 											</Text>
 										)}
@@ -335,7 +330,7 @@ export function MultiSelect({
 							renderItem={({ item: [groupKey, groupOptions] }) => (
 								<View>
 									{groupKey ? (
-										<Text className="mb-1 px-3 py-1 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+										<Text className="mb-1 px-3 py-1 font-bold text-muted-foreground text-xs uppercase tracking-wider">
 											{groupKey}
 										</Text>
 									) : null}
@@ -380,7 +375,7 @@ export function MultiSelect({
 										className="flex-row items-center gap-2 px-3 py-2.5 active:bg-accent"
 									>
 										<Plus size={16} className="text-muted-foreground" />
-										<Text className="text-sm text-foreground">
+										<Text className="text-foreground text-sm">
 											Create &ldquo;{inputValue.trim()}&rdquo;
 										</Text>
 									</Pressable>

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Cloud, Info, Sun } from "lucide-react";
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -6,8 +7,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Sun, Cloud, Info } from "lucide-react";
- 
+
 const settingsItems = [
 	{
 		name: "Theme",
@@ -25,21 +25,15 @@ const settingsItems = [
 		icon: Info,
 	},
 ];
- 
 
- 
- 
-export function SettingsSidebar(){
- 
+export function SettingsSidebar() {
 	return (
-		
 		<SidebarGroup>
 			<SidebarMenu>
 				{settingsItems.map((item) => (
 					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton asChild>
 							<Link to={item.url}>
-								
 								<span className="font-semibold">{item.name}</span>
 							</Link>
 						</SidebarMenuButton>
@@ -48,5 +42,4 @@ export function SettingsSidebar(){
 			</SidebarMenu>
 		</SidebarGroup>
 	);
-
 }

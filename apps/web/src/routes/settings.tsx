@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Separator } from "@/components/ui/separator";
 import AboutSection from "@/components/settings/AboutSection";
 import AppearanceSection from "@/components/settings/AppearanceSection";
 import CloudSyncSection from "@/components/settings/CloudSyncSection";
@@ -7,6 +6,7 @@ import DataSection from "@/components/settings/DataSection";
 import ErrorDialog from "@/components/settings/ErrorDialog";
 import { useSettings } from "@/components/settings/hooks";
 import YouTubeSection from "@/components/settings/YouTubeSection";
+import { Separator } from "@/components/ui/separator";
 
 export const Route = createFileRoute("/settings")({
 	component: SettingsComponent,
@@ -17,7 +17,7 @@ function SettingsComponent() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<div className="border-b border-border px-6 py-6">
+			<div className="border-border border-b px-6 py-6">
 				<h1 className="font-semibold text-2xl text-foreground">Settings</h1>
 				<p className="mt-1 text-muted-foreground text-sm">
 					Manage your reading experience and data
@@ -70,7 +70,10 @@ function SettingsComponent() {
 				</div>
 			</div>
 
-			<ErrorDialog error={s.errorDialog} onClose={() => s.setErrorDialog(null)} />
+			<ErrorDialog
+				error={s.errorDialog}
+				onClose={() => s.setErrorDialog(null)}
+			/>
 		</div>
 	);
 }

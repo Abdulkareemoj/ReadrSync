@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import type { CollectionTreeNode } from "@packages/agents";
 import { router } from "expo-router";
 import {
 	Archive,
@@ -13,11 +14,10 @@ import {
 } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import type { CollectionTreeNode } from "@packages/agents";
+import { useBookmarks } from "@/hooks/use-bookmarks";
 import { useCollectionsStore, useReaderStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { AddBookmarkModal } from "./bookmarks/add-bookmark-modal";
-import { useBookmarks } from "@/hooks/use-bookmarks";
 
 interface CollectionsBottomSheetProps {
 	isOpen: boolean;
@@ -80,8 +80,18 @@ export function CollectionsBottomSheet({
 	};
 
 	const navItems = [
-		{ id: "favorites", name: "Favorites", icon: Star, href: "/bookmarks/favorites" as const },
-		{ id: "archive", name: "Archive", icon: Archive, href: "/bookmarks/archive" as const },
+		{
+			id: "favorites",
+			name: "Favorites",
+			icon: Star,
+			href: "/bookmarks/favorites" as const,
+		},
+		{
+			id: "archive",
+			name: "Archive",
+			icon: Archive,
+			href: "/bookmarks/archive" as const,
+		},
 	];
 
 	// Flatten tree into a list with depth info for display
@@ -108,7 +118,9 @@ export function CollectionsBottomSheet({
 		{ id: "all", name: "All Bookmarks", depth: 0 },
 		{ id: "liked", name: "Liked", depth: 0 },
 		{ id: "saved", name: "Saved", depth: 0 },
-		...treeItems.filter((c) => c.id !== "all" && c.id !== "liked" && c.id !== "saved"),
+		...treeItems.filter(
+			(c) => c.id !== "all" && c.id !== "liked" && c.id !== "saved",
+		),
 	];
 
 	return (
@@ -166,11 +178,14 @@ export function CollectionsBottomSheet({
 						);
 					})}
 
-					<Text className="mb-4 mt-6 px-2 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
+					<Text className="mt-6 mb-4 px-2 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">
 						Filters
 					</Text>
 					{collections.map((collection) => {
-						const Icon = getCollectionIcon(collection.id, (collection as any).depth ?? 0);
+						const Icon = getCollectionIcon(
+							collection.id,
+							(collection as any).depth ?? 0,
+						);
 						const isActive = activeTab === collection.id;
 						const depth = (collection as any).depth ?? 0;
 
@@ -206,7 +221,9 @@ export function CollectionsBottomSheet({
 					})}
 
 					<View className="mt-6">
-						<Text className="font-medium text-foreground mb-3">Add New Bookmark</Text>
+						<Text className="mb-3 font-medium text-foreground">
+							Add New Bookmark
+						</Text>
 						<AddBookmarkModal
 							onAddBookmark={(data) => {
 								addBookmark({

@@ -83,9 +83,10 @@ export default function Hero() {
 
 				<div className="mt-4 flex items-center justify-center gap-2">
 					{slides.map((slide, i) => (
-						<button
+						<Button
 							key={slide.label}
-							type="button"
+							variant="ghost"
+							size="icon"
 							onClick={() => go(i)}
 							aria-label={`Show slide ${i + 1}`}
 							aria-current={i === index}

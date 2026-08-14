@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -122,24 +122,24 @@ function AuthCallbackComponent() {
 			{status === "exchanging" && (
 				<>
 					<Loader2 className="size-8 animate-spin text-primary" />
-					<p className="text-sm text-muted-foreground">Completing sign-in...</p>
+					<p className="text-muted-foreground text-sm">Completing sign-in...</p>
 				</>
 			)}
 			{status === "success" && (
 				<>
 					<CheckCircle2 className="size-12 text-green-500" />
 					<p className="font-medium">Connected!</p>
-					<p className="text-sm text-muted-foreground">Redirecting back...</p>
+					<p className="text-muted-foreground text-sm">Redirecting back...</p>
 				</>
 			)}
 			{status === "error" && (
 				<>
 					<XCircle className="size-12 text-destructive" />
 					<p className="font-medium">Connection failed</p>
-					<p className="text-sm text-muted-foreground">{errorMsg}</p>
+					<p className="text-muted-foreground text-sm">{errorMsg}</p>
 					<a
 						href="/settings"
-						className="text-sm text-primary underline underline-offset-4"
+						className="text-primary text-sm underline underline-offset-4"
 					>
 						Back to settings
 					</a>

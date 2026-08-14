@@ -12,12 +12,11 @@ const BOOKMARK_REGEX =
 const TAG_REGEX = /TAGS\s*=\s*["']([^"']*)["']/i;
 const ADD_DATE_REGEX = /ADD_DATE\s*=\s*["']([^"']*)["']/i;
 const ICON_REGEX = /ICON\s*=\s*["']([^"']*)["']/i;
-const DESCRIPTION_REGEX =
-	/<DD>([\s\S]*?)<\/?DL/i;
+const DESCRIPTION_REGEX = /<DD>([\s\S]*?)<\/?DL/i;
 
 function parseAddDate(value: string): string | undefined {
 	if (!value) return undefined;
-	const ts = parseInt(value, 10);
+	const ts = Number.parseInt(value, 10);
 	if (!isNaN(ts)) return new Date(ts * 1000).toISOString();
 	return value;
 }
@@ -27,7 +26,11 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 	let match: RegExpExecArray | null;
 	const bookmarkMatches: { index: number; match: RegExpExecArray }[] = [];
 
-	while ((match = BOOKMARK_REGEX.exec(html)) !== null) {
+	for (
+		match = BOOKMARK_REGEX.exec(html);
+		match !== null;
+		match = BOOKMARK_REGEX.exec(html)
+	) {
 		bookmarkMatches.push({ index: match.index, match });
 	}
 
@@ -65,7 +68,9 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 	for (let i = 0; i < entries.length; i++) {
 		const entryIndex = bookmarkMatches[i]?.index ?? -1;
 		if (entryIndex < 0) continue;
-		const afterBookmark = html.slice(entryIndex + bookmarkMatches[i].match[0].length);
+		const afterBookmark = html.slice(
+			entryIndex + bookmarkMatches[i].match[0].length,
+		);
 		const descMatch = afterBookmark.match(DESCRIPTION_REGEX);
 		if (descMatch) {
 			entries[i].description = descMatch[1].replace(/<[^>]*>/g, "").trim();
@@ -103,9 +108,10 @@ export function generateHtmlBookmarks(options: {
 			if (b.tags && b.tags.length > 0)
 				attrs.push(`TAGS="${b.tags.map(escapeHtml).join(",")}"`);
 			if (b.icon) attrs.push(`ICON="${escapeHtml(b.icon)}"`);
-			const parts = [`    <DT><A ${attrs.join(" ")}>${escapeHtml(b.title)}</A>`];
-			if (b.description)
-				parts.push(`    <DD>${escapeHtml(b.description)}`);
+			const parts = [
+				`    <DT><A ${attrs.join(" ")}>${escapeHtml(b.title)}</A>`,
+			];
+			if (b.description) parts.push(`    <DD>${escapeHtml(b.description)}`);
 			return parts.join("\n");
 		})
 		.join("\n");

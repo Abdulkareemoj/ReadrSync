@@ -1,8 +1,8 @@
 import type {
-	IAuthAgent,
 	AuthProvider,
 	AuthResult,
 	AuthUserInfo,
+	IAuthAgent,
 } from "@packages/agents";
 
 const TOKEN_KEY = "google_drive_tokens";
@@ -176,15 +176,15 @@ export function createWebAuthAgent(): IAuthAgent {
 			const scopeStr = SCOPES.join(" ");
 
 			const authUrl =
-				`https://accounts.google.com/o/oauth2/v2/auth?` +
+				"https://accounts.google.com/o/oauth2/v2/auth?" +
 				`client_id=${encodeURIComponent(clientId)}` +
 				`&redirect_uri=${encodeURIComponent(redirectUri)}` +
-				`&response_type=code` +
+				"&response_type=code" +
 				`&scope=${encodeURIComponent(scopeStr)}` +
-				`&access_type=offline` +
-				`&prompt=consent` +
+				"&access_type=offline" +
+				"&prompt=consent" +
 				`&code_challenge=${encodeURIComponent(codeChallenge)}` +
-				`&code_challenge_method=S256`;
+				"&code_challenge_method=S256";
 
 			window.location.href = authUrl;
 

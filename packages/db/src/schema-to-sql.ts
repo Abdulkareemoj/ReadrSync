@@ -175,16 +175,16 @@ export function getFtsTriggerStatements(): string[] {
  */
 export function getIndexStatements(): string[] {
 	return [
-		`CREATE INDEX IF NOT EXISTS idx_bookmarks_collection_id ON bookmarks(collection_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_bookmarks_favorite ON bookmarks(favorite)`,
-		`CREATE INDEX IF NOT EXISTS idx_bookmarks_liked ON bookmarks(liked)`,
-		`CREATE INDEX IF NOT EXISTS idx_bookmarks_saved ON bookmarks(saved)`,
-		`CREATE INDEX IF NOT EXISTS idx_bookmarks_date_added ON bookmarks(date_added)`,
-		`CREATE INDEX IF NOT EXISTS idx_articles_feed_id ON articles(feed_id)`,
+		"CREATE INDEX IF NOT EXISTS idx_bookmarks_collection_id ON bookmarks(collection_id)",
+		"CREATE INDEX IF NOT EXISTS idx_bookmarks_favorite ON bookmarks(favorite)",
+		"CREATE INDEX IF NOT EXISTS idx_bookmarks_liked ON bookmarks(liked)",
+		"CREATE INDEX IF NOT EXISTS idx_bookmarks_saved ON bookmarks(saved)",
+		"CREATE INDEX IF NOT EXISTS idx_bookmarks_date_added ON bookmarks(date_added)",
+		"CREATE INDEX IF NOT EXISTS idx_articles_feed_id ON articles(feed_id)",
 		`CREATE INDEX IF NOT EXISTS idx_articles_read ON articles("read")`,
-		`CREATE INDEX IF NOT EXISTS idx_articles_liked ON articles(liked)`,
-		`CREATE INDEX IF NOT EXISTS idx_articles_saved ON articles(saved)`,
-		`CREATE INDEX IF NOT EXISTS idx_articles_pub_date ON articles(pub_date)`,
+		"CREATE INDEX IF NOT EXISTS idx_articles_liked ON articles(liked)",
+		"CREATE INDEX IF NOT EXISTS idx_articles_saved ON articles(saved)",
+		"CREATE INDEX IF NOT EXISTS idx_articles_pub_date ON articles(pub_date)",
 	];
 }
 

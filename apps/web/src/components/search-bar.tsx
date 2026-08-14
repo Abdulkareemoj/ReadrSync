@@ -80,7 +80,10 @@ export default function SearchBar({
 	return (
 		<>
 			<InputGroup>
-				<Search className="text-muted-foreground size-4" data-icon="inline-start" />
+				<Search
+					className="size-4 text-muted-foreground"
+					data-icon="inline-start"
+				/>
 				<InputGroupInput
 					value={query}
 					onChange={(e) => {

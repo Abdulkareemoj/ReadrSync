@@ -1,14 +1,11 @@
+import { useCollectionsStore } from "@packages/store";
 import {
 	Link,
 	useMatchRoute,
 	useNavigate,
 	useRouterState,
 } from "@tanstack/react-router";
-import {
-	HelpCircleIcon,
-	Search,
-	Settings,
-} from "lucide-react";
+import { HelpCircleIcon, Search, Settings } from "lucide-react";
 import { useMemo, useState } from "react";
 import AnimatedTabs from "@/components/animated-tabs";
 import { BookmarkSidebar } from "@/components/bookmarks/bookmark-sidebar";
@@ -28,7 +25,6 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { useFeeds } from "@/hooks/use-feeds";
-import { useCollectionsStore } from "@packages/store";
 import { useReaderStore } from "@/lib/store";
 import { ExploreSidebar } from "./explore-sidebar";
 import { SidebarBrand } from "./sidebar-brand";
@@ -197,7 +193,7 @@ export function AppSidebar() {
 	return (
 		<Sidebar collapsible="offcanvas">
 			<SidebarHeader>
-					<SidebarBrand />
+				<SidebarBrand />
 			</SidebarHeader>
 			<SidebarContent>
 				<div className="p-2">
@@ -230,7 +226,8 @@ export function AppSidebar() {
 											{matchRoute({ to: "/", fuzzy: true }) && "Home"}
 											{matchRoute({ to: "/rss", fuzzy: true }) && "Sources"}
 											{matchRoute({ to: "/explore", fuzzy: true }) && "Explore"}
-											{matchRoute({ to: "/settings", fuzzy: true }) && "Settings"}
+											{matchRoute({ to: "/settings", fuzzy: true }) &&
+												"Settings"}
 										</h2>
 										<div className="flex items-center gap-2">
 											{!matchRoute({ to: "/settings", fuzzy: true }) && (

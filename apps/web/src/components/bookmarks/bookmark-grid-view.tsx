@@ -1,7 +1,12 @@
 import type { Bookmark } from "@packages/store";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyTitle,
+} from "@/components/ui/empty";
 import { BookmarkGridCard } from "./bookmark-grid-card";
 
 interface BookmarkGridViewProps {

@@ -1,40 +1,48 @@
+import { useForm } from "@tanstack/react-form";
 import * as React from "react";
 import { View } from "react-native";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
 
 // Define the form schema with Zod
 const feedSchema = z.object({
-	feedUrl: z.url("Please enter a valid RSS feed URL").min(1, "URL is required").refine(
-			(url) => {
-				try {
-					const urlObj = new URL(url);
-					// Ensure the URL has a valid domain
-					return urlObj.hostname.includes(".");
-				} catch {
-					return false;
-				}
-			},
-			"Please enter a valid domain (e.g., https://example.com/feed.xml)"
-		),
+	feedUrl: z
+		.url("Please enter a valid RSS feed URL")
+		.min(1, "URL is required")
+		.refine((url) => {
+			try {
+				const urlObj = new URL(url);
+				// Ensure the URL has a valid domain
+				return urlObj.hostname.includes(".");
+			} catch {
+				return false;
+			}
+		}, "Please enter a valid domain (e.g., https://example.com/feed.xml)"),
 	title: z.string().optional(),
 });
 
 interface AddFeedModalProps {
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
-	onAddFeed: (data: {
-		feedUrl: string;
-		title?: string;
-	}) => void;
+	onAddFeed: (data: { feedUrl: string; title?: string }) => void;
 }
 
-export function AddFeedModal({ open, onOpenChange, onAddFeed }: AddFeedModalProps) {
+export function AddFeedModal({
+	open,
+	onOpenChange,
+	onAddFeed,
+}: AddFeedModalProps) {
 	const [internalOpen, setInternalOpen] = React.useState(false);
 	const isControlled = open !== undefined;
 	const isOpen = isControlled ? open : internalOpen;
@@ -71,10 +79,7 @@ export function AddFeedModal({ open, onOpenChange, onAddFeed }: AddFeedModalProp
 	});
 
 	return (
-		<Dialog
-			open={isOpen}
-			onOpenChange={setOpen}
-		>
+		<Dialog open={isOpen} onOpenChange={setOpen}>
 			<DialogContent className="sm:max-w-106.25">
 				<DialogHeader>
 					<DialogTitle>Add New RSS Feed</DialogTitle>
@@ -136,7 +141,9 @@ export function AddFeedModal({ open, onOpenChange, onAddFeed }: AddFeedModalProp
 						children={(state) => (
 							<Button
 								onPress={() => form.handleSubmit()}
-								disabled={state.values.feedUrl.trim() === "" || state.isSubmitting}
+								disabled={
+									state.values.feedUrl.trim() === "" || state.isSubmitting
+								}
 								className="mt-2 w-full"
 							>
 								<Text className="font-semibold text-white">

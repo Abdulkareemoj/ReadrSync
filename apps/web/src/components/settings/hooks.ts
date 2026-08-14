@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { detectFormat, exportSyncData, importSyncData } from "@/lib/sync";
-import type { ExportFormat } from "@/lib/sync";
+import { useEffect, useState } from "react";
 import { getInitializedAgents } from "@/lib/agents";
 import { useSettingsStore } from "@/lib/store";
+import type { ExportFormat } from "@/lib/sync";
+import { detectFormat, exportSyncData, importSyncData } from "@/lib/sync";
 
 export function useSettings() {
 	const { theme, setTheme } = useTheme();

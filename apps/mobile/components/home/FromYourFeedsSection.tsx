@@ -38,9 +38,7 @@ export default function FromYourFeedsSection({ articlesByFeed }: Props) {
 				({ feed, articles }) =>
 					articles.length > 0 && (
 						<View key={feed.id} className="mb-4">
-							<Text className="mb-2 font-semibold text-sm">
-								{feed.title}
-							</Text>
+							<Text className="mb-2 font-semibold text-sm">{feed.title}</Text>
 							<ScrollView
 								horizontal
 								showsHorizontalScrollIndicator={false}
