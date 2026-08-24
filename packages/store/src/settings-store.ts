@@ -38,6 +38,7 @@ export interface SettingsState {
 	setSyncProvider: (provider: SyncProvider) => void;
 	setSyncStatus: (status: SyncStatus) => void;
 	setLastSyncedAt: (at: string) => void;
+	setYoutubeApiKey: (key: string) => void;
 	setAuth: (auth: {
 		isAuthenticated: boolean;
 		provider: AuthProvider;

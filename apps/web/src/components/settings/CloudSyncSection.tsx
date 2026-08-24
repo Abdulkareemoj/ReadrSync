@@ -11,7 +11,6 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import Row from "./Row";
 import SectionHeading from "./SectionHeading";
 import StatusDot from "./StatusDot";
@@ -19,7 +18,7 @@ import StatusDot from "./StatusDot";
 type Props = {
 	isAuthenticated: boolean;
 	authEmail: string | null;
-	syncStatus: "connected" | "syncing" | "error" | "idle";
+	syncStatus: "connected" | "connecting" | "syncing" | "error" | "idle";
 	statusLabel: string;
 	lastSync: string | null;
 	showConnectDialog: boolean;

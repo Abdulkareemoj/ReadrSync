@@ -1,5 +1,5 @@
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { BookOpenText, Moon, Settings, Sun } from "lucide-react";
+import { BookOpenText, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import SearchBar from "@/components/search-bar";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ export default function Toolbar() {
 						onSearch={(q) => {
 							void navigate({
 								to: location.pathname as any,
-								search: (prev: any) => ({ ...prev, q }),
+								search: ((prev: any) => ({ ...prev, q })) as any,
 								replace: true,
 							});
 						}}

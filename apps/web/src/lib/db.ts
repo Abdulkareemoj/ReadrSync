@@ -5,12 +5,7 @@ import {
 	createRssAgent,
 	type IAgents,
 } from "@packages/agents";
-import {
-	getCreateTableStatements,
-	runFtsSetup,
-	runMigrations,
-	SCHEMA_VERSION,
-} from "@packages/db";
+import { runFtsSetup, runMigrations, SCHEMA_VERSION } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import { seedDatabase } from "@packages/db/src/seed-data";
@@ -181,6 +176,7 @@ function setupPersistence(client: Database) {
 
 let initializedAgents: {
 	bookmarkAgent: ReturnType<typeof createBookmarkAgent>;
+	collectionAgent: ReturnType<typeof createCollectionAgent>;
 	rssAgent: ReturnType<typeof createRssAgent>;
 	highlightAgent: ReturnType<typeof createHighlightAgent>;
 	syncAgent: ReturnType<typeof createWebSyncAgent>;
@@ -196,7 +192,7 @@ export async function initializeWebAgents() {
 	// 1. Initialize sql.js (loads WASM)
 	// Tell sql.js where to find the WASM file
 	const SQL = await initSqlJs({
-		locateFile: (filename: string) => {
+		locateFile: () => {
 			return "/sql-wasm.wasm";
 		},
 	});

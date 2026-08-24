@@ -1,4 +1,5 @@
 import { useCollectionsStore } from "@packages/store";
+import { fetchPageMetadata } from "@packages/utils";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import MultipleSelector, { type Option } from "@/components/ui/multi-select";
 import { Spinner } from "@/components/ui/spinner";
 import { useTags } from "@/hooks/use-tags";
-import { useReaderStore } from "@/lib/store";
 
 // Define the form schema with Zod
 const bookmarkSchema = z.object({
@@ -52,7 +52,6 @@ export function AddBookmarkDialog({ onAddBookmark }: AddBookmarkDialogProps) {
 		undefined,
 	);
 
-	const { bookmarkAgent } = useReaderStore((state) => state);
 	const { tagOptions } = useTags();
 	const { bookmarkCollections } = useCollectionsStore();
 
@@ -103,7 +102,7 @@ export function AddBookmarkDialog({ onAddBookmark }: AddBookmarkDialogProps) {
 			setIsLoading(true);
 
 			try {
-				const metadata = await bookmarkAgent.fetchMetadata(url);
+				const metadata = await fetchPageMetadata(url);
 
 				// Only auto-fill title if user hasn't entered one
 				if (!title.trim()) {
@@ -122,12 +121,7 @@ export function AddBookmarkDialog({ onAddBookmark }: AddBookmarkDialogProps) {
 
 		const timeoutId = setTimeout(fetchMetadata, 800); // Increased debounce time
 		return () => clearTimeout(timeoutId);
-	}, [
-		form.getFieldValue("url"),
-		form.getFieldValue("title"),
-		bookmarkAgent,
-		form,
-	]);
+	}, [form.getFieldValue("url"), form.getFieldValue("title"), form]);
 
 	return (
 		<Dialog

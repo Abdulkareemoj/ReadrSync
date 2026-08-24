@@ -11,14 +11,15 @@ import { useBookmarksPage } from "@/components/bookmarks/hooks";
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksComponent,
 	validateSearch: (search: Record<string, unknown>) => ({
-		filter: (search.filter as string) || "all",
-		tags: (search.tags as string) || "",
+		filter: (search.filter as string) || undefined,
+		tags: (search.tags as string) || undefined,
+		q: (search.q as string) || undefined,
 	}),
 });
 
 function BookmarksComponent() {
 	const { filter, tags: tagsParam } = Route.useSearch();
-	const d = useBookmarksPage(filter, tagsParam);
+	const d = useBookmarksPage(filter ?? "all", tagsParam ?? "");
 
 	const commonProps = {
 		bookmarks: d.bookmarks,

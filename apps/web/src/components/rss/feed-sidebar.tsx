@@ -1,5 +1,5 @@
 import type { Feed } from "@packages/store";
-import { Bookmark, Rss, Trash2 } from "lucide-react";
+import { Rss, Trash2 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { AddFeedDialog } from "@/components/rss/add-feed-dialog";
 import { Badge } from "@/components/ui/badge";

@@ -35,7 +35,7 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 	}
 
 	for (const { match: m } of bookmarkMatches) {
-		const href = m[1].trim();
+		const href = (m[1] ?? "").trim();
 		if (!href || href.startsWith("place:")) continue;
 
 		const rawTitle = m[2]?.trim() || "Untitled";
@@ -44,7 +44,7 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 		const fullTag = m[0];
 		const tagsMatch = fullTag.match(TAG_REGEX);
 		const tags = tagsMatch
-			? tagsMatch[1]
+			? (tagsMatch[1] ?? "")
 					.split(",")
 					.map((t) => t.trim())
 					.filter(Boolean)
@@ -56,9 +56,9 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 		const entry: HtmlBookmarkEntry = {
 			title,
 			url: href,
-			addDate: addDateMatch ? parseAddDate(addDateMatch[1]) : undefined,
+			addDate: addDateMatch ? parseAddDate(addDateMatch[1] ?? "") : undefined,
 			tags,
-			icon: iconMatch ? iconMatch[1] : undefined,
+			icon: iconMatch?.[1],
 		};
 
 		entries.push(entry);
@@ -66,14 +66,14 @@ export function parseHtmlBookmarks(html: string): HtmlBookmarkEntry[] {
 
 	// Try to match descriptions ( <DD>text after an <A> tag )
 	for (let i = 0; i < entries.length; i++) {
-		const entryIndex = bookmarkMatches[i]?.index ?? -1;
-		if (entryIndex < 0) continue;
-		const afterBookmark = html.slice(
-			entryIndex + bookmarkMatches[i].match[0].length,
-		);
+		const bm = bookmarkMatches[i];
+		if (!bm) continue;
+		const afterBookmark = html.slice(bm.index + bm.match[0].length);
 		const descMatch = afterBookmark.match(DESCRIPTION_REGEX);
-		if (descMatch) {
-			entries[i].description = descMatch[1].replace(/<[^>]*>/g, "").trim();
+		const desc = descMatch?.[1]?.replace(/<[^>]*>/g, "").trim();
+		const entry = entries[i];
+		if (entry && desc) {
+			entry.description = desc;
 		}
 	}
 

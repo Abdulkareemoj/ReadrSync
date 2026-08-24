@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 
 const colors = {
 	connected: "bg-green-500",
+	connecting: "bg-amber-500/60 animate-pulse",
 	error: "bg-destructive",
 	syncing: "bg-amber-500 animate-pulse",
 	idle: "bg-muted-foreground/40",

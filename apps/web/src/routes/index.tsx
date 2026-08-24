@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
 	component: DashboardComponent,
+	validateSearch: (search: Record<string, unknown>) => ({
+		q: (search.q as string) || undefined,
+	}),
 });
 
 function DashboardComponent() {

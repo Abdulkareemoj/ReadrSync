@@ -5,7 +5,6 @@ import type {
 	IRssAgent,
 	ISyncAgent,
 	SyncData,
-	SyncResult,
 } from "@packages/agents";
 import * as Drive from "./google-drive";
 

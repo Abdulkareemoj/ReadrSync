@@ -35,6 +35,10 @@ export function useSettings() {
 		}
 	};
 
+	const handleFontSizeChange = (value: string) => {
+		setReaderFontSize(value as "sm" | "md" | "lg");
+	};
+
 	const handleExport = async () => {
 		setSyncStatus("syncing");
 		try {
@@ -162,14 +166,16 @@ export function useSettings() {
 			? "Connected"
 			: syncStatus === "syncing"
 				? "Syncing"
-				: syncStatus === "error"
-					? "Error"
-					: "Idle";
+				: syncStatus === "connecting"
+					? "Connecting"
+					: syncStatus === "error"
+						? "Error"
+						: "Idle";
 
 	return {
-		theme,
+		theme: theme ?? "system",
 		readerFontSize,
-		setReaderFontSize,
+		setReaderFontSize: handleFontSizeChange,
 		importMode,
 		setImportMode,
 		exportFormat,

@@ -194,7 +194,9 @@ export default function ArticleGrid({
 				const feedTitle = feeds.find((f) => f.id === article.feedId)?.title;
 				const imageUrl =
 					article.imageUrl ||
-					extractImageFromContent(article.content || article.contentSnippet);
+					extractImageFromContent(
+						(article.content || article.contentSnippet) ?? "",
+					);
 
 				return (
 					<Link
@@ -226,12 +228,10 @@ export default function ArticleGrid({
 										})
 									: ""
 							}
-							imageUrl={imageUrl}
-							imageData={article.imageData}
-							feedTitle={feedTitle}
+							imageUrl={imageUrl ?? undefined}
+							imageData={article.imageData ?? undefined}
 							liked={article.liked}
 							saved={article.saved}
-							read={article.read}
 							onLike={() => toggleArticleLike(article.id)}
 							onSave={() => toggleArticleSave(article.id)}
 						/>

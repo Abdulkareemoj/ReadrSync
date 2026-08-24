@@ -15,9 +15,6 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact({
 			jsxImportSource: "react",
-			babel: {
-				plugins: ["@babel/plugin-transform-flow-strip-types"],
-			},
 		}),
 	],
 	resolve: {
@@ -49,7 +46,6 @@ const config = defineConfig({
 			"@expo/vector-icons",
 		],
 	},
-	tsconfigPaths: true,
 });
 
 export default config;

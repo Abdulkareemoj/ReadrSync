@@ -2,6 +2,7 @@ import type { Bookmark } from "@packages/store";
 import { useRouterState } from "@tanstack/react-router";
 import {
 	Bookmark as BookmarkIcon,
+	BookmarkPlus,
 	Copy,
 	ExternalLink,
 	Heart,
@@ -163,6 +164,10 @@ function BookmarkListItem({
 							<BookmarkIcon className="size-4" />
 							Move to Inbox
 						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => onSave(bookmark.id)}>
+							<BookmarkPlus className="size-4" />
+							Save for later
+						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<ConfirmationDialog
 							title="Confirm Deletion"
@@ -191,10 +196,10 @@ export function BookmarkListView({
 	onDelete,
 	onEdit,
 	onMove,
-	onSave: _onSave,
+	onSave,
 }: BookmarkListViewProps) {
 	const search = useRouterState({
-		select: (s) => (s.location.search as any)?.q ?? "",
+		select: (s): string => ((s.location.search as any)?.q ?? "") as string,
 	});
 
 	const filteredBookmarks = useMemo(() => {
@@ -218,6 +223,7 @@ export function BookmarkListView({
 								key={bookmark.id}
 								bookmark={bookmark}
 								onLike={onLike}
+								onSave={onSave}
 								onDelete={onDelete}
 								onEdit={onEdit}
 								onMove={onMove}

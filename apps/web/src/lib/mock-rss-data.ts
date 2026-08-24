@@ -7,6 +7,7 @@ export const mockFeeds: Omit<Feed, "unreadCount">[] = [
 		feedUrl: "https://techcrunch.com/feed/",
 		siteUrl: "https://techcrunch.com",
 		lastFetched: new Date().toISOString(),
+		lastUpdatedAt: new Date().toISOString(),
 	},
 	{
 		id: "f2",
@@ -14,6 +15,7 @@ export const mockFeeds: Omit<Feed, "unreadCount">[] = [
 		feedUrl: "https://hnrss.org/frontpage",
 		siteUrl: "https://news.ycombinator.com",
 		lastFetched: new Date().toISOString(),
+		lastUpdatedAt: new Date().toISOString(),
 	},
 ];
 
@@ -27,8 +29,14 @@ export const mockArticles: Article[] = [
 			"A new AI company focused on edge computing secured major funding.",
 		pubDate: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
 		read: false,
+		readAt: null,
+		content: null,
+		fullContent: null,
+		imageUrl: null,
+		imageData: null,
 		liked: false,
 		saved: false,
+		lastUpdatedAt: new Date().toISOString(),
 	},
 	{
 		id: "a2",
@@ -39,8 +47,14 @@ export const mockArticles: Article[] = [
 			"An in-depth look at how serverless architectures are changing cloud development.",
 		pubDate: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
 		read: true,
+		readAt: new Date().toISOString(),
+		content: null,
+		fullContent: null,
+		imageUrl: null,
+		imageData: null,
 		liked: true,
 		saved: false,
+		lastUpdatedAt: new Date().toISOString(),
 	},
 	{
 		id: "a3",
@@ -51,7 +65,13 @@ export const mockArticles: Article[] = [
 			"Discussion thread about a new cross-platform bookmark tool.",
 		pubDate: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
 		read: false,
+		readAt: null,
+		content: null,
+		fullContent: null,
+		imageUrl: null,
+		imageData: null,
 		liked: false,
 		saved: true,
+		lastUpdatedAt: new Date().toISOString(),
 	},
 ];

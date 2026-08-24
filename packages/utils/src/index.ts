@@ -219,6 +219,50 @@ export async function extractArticleContent(
 	}
 }
 
+//  Bookmark metadata fetching (web/desktop)
+
+export interface PageMetadata {
+	title?: string;
+	description?: string;
+	image?: string;
+	favicon?: string;
+}
+
+export async function fetchPageMetadata(url: string): Promise<PageMetadata> {
+	try {
+		const res = await fetchWithProxy(url);
+		const html = await res.text();
+
+		// Patch global fetch so article-parser doesn't make its own CORS-blocked request
+		const originalFetch = globalThis.fetch;
+		globalThis.fetch = () =>
+			Promise.resolve(new Response(html, { status: 200 }));
+		let result: any;
+		try {
+			result = await extractArticle(url, {}, html as any);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+
+		let favicon: string | undefined;
+		try {
+			favicon = `${new URL(url).origin}/favicon.ico`;
+		} catch {
+			favicon = undefined;
+		}
+
+		return {
+			title: result?.title ?? undefined,
+			description: result?.description ?? undefined,
+			image: result?.image ?? undefined,
+			favicon,
+		};
+	} catch (err) {
+		console.warn("[fetchPageMetadata] Failed:", url, err);
+		return {};
+	}
+}
+
 //  Feed auto-discovery (web/desktop uses CORS proxies via fetchWithProxy)
 
 import { createFeedDiscoverer } from "./feed-discovery";

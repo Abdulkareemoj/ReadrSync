@@ -90,20 +90,20 @@ export function useBookmarksPage(filter: string, tagsParam: string) {
 		}
 		const next = Array.from(current);
 		void navigate({
-			search: (prev: any) => ({
+			search: ((prev: any) => ({
 				...prev,
 				tags: next.length > 0 ? next.join(",") : undefined,
-			}),
+			})) as any,
 			replace: true,
 		});
 	};
 
 	const clearTagFilters = () => {
 		void navigate({
-			search: (prev: any) => ({
+			search: ((prev: any) => ({
 				...prev,
 				tags: undefined,
-			}),
+			})) as any,
 			replace: true,
 		});
 	};

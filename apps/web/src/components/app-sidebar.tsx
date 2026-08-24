@@ -1,6 +1,5 @@
 import { useCollectionsStore } from "@packages/store";
 import {
-	Link,
 	useMatchRoute,
 	useNavigate,
 	useRouterState,
@@ -49,20 +48,14 @@ export function AppSidebar() {
 	const navigate = useNavigate();
 	const location = useRouterState({ select: (s) => s.location });
 
-	const {
-		bookmarkCollections,
-		addBookmarkCollection,
-		removeBookmarkCollection,
-		setBookmarkCollections,
-	} = useCollectionsStore();
+	const { addBookmarkCollection, setBookmarkCollections } =
+		useCollectionsStore();
 	const { feeds, removeFeed } = useFeeds();
 	const {
-		bookmarks,
 		collections: collectionTree,
 		createCollection,
 		renameCollection,
 		deleteCollection,
-		moveCollection,
 	} = useReaderStore((state) => state);
 
 	// Get current collection/feed ID from search params
@@ -70,10 +63,21 @@ export function AppSidebar() {
 
 	// Build a flat list of all collections for parent picker
 	const flatCollections = useMemo(() => {
-		const result: { id: string; name: string; parentId: string | null }[] = [];
+		const result: {
+			id: string;
+			name: string;
+			parentId: string | null;
+			position: number;
+		}[] = [];
+		let position = 2;
 		const walk = (nodes: typeof collectionTree) => {
 			for (const n of nodes) {
-				result.push({ id: n.id, name: n.name, parentId: n.parentId });
+				result.push({
+					id: n.id,
+					name: n.name,
+					parentId: n.parentId,
+					position: position++,
+				});
 				walk(n.children);
 			}
 		};
@@ -120,18 +124,9 @@ export function AppSidebar() {
 
 		void navigate({
 			to: targetPath as any,
-			search: query ? { q: query } : undefined,
+			search: (query ? { q: query } : undefined) as any,
 			replace: true,
 		});
-	}
-
-	function slugify(input: string): string {
-		return input
-			.toLowerCase()
-			.trim()
-			.replace(/[^a-z0-9\s-]/g, "")
-			.replace(/\s+/g, "-")
-			.replace(/-+/g, "-");
 	}
 
 	function handleAddCollection(name: string) {

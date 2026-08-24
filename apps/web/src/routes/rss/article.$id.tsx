@@ -332,7 +332,7 @@ function ArticleReaderComponent() {
 						// the HTML above, removing scripts/iframes/forms.
 					>
 						{HtmlParser(preparedHtml, {
-							transform: (node: any, index: number) => {
+							transform: (node: any) => {
 								// Open all links in a new tab
 								if (node.type === "tag" && node.name === "a") {
 									const href = node.attribs?.href;

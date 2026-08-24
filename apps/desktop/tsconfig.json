@@ -11,7 +11,6 @@
 		"skipLibCheck": true,
 		"types": ["vite/client"],
 		"rootDirs": ["."],
-		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*", "../web/src/*"],
 			"@packages/*": ["../../packages/*"]

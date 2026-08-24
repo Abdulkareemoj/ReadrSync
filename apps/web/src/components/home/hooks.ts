@@ -14,9 +14,25 @@ export function useHomeData() {
 	const unreadArticles = articles.filter((a) => !a.read).length;
 	const totalFeeds = feeds.length;
 
+	// ~200 words per minute reading speed, computed from cached article text
+	const estimateReadTime = (a: {
+		content?: string | null;
+		contentSnippet?: string | null;
+		fullContent?: string | null;
+	}) => {
+		const text = (a.fullContent || a.content || a.contentSnippet || "").replace(
+			/<[^>]*>/g,
+			" ",
+		);
+		return Math.max(
+			1,
+			Math.round(text.split(/\s+/).filter(Boolean).length / 200),
+		);
+	};
+
 	const totalReadingTime = articles
 		.filter((a) => !a.read)
-		.reduce((acc, a) => acc + (a.readTime || 0), 0);
+		.reduce((acc, a) => acc + estimateReadTime(a), 0);
 
 	const today = new Date();
 	const todayStart = new Date(
@@ -28,22 +44,24 @@ export function useHomeData() {
 		today.getTime() - 7 * 24 * 60 * 60 * 1000,
 	).toISOString();
 
-	const bookmarksToday = bookmarks.filter((b) => b.createdAt >= todayStart);
-	const articlesToday = articles.filter((a) => a.pubDate >= todayStart);
-	const bookmarksThisWeek = bookmarks.filter((b) => b.createdAt >= weekAgo);
-	const articlesThisWeek = articles.filter((a) => a.pubDate >= weekAgo);
+	const bookmarksToday = bookmarks.filter((b) => b.dateAdded >= todayStart);
+	const articlesToday = articles.filter((a) => (a.pubDate ?? "") >= todayStart);
+	const bookmarksThisWeek = bookmarks.filter((b) => b.dateAdded >= weekAgo);
+	const articlesThisWeek = articles.filter((a) => (a.pubDate ?? "") >= weekAgo);
 
 	const dailyHighlights = articles
 		.filter((a) => !a.read)
 		.sort((a, b) => {
 			if (a.liked && !b.liked) return -1;
 			if (!a.liked && b.liked) return 1;
-			return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+			return (
+				new Date(b.pubDate ?? 0).getTime() - new Date(a.pubDate ?? 0).getTime()
+			);
 		})
 		.slice(0, 5);
 
 	const trendingArticles = articles
-		.filter((a) => a.pubDate >= weekAgo)
+		.filter((a) => (a.pubDate ?? "") >= weekAgo)
 		.sort(
 			(a, b) =>
 				(b.liked ? 1 : 0) -
@@ -77,8 +95,8 @@ export function useHomeData() {
 	const totalLiked = articles.filter((a) => a.liked).length;
 	const totalSaved = articles.filter((a) => a.saved).length;
 
-	const pinnedBookmarks = bookmarks.filter((b) => b.pinned);
-	const pinnedArticles = articles.filter((a) => a.pinned);
+	const pinnedBookmarks = bookmarks.filter((b) => b.favorite);
+	const pinnedArticles = articles.filter((a) => a.saved);
 
 	const articlesByFeed = feeds.slice(0, 3).map((feed) => ({
 		feed,
@@ -95,9 +113,8 @@ export function useHomeData() {
 		},
 		{} as Record<string, number>,
 	);
-	const topTags = Object.entries(tagCounts)
+	const topTags = (Object.entries(tagCounts) as [string, number][])
 		.filter(([_, count]) => typeof count === "number")
-		.map(([tag, count]) => [tag, count as number])
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 10);
 

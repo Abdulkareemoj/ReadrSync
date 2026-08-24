@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, GalleryVerticalEnd, Rss } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,10 +27,10 @@ export function CollectionList({ collections, type }: CollectionListProps) {
 		const basePath = type === "bookmark" ? "/bookmarks" : "/rss";
 		void navigate({
 			to: basePath as any,
-			search: (prev: any) => ({
+			search: ((prev: any) => ({
 				...prev,
 				collection: collectionId === "all" ? undefined : collectionId,
-			}),
+			})) as any,
 			replace: true,
 		});
 	}

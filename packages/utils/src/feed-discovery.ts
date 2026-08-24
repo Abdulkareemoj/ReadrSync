@@ -19,7 +19,7 @@ function getAttr(tag: string, name: string): string | null {
 	const match = tag.match(
 		new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i"),
 	);
-	return match ? match[1] : null;
+	return match?.[1] ?? null;
 }
 
 function normalizeUrl(input: string): string {

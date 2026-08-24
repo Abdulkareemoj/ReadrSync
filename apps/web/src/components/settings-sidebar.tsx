@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Cloud, Info, Sun } from "lucide-react";
 import {
 	SidebarGroup,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,

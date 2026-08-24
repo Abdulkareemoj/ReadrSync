@@ -5,11 +5,11 @@ type Article = {
 	id: string;
 	title: string;
 	feedId: string;
-	contentSnippet?: string;
-	content?: string;
-	imageUrl?: string;
-	imageData?: string;
-	pubDate?: string;
+	contentSnippet?: string | null;
+	content?: string | null;
+	imageUrl?: string | null;
+	imageData?: string | null;
+	pubDate?: string | null;
 	readTime?: number;
 	liked?: boolean;
 	saved?: boolean;
@@ -18,7 +18,7 @@ type Article = {
 type Feed = {
 	id: string;
 	title: string;
-	siteUrl?: string;
+	siteUrl?: string | null;
 };
 
 type Props = {

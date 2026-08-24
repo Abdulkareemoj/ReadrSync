@@ -25,7 +25,6 @@ import {
 	CommandSeparator,
 	CommandShortcut,
 } from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -45,7 +44,7 @@ export default function SearchBar({
 	const [query, setQuery] = useState("");
 	const [open, setOpen] = useState(false);
 	const navigate = useNavigate();
-	const { theme, setTheme } = useTheme();
+	const { setTheme } = useTheme();
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {

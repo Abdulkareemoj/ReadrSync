@@ -28,7 +28,7 @@ function slugify(input: string): string {
 
 export const useCollectionsStore = create<CollectionsState>()(
 	persist(
-		(set, get) => ({
+		(set) => ({
 			bookmarkCollections: [
 				{ id: "all", name: "All Bookmarks", parentId: null, position: 0 },
 				{ id: "inbox", name: "Inbox", parentId: null, position: 1 },

@@ -267,11 +267,11 @@ export async function seedDatabase(
 		const feedCount = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(feeds)
-			.then((rows) => rows[0]?.count ?? 0);
+			.then((rows: { count: number }[]) => rows[0]?.count ?? 0);
 		const bookmarkCount = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(bookmarks)
-			.then((rows) => rows[0]?.count ?? 0);
+			.then((rows: { count: number }[]) => rows[0]?.count ?? 0);
 		if (feedCount > 0 || bookmarkCount > 0) {
 			console.log("[Seed] Database already has data, skipping seed.");
 			return { seeded: false, feeds: 0, bookmarks: 0 };

@@ -240,7 +240,7 @@ export async function extractArticleContent(
 				/<div[^>]*class=["'][^"']*(?:article|post|content|entry|story)[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
 			);
 
-		const content = articleMatch ? articleMatch[1] : clean;
+		const content = articleMatch?.[1] ?? clean;
 
 		// OG image
 		const image =

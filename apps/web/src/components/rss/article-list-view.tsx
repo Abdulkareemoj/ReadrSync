@@ -41,7 +41,7 @@ export default function ArticleListView({
 	onShare,
 }: ArticleListViewProps) {
 	const search = useRouterState({
-		select: (s) => (s.location.search as any)?.q ?? "",
+		select: (s): string => ((s.location.search as any)?.q ?? "") as string,
 	});
 
 	const filteredArticles = useMemo(() => {

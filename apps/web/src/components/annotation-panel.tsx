@@ -6,7 +6,7 @@ import { Textarea } from "./ui/textarea";
 interface Annotation {
 	id: string;
 	text: string;
-	highlightedText: string;
+	highlightedText?: string;
 	timestamp: string;
 }
 

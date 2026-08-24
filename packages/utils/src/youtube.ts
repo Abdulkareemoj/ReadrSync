@@ -66,6 +66,7 @@ function buildFeedUrl(
 		if (!parts.length) return null;
 
 		const first = parts[0];
+		if (!first) return null;
 
 		if (first === "channel" && parts[1]?.startsWith("UC")) {
 			return {
@@ -226,6 +227,7 @@ export function extractYouTubeHandle(normalizedUrl: string): string | null {
 		if (!parts.length) return null;
 
 		const first = parts[0];
+		if (!first) return null;
 		if (first.startsWith("@")) return first.slice(1);
 		if (first === "c" || first === "user") return parts[1] ?? null;
 

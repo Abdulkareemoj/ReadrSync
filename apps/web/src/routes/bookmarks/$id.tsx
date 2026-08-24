@@ -21,7 +21,15 @@ function BookmarkPageComponent() {
 
 	return (
 		<main className="flex-1 overflow-y-auto">
-			<BookmarkDisplay {...bookmark} />
+			<BookmarkDisplay
+				id={bookmark.id}
+				title={bookmark.title}
+				url={bookmark.url}
+				description={bookmark.description ?? undefined}
+				tags={bookmark.tags}
+				favicon={bookmark.favicon ?? undefined}
+				liked={bookmark.liked}
+			/>
 		</main>
 	);
 }

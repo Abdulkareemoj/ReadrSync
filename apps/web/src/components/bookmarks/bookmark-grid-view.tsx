@@ -21,14 +21,14 @@ interface BookmarkGridViewProps {
 export function BookmarkGridView({
 	bookmarks,
 	onLike,
-	onSave,
+	onSave: _onSave,
 	onDelete,
 	onEdit,
 	onMove,
 }: BookmarkGridViewProps) {
 	const router = useRouter();
 	const search = useRouterState({
-		select: (s) => (s.location.search as any)?.q ?? "",
+		select: (s): string => ((s.location.search as any)?.q ?? "") as string,
 	});
 
 	const filteredBookmarks = useMemo(() => {
@@ -53,9 +53,9 @@ export function BookmarkGridView({
 								id={bookmark.id}
 								title={bookmark.title}
 								url={bookmark.url || ""}
-								description={bookmark.description}
+								description={bookmark.description ?? undefined}
 								tags={bookmark.tags}
-								favicon={bookmark.favicon}
+								favicon={bookmark.favicon ?? undefined}
 								liked={bookmark.liked}
 								onLike={onLike}
 								onDelete={onDelete}

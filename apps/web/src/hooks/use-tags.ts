@@ -61,7 +61,7 @@ export function useTags() {
 	}, [tagFrequency]);
 
 	// Function to add a new tag to the system
-	const addNewTag = (newTag: string): Option => {
+	const addNewTag = (newTag: string): Option | null => {
 		const trimmedTag = newTag.trim();
 		if (!trimmedTag) return null;
 

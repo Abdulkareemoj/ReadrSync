@@ -204,10 +204,10 @@ export function BookmarkSidebar({
 		}
 		const next = Array.from(current);
 		void navigate({
-			search: (prev: any) => ({
+			search: ((prev: any) => ({
 				...prev,
 				tags: next.length > 0 ? next.join(",") : undefined,
-			}),
+			})) as any,
 			replace: true,
 		});
 	};
@@ -221,10 +221,10 @@ export function BookmarkSidebar({
 	const handleSearch = (query: string) => {
 		setSearchQuery(query);
 		void navigate({
-			search: (prev: any) => ({
+			search: ((prev: any) => ({
 				...prev,
 				q: query || undefined,
-			}),
+			})) as any,
 			replace: true,
 		});
 	};
@@ -366,10 +366,10 @@ export function BookmarkSidebar({
 									<Button
 										onClick={() => {
 											void navigate({
-												search: (prev: any) => ({
+												search: ((prev: any) => ({
 													...prev,
 													tags: undefined,
-												}),
+												})) as any,
 												replace: true,
 											});
 										}}

@@ -479,8 +479,13 @@ export function initializeReaderStore(agents: {
 	return readerStore;
 }
 
-export function useReaderStore<T>(selector: (state: ReaderState) => T): T {
-	if (!readerStore) return undefined as unknown as T;
+export function useReaderStore(): ReaderState;
+export function useReaderStore<T>(selector: (state: ReaderState) => T): T;
+export function useReaderStore<T>(
+	selector?: (state: ReaderState) => T,
+): T | ReaderState {
+	if (!readerStore) return undefined as unknown as T | ReaderState;
+	if (!selector) return readerStore();
 	return readerStore(selector);
 }
 

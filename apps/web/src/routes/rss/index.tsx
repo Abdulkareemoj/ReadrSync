@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const rssSearchSchema = z.object({
 	filter: z.string().nullable().catch(null),
+	q: z.string().optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/rss/")({
