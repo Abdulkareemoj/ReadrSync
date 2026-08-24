@@ -57,6 +57,7 @@ function normalizeOutlines(items: any[]): OpmlOutline[] {
 			htmlUrl: item["@_htmlUrl"],
 			url: item["@_url"] ?? item["@_href"],
 			description: item["@_description"],
+			category: item["@_category"],
 		};
 		if (item.outline) {
 			outline.outline = Array.isArray(item.outline)
