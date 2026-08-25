@@ -30,9 +30,7 @@ export default function SmallArticleCard({ articleId }: { articleId: string }) {
 							{feed?.title || "RSS"}
 						</Text>
 					</View>
-					<Text className="text-[10px] text-muted-foreground">
-						{article.readTime || 3} min
-					</Text>
+					<Text className="text-[10px] text-muted-foreground">3 min</Text>
 				</View>
 				<Text className="font-semibold text-sm" numberOfLines={2}>
 					{article.title}

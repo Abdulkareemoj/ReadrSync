@@ -279,7 +279,9 @@ export default function MobileBookmarksScreen({
 				<TouchableOpacity
 					onPress={() => {
 						// Open collection picker or show filters
-						navigation.navigate("Collections" as any);
+						(navigation as { navigate: (name: string) => void }).navigate(
+							"Collections",
+						);
 					}}
 					className="flex-row items-center rounded-full bg-blue-50 px-3 py-1.5 active:bg-blue-100"
 				>
@@ -339,7 +341,13 @@ export default function MobileBookmarksScreen({
 			renderItem={({ item }) => (
 				<View className="mx-4 mb-3">
 					<BookmarkCard
-						{...item}
+						id={item.id}
+						title={item.title}
+						url={item.url}
+						favicon={item.favicon ?? undefined}
+						tags={item.tags ?? undefined}
+						liked={item.liked}
+						saved={item.saved}
 						onLike={() => {
 							// Handle like action
 							console.log("Toggle like for:", item.id);

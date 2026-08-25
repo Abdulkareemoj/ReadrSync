@@ -91,6 +91,7 @@ export default function ArchivePage() {
 					data={bookmarks}
 					renderItem={renderBookmarkItem}
 					keyExtractor={keyExtractor}
+					key={viewMode}
 					numColumns={viewMode === "grid" ? 2 : 1}
 					contentContainerStyle={{
 						paddingHorizontal: 16,

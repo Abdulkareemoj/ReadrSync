@@ -11,6 +11,10 @@ import {
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 
+type Props = {
+	tags: { tag: string; count: number }[];
+};
+
 export default function TagCloud({ tags }: Props) {
 	const [open, setOpen] = useState(false);
 

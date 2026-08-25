@@ -44,8 +44,13 @@ export default function DataSection() {
 						<View className="flex-row items-center gap-2">
 							<View className="w-28">
 								<Select
-									value={exportFormat}
-									onValueChange={(v: any) => v && setExportFormat(v.value ?? v)}
+									value={{
+										value: exportFormat,
+										label: exportFormat.toUpperCase(),
+									}}
+									onValueChange={(v) => {
+										if (v?.value) setExportFormat(v.value as ExportFormat);
+									}}
 								>
 									<SelectTrigger>
 										<SelectValue placeholder={""} />

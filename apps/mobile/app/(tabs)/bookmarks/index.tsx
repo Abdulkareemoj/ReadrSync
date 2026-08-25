@@ -126,6 +126,7 @@ export default function Bookmarks() {
 					data={filteredBookmarks}
 					renderItem={renderBookmarkItem}
 					keyExtractor={keyExtractor}
+					key={viewMode}
 					numColumns={viewMode === "grid" ? 2 : 1}
 					contentContainerStyle={{
 						paddingHorizontal: 16,

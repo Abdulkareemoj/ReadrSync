@@ -22,7 +22,10 @@ export function useHomeData() {
 
 	const totalReadingTime = articles
 		.filter((a) => !a.read)
-		.reduce((acc, a) => acc + (a.readTime || 0), 0);
+		.reduce(
+			(acc, a) => acc + ((a as unknown as { readTime?: number }).readTime ?? 0),
+			0,
+		);
 
 	const dashboardData = [
 		{
@@ -65,10 +68,10 @@ export function useHomeData() {
 		today.getTime() - 7 * 24 * 60 * 60 * 1000,
 	).toISOString();
 
-	const bookmarksToday = bookmarks.filter((b) => b.createdAt >= todayStart);
-	const articlesToday = articles.filter((a) => a.pubDate >= todayStart);
-	const bookmarksThisWeek = bookmarks.filter((b) => b.createdAt >= weekAgo);
-	const articlesThisWeek = articles.filter((a) => a.pubDate >= weekAgo);
+	const bookmarksToday = bookmarks.filter((b) => b.dateAdded >= todayStart);
+	const articlesToday = articles.filter((a) => (a.pubDate ?? "") >= todayStart);
+	const bookmarksThisWeek = bookmarks.filter((b) => b.dateAdded >= weekAgo);
+	const articlesThisWeek = articles.filter((a) => (a.pubDate ?? "") >= weekAgo);
 
 	const hasTodayActivity =
 		bookmarksToday.length > 0 || articlesToday.length > 0;
@@ -85,17 +88,19 @@ export function useHomeData() {
 		.sort((a, b) => {
 			if (a.liked && !b.liked) return -1;
 			if (!a.liked && b.liked) return 1;
-			return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+			return (
+				new Date(b.pubDate ?? 0).getTime() - new Date(a.pubDate ?? 0).getTime()
+			);
 		})
 		.slice(0, 3);
 
 	const trendingArticles = articles
-		.filter((a) => a.pubDate >= weekAgo && a.liked)
+		.filter((a) => (a.pubDate ?? "") >= weekAgo && a.liked)
 		.slice(0, 3);
 
 	const readDates = articles
-		.filter((a) => a.read)
-		.map((a) => new Date(a.pubDate).toDateString());
+		.filter((a) => a.read && a.pubDate)
+		.map((a) => new Date(a.pubDate as string).toDateString());
 	const uniqueReadDates = Array.from(new Set(readDates));
 	let currentStreak = 0;
 	for (let i = 0; i < 7; i++) {

@@ -75,22 +75,23 @@ export default function SourcesScreen() {
 	);
 
 	const handleDelete = useCallback(
-		(feed: Feed) => {
+		(id: string) => {
+			const feed = feeds.find((f) => f.id === id);
 			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 			Alert.alert(
 				"Remove Feed",
-				`Remove "${feed.title}"? All its articles will be deleted.`,
+				`Remove "${feed?.title ?? "this feed"}"? All its articles will be deleted.`,
 				[
 					{ text: "Cancel", style: "cancel" },
 					{
 						text: "Remove",
 						style: "destructive",
-						onPress: () => removeFeed(feed.id),
+						onPress: () => removeFeed(id),
 					},
 				],
 			);
 		},
-		[removeFeed],
+		[removeFeed, feeds],
 	);
 
 	const handleSaveTitle = useCallback(
@@ -194,7 +195,7 @@ export default function SourcesScreen() {
 							<Pressable
 								onPress={(e) => {
 									e.stopPropagation?.();
-									handleDelete(feed);
+									handleDelete(feed.id);
 								}}
 								className="rounded-lg p-2 active:opacity-60"
 								hitSlop={8}

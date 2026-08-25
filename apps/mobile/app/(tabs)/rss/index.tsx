@@ -248,17 +248,19 @@ export default function RssScreen() {
 						<Text className="mb-1 font-medium text-foreground">
 							Sort Articles
 						</Text>
-						{[
-							{ key: "newest", label: "Newest First" },
-							{ key: "oldest", label: "Oldest First" },
-							{ key: "unread", label: "Unread First" },
-							{ key: "liked", label: "Liked First" },
-							{ key: "source", label: "By Source" },
-						].map((option) => (
+						{(
+							[
+								{ key: "Latest", label: "Newest First" },
+								{ key: "Oldest", label: "Oldest First" },
+								{ key: "Unread", label: "Unread First" },
+								{ key: "Liked", label: "Liked First" },
+								{ key: "Source", label: "By Source" },
+							] as const
+						).map((option) => (
 							<Pressable
 								key={option.key}
 								onPress={() => {
-									setSortBy(option.key as typeof sortBy);
+									setSortBy(option.key);
 									setShowBottomSheet(false);
 								}}
 								className={`flex-row items-center justify-between rounded-xl border px-4 py-3 active:opacity-80 ${

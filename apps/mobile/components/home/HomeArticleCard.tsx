@@ -1,25 +1,9 @@
+import type { Article, Feed } from "@packages/store";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Rss } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
-
-type Article = {
-	id: string;
-	title: string;
-	feedId: string;
-	contentSnippet?: string;
-	content?: string;
-	imageUrl?: string;
-	pubDate?: string;
-	readTime?: number;
-};
-
-type Feed = {
-	id: string;
-	title: string;
-	siteUrl?: string;
-};
 
 type Props = {
 	article: Article;
@@ -54,9 +38,7 @@ export default function HomeArticleCard({ article, feed }: Props) {
 							{feed?.title || "RSS"}
 						</Text>
 					</View>
-					<Text className="text-muted-foreground text-xs">
-						{article.readTime || 5} min read
-					</Text>
+					<Text className="text-muted-foreground text-xs">5 min read</Text>
 				</View>
 
 				<Text className="mb-1 font-semibold text-base" numberOfLines={2}>

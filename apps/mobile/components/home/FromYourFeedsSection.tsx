@@ -1,24 +1,8 @@
+import type { Article, Feed } from "@packages/store";
 import { Rss } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import HomeArticleCard from "./HomeArticleCard";
-
-type Feed = {
-	id: string;
-	title: string;
-	siteUrl?: string;
-};
-
-type Article = {
-	id: string;
-	title: string;
-	feedId: string;
-	contentSnippet?: string;
-	content?: string;
-	imageUrl?: string;
-	pubDate?: string;
-	readTime?: number;
-};
 
 type Props = {
 	articlesByFeed: { feed: Feed; articles: Article[] }[];

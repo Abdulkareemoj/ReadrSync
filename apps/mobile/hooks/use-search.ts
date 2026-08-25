@@ -22,7 +22,7 @@ export function useMobileSearch() {
 
 		// Add tag matches
 		bookmarks.forEach((bookmark) => {
-			bookmark.tags?.forEach((tag) => {
+			bookmark.tags?.forEach((tag: string) => {
 				if (
 					tag.toLowerCase().includes(lowerQuery) &&
 					!suggestions.includes(tag)
