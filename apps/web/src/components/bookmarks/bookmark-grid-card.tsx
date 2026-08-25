@@ -125,9 +125,9 @@ export function BookmarkGridCard({
 				</DropdownMenu>
 			</div>
 
-			<Button
+			<button
 				type="button"
-				className="w-full cursor-pointer text-left"
+				className="w-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left"
 				onClick={onClick}
 			>
 				{/* Hero Area - Favicon centered on gradient */}
@@ -178,7 +178,7 @@ export function BookmarkGridCard({
 						</div>
 					)}
 				</div>
-			</Button>
+			</button>
 		</div>
 	);
 }
