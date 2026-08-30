@@ -11,12 +11,12 @@ import { MediaPlaceholder } from "@/components/media-placeholder";
 import { Button } from "@/components/ui/button";
 
 const shots = {
-	mac: "ReadrSync on macOS — library grid with continue-reading shelf",
-	safari: "ReadrSync web app in Safari — reader view with synced highlights",
-	browser: "ReadrSync web app — notes panel exporting to Markdown",
-	ipad: "ReadrSync on iPad — two-page reader with margin notes",
-	iphone: "ReadrSync on iPhone — resuming an audiobook at the same page",
-	android: "ReadrSync on Android — offline library with pending sync badge",
+	mac: "ReadrSync on macOS, library grid with continue-reading shelf",
+	safari: "ReadrSync web app in Safari, reader view with synced highlights",
+	browser: "ReadrSync web app, notes panel exporting to Markdown",
+	ipad: "ReadrSync on iPad, two-page reader with margin notes",
+	iphone: "ReadrSync on iPhone, resuming an audiobook at the same page",
+	android: "ReadrSync on Android, offline library with pending sync badge",
 };
 
 export function PromoBand() {
@@ -30,7 +30,7 @@ export function PromoBand() {
 					<p className="mt-2 text-primary text-promo">No account required</p>
 				</div>
 
-				{/* Device showcase — every frame opens fullscreen */}
+				{/* Device showcase, every frame opens fullscreen */}
 				<div className="mt-16 grid gap-6 lg:grid-cols-12">
 					<div className="lg:col-span-7">
 						<Zoomable

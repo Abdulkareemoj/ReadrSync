@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Device mockup frames — pure CSS/DOM, theme-token driven, no shadows.
+ * Device mockup frames, pure CSS/DOM, theme-token driven, no shadows.
  * Each frame is a fixed-aspect shell; `children` is the screen content
  * (a MediaPlaceholder today, a real <img>/<video> later).
  */

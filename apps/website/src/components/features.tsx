@@ -30,11 +30,11 @@ const features = [
 const categories = [
 	{
 		label: "Fiction",
-		media: "Category card — a paperback open on a sunlit bench",
+		media: "Category card, a paperback open on a sunlit bench",
 	},
 	{
 		label: "Non-fiction",
-		media: "Category card — a desk with annotated hardcovers",
+		media: "Category card, a desk with annotated hardcovers",
 	},
 ];
 

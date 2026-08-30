@@ -1,19 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MediaPlaceholder } from "@/components/media-placeholder";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
+import { MediaLightbox } from "@/components/media-lightbox";
 const slides = [
 	{
 		label:
-			"Product shot — ReadrSync library view on desktop, reading progress synced across shelves",
+      "Product shot, ReadrSync library view on desktop, reading progress synced across shelves",
+    	mediaSrc: "/rss.png",
 	},
 	{
 		label:
-			"Product shot — phone and tablet side by side, resuming the same page mid-sentence",
+      "Product shot, phone and tablet side by side, resuming the same page mid-sentence",
+    		mediaSrc: "/home.jpeg",
 	},
 	{
-		label: "Product shot — highlights and notes panel syncing in real time",
+    label: "Product shot, highlights and notes panel syncing in real time",
+				mediaSrc: "/bookmarks.png",
 	},
 ];
 
@@ -76,7 +78,11 @@ export default function Hero() {
 								i === index ? "opacity-100" : "opacity-0",
 							)}
 						>
-							<MediaPlaceholder label={slide.label} />
+						<MediaLightbox
+							label={slide.label}
+							src={slide.mediaSrc}
+							className="h-full w-full"
+						/>
 						</div>
 					))}
 				</div>

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Stand-in for the photography that carries this design system.
- * Swap each one for a real <img className="h-full w-full object-cover" /> —
+ * Swap each one for a real <img className="h-full w-full object-cover" />,
  * `label` describes the shot the slot is composed for.
  */
 export function MediaPlaceholder({
