@@ -103,8 +103,8 @@ The internet moves fast. Great articles, saved links, and RSS feeds pile up in a
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/bookmark-tool.git
-cd bookmark-tool
+git clone https://github.com/Abdulkareemoj/ReadrSync.git
+cd ReadrSync
 
 # 2. Install dependencies
 pnpm install
@@ -154,7 +154,7 @@ ReadrSync is actively growing. Here's what's already here and what's coming:
 - [x] Import/export via OPML and HTML
 - [x] Collections sorting
 
-Have a feature request? [Open an issue](https://github.com/yourusername/bookmark-tool/issues), we're building this in the open.
+Have a feature request? [Open an issue](https://github.com/Abdulkareemoj/ReadrSync/issues), we're building this in the open.
 
 <br/>
 
@@ -205,7 +205,7 @@ Released under the [MIT License](LICENSE), free to use, modify, and share.
 
 
 
-[Website](#) · [Twitter/X](#) · [Discord](#) · [Issues](https://github.com/yourusername/bookmark-tool/issues)
+[Website](#) · [Twitter/X](#) · [Discord](#) · [Issues](https://github.com/Abdulkareemoj/ReadrSync/issues)
 
 *Enjoying ReadrSync? Consider giving the repo a ⭐.*
 

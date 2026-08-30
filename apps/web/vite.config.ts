@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 
 const config = defineConfig({
-	envDir: path.resolve(__dirname, "../../"),
+	envDir: path.resolve(import.meta.dirname, "../../"),
 	plugins: [
 		viteTsConfigPaths({
 			projects: ["./tsconfig.json"],
@@ -20,8 +20,11 @@ const config = defineConfig({
 	resolve: {
 		alias: {
 			"react-native": "react-native-web",
-			"drizzle-orm/expo-sqlite": path.resolve(__dirname, "src/lib/db-stubs.ts"),
-			"expo-sqlite": path.resolve(__dirname, "src/lib/db-stubs.ts"),
+			"drizzle-orm/expo-sqlite": path.resolve(
+				import.meta.dirname,
+				"src/lib/db-stubs.ts",
+			),
+			"expo-sqlite": path.resolve(import.meta.dirname, "src/lib/db-stubs.ts"),
 			expo: "wa-sqlite",
 		},
 		extensions: [
