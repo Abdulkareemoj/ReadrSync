@@ -55,3 +55,5 @@ packages/db/sqlite.db
 apps/website/src/routeTree.gen.ts
 apps/web/src/routeTree.gen.ts
 txt.txt
+AGENTS.MD
+AGENTS copy.md
