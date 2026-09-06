@@ -11,6 +11,8 @@ export function useSettings() {
 	const {
 		syncStatus,
 		setSyncStatus,
+		lastSyncedAt,
+		setLastSyncedAt,
 		readerFontSize,
 		setReaderFontSize,
 		isAuthenticated,
@@ -21,7 +23,6 @@ export function useSettings() {
 
 	const [importMode, setImportMode] = useState<"merge" | "replace">("merge");
 	const [exportFormat, setExportFormat] = useState<ExportFormat>("json");
-	const [lastSync, setLastSync] = useState<string | null>(null);
 	const [showConnectDialog, setShowConnectDialog] = useState(false);
 	const [errorDialog, setErrorDialog] = useState<{
 		title: string;
@@ -50,7 +51,7 @@ export function useSettings() {
 			a.download = result.filename;
 			a.click();
 			URL.revokeObjectURL(url);
-			setLastSync(new Date().toISOString());
+			setLastSyncedAt(new Date().toISOString());
 			setSyncStatus("connected");
 		} catch (e) {
 			console.error("Export failed:", e);
@@ -75,7 +76,7 @@ export function useSettings() {
 					);
 				}
 				await importSyncData(text, format, importMode);
-				setLastSync(new Date().toISOString());
+				setLastSyncedAt(new Date().toISOString());
 				setSyncStatus("connected");
 				window.location.reload();
 			} catch (err) {
@@ -95,6 +96,7 @@ export function useSettings() {
 	};
 
 	const handleSignIn = async () => {
+		setSyncStatus("connecting");
 		try {
 			const agents = getInitializedAgents();
 			const result = await agents.authAgent.signIn("gdrive");
@@ -105,15 +107,18 @@ export function useSettings() {
 					provider: "gdrive",
 					email: info?.email ?? null,
 				});
+				setSyncStatus("connected");
 			} else {
+				setSyncStatus("error");
 				setErrorDialog({
 					title: "Unable to connect",
 					message:
 						result.error ??
-						"Connection failed. Google Drive sync is only available on the desktop app.",
+						"Failed to connect to Google Drive. Please try again.",
 				});
 			}
 		} catch (e) {
+			setSyncStatus("error");
 			setErrorDialog({
 				title: "Connection error",
 				message: (e as Error).message,
@@ -139,7 +144,7 @@ export function useSettings() {
 			if (!store) throw new Error("Store not initialized");
 			const result = await store.getState().triggerSync();
 			setSyncStatus(result.success ? "connected" : "error");
-			if (result.syncedAt) setLastSync(result.syncedAt);
+			if (result.syncedAt) setLastSyncedAt(result.syncedAt);
 		} catch (e) {
 			console.error("Sync failed:", e);
 			setSyncStatus("error");
@@ -180,7 +185,7 @@ export function useSettings() {
 		setImportMode,
 		exportFormat,
 		setExportFormat,
-		lastSync,
+		lastSync: lastSyncedAt,
 		isAuthenticated,
 		authEmail,
 		syncStatus,

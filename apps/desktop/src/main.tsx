@@ -1,6 +1,6 @@
 import "../../web/src/styles.css";
 
-import { initializeReaderStore } from "@packages/store";
+import { initializeReaderStore, useSettingsStore } from "@packages/store";
 import { RouterProvider } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
 import React from "react";
@@ -13,10 +13,28 @@ async function bootstrap() {
 
 	(window as any).__BOOKMARKREADER_AGENTS__ = agents;
 
-	agents.syncAgent.startAutoSync(30_000);
-
 	const store = initializeReaderStore(agents);
 	await store.getState().loadInitialData();
+
+	// Background sync every 30s. Routed through the store so lastSyncedAt and
+	// sync status reflect in the UI (identical path to the manual "Sync now").
+	const AUTO_SYNC_INTERVAL_MS = 30_000;
+	setInterval(() => {
+		const settings = useSettingsStore.getState();
+		if (settings.syncStatus === "syncing") return;
+		settings.setSyncStatus("syncing");
+		store
+			.getState()
+			.triggerSync()
+			.then((result) => {
+				const next = useSettingsStore.getState();
+				next.setSyncStatus(result.success ? "connected" : "error");
+				if (result.syncedAt) next.setLastSyncedAt(result.syncedAt);
+			})
+			.catch(() => {
+				useSettingsStore.getState().setSyncStatus("error");
+			});
+	}, AUTO_SYNC_INTERVAL_MS);
 
 	// Set up platform YouTube handle resolver (desktop uses native Rust command)
 	(window as any).__RESOLVE_YOUTUBE_HANDLE__ = async (input: string) => {

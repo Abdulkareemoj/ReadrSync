@@ -10,6 +10,7 @@ import {
 } from "@packages/utils";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
+import { useEffect } from "react";
 import { Alert } from "react-native";
 import { getInitializedAgents } from "@/lib/agents";
 import { useSettingsStore } from "@/lib/store";
@@ -22,9 +23,12 @@ export function useCloudSync() {
 		clearAuth,
 		syncStatus,
 		setSyncStatus,
+		lastSyncedAt,
+		setLastSyncedAt,
 	} = useSettingsStore();
 
-	const handleSignIn = async () => {
+	const doSignIn = async () => {
+		setSyncStatus("connecting");
 		try {
 			const agents = getInitializedAgents();
 			const result = await agents.authAgent.signIn("gdrive");
@@ -35,13 +39,27 @@ export function useCloudSync() {
 					provider: "gdrive",
 					email: info?.email ?? null,
 				});
+				setSyncStatus("connected");
 				Alert.alert("Connected", "Google Drive connected successfully.");
 			} else {
+				setSyncStatus("error");
 				Alert.alert("Connection Failed", result.error ?? "Unknown error");
 			}
 		} catch (e) {
+			setSyncStatus("error");
 			Alert.alert("Error", `Failed to connect: ${(e as Error).message}`);
 		}
+	};
+
+	const handleSignIn = () => {
+		Alert.alert(
+			"Connect Google Drive",
+			"Link your Google Drive to sync bookmarks, feeds, and reading progress across devices. You'll be redirected to Google to authorize access.",
+			[
+				{ text: "Cancel", style: "cancel" },
+				{ text: "Continue", onPress: doSignIn },
+			],
+		);
 	};
 
 	const handleSignOut = () => {
@@ -61,13 +79,14 @@ export function useCloudSync() {
 						} catch {
 							clearAuth();
 						}
+						setSyncStatus("idle");
 					},
 				},
 			],
 		);
 	};
 
-	const handleSyncNow = async (setLastSync: (ts: string) => void) => {
+	const handleSyncNow = async () => {
 		setSyncStatus("syncing");
 		try {
 			const { getReaderStore } = await import("@packages/store");
@@ -75,17 +94,40 @@ export function useCloudSync() {
 			if (!store) throw new Error("Store not initialized");
 			const result = await store.getState().triggerSync();
 			setSyncStatus(result.success ? "connected" : "error");
-			if (result.syncedAt) setLastSync(result.syncedAt);
+			if (result.syncedAt) setLastSyncedAt(result.syncedAt);
 		} catch (e) {
 			console.error("Sync failed:", e);
 			setSyncStatus("error");
 		}
 	};
 
+	useEffect(() => {
+		if (isAuthenticated) return;
+		getInitializedAgents()
+			.authAgent.isSignedIn()
+			.then((signedIn) => {
+				if (!signedIn) return null;
+				return getInitializedAgents().authAgent.getUserInfo();
+			})
+			.then((info) => {
+				if (info) {
+					setAuth({
+						isAuthenticated: true,
+						provider: "gdrive",
+						email: info?.email ?? null,
+					});
+				}
+			})
+			.catch(() => {
+				/* ignore */
+			});
+	}, []);
+
 	return {
 		isAuthenticated,
 		authEmail,
 		syncStatus,
+		lastSyncedAt,
 		handleSignIn,
 		handleSignOut,
 		handleSyncNow,

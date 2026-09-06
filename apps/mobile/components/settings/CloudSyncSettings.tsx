@@ -1,5 +1,4 @@
 import { Cloud, LogOut } from "lucide-react-native";
-import { useState } from "react";
 import { Text, View } from "react-native";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,11 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { useCloudSync } from "./hooks";
 
 export default function CloudSyncSettings() {
-	const [lastSync, setLastSync] = useState<string | null>(null);
 	const {
 		isAuthenticated,
 		authEmail,
 		syncStatus,
+		lastSyncedAt,
 		handleSignIn,
 		handleSignOut,
 		handleSyncNow,
@@ -69,10 +68,10 @@ export default function CloudSyncSettings() {
 					<View className="mt-4 flex-row items-center justify-between">
 						<View>
 							<Text className="font-medium text-sm">Sync status</Text>
-							{lastSync && (
+							{lastSyncedAt && (
 								<Text className="text-muted-foreground text-xs">
 									Last synced{" "}
-									{new Date(lastSync).toLocaleDateString(undefined, {
+									{new Date(lastSyncedAt).toLocaleDateString(undefined, {
 										month: "short",
 										day: "numeric",
 										hour: "numeric",
@@ -96,13 +95,15 @@ export default function CloudSyncSettings() {
 										? "Connected"
 										: syncStatus === "syncing"
 											? "Syncing"
-											: syncStatus === "error"
-												? "Error"
-												: "Idle"}
+											: syncStatus === "connecting"
+												? "Connecting"
+												: syncStatus === "error"
+													? "Error"
+													: "Idle"}
 								</Text>
 							</Badge>
 							<Button
-								onPress={() => handleSyncNow(setLastSync)}
+								onPress={handleSyncNow}
 								variant="outline"
 								size="sm"
 								disabled={syncStatus === "syncing"}

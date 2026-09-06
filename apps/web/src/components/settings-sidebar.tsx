@@ -10,17 +10,20 @@ import {
 const settingsItems = [
 	{
 		name: "Theme",
-		url: "/settings#theme",
+		url: "/settings",
+		hash: "theme",
 		icon: Sun,
 	},
 	{
 		name: "Sync",
-		url: "/settings#sync",
+		url: "/settings",
+		hash: "sync",
 		icon: Cloud,
 	},
 	{
 		name: "About",
-		url: "/settings#about",
+		url: "/settings",
+		hash: "about",
 		icon: Info,
 	},
 ];
@@ -32,7 +35,7 @@ export function SettingsSidebar() {
 				{settingsItems.map((item) => (
 					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton asChild>
-							<Link to={item.url}>
+							<Link to={item.url} hash={item.hash}>
 								<span className="font-semibold">{item.name}</span>
 							</Link>
 						</SidebarMenuButton>

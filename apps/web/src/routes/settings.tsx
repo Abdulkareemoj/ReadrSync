@@ -26,47 +26,57 @@ function SettingsComponent() {
 
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<div className="flex flex-col gap-12">
-					<AppearanceSection
-						theme={s.theme}
-						readerFontSize={s.readerFontSize}
-						onThemeChange={s.handleThemeChange}
-						onFontSizeChange={s.setReaderFontSize}
-					/>
+					<section id="theme" className="scroll-mt-24">
+						<AppearanceSection
+							theme={s.theme}
+							readerFontSize={s.readerFontSize}
+							onThemeChange={s.handleThemeChange}
+							onFontSizeChange={s.setReaderFontSize}
+						/>
+					</section>
 
 					<Separator />
 
-					<DataSection
-						exportFormat={s.exportFormat}
-						importMode={s.importMode}
-						onExportFormatChange={s.setExportFormat}
-						onImportModeChange={s.setImportMode}
-						onExport={s.handleExport}
-						onImport={s.handleImport}
-						onClearCache={s.handleClearCache}
-					/>
+					<section id="data" className="scroll-mt-24">
+						<DataSection
+							exportFormat={s.exportFormat}
+							importMode={s.importMode}
+							onExportFormatChange={s.setExportFormat}
+							onImportModeChange={s.setImportMode}
+							onExport={s.handleExport}
+							onImport={s.handleImport}
+							onClearCache={s.handleClearCache}
+						/>
+					</section>
 
 					<Separator />
 
-					<CloudSyncSection
-						isAuthenticated={s.isAuthenticated}
-						authEmail={s.authEmail}
-						syncStatus={s.syncStatus}
-						statusLabel={s.statusLabel}
-						lastSync={s.lastSync}
-						showConnectDialog={s.showConnectDialog}
-						onConnectDialogChange={s.setShowConnectDialog}
-						onSignIn={s.handleSignIn}
-						onSignOut={s.handleSignOut}
-						onSyncNow={s.handleSyncNow}
-					/>
+					<section id="sync" className="scroll-mt-24">
+						<CloudSyncSection
+							isAuthenticated={s.isAuthenticated}
+							authEmail={s.authEmail}
+							syncStatus={s.syncStatus}
+							statusLabel={s.statusLabel}
+							lastSync={s.lastSync}
+							showConnectDialog={s.showConnectDialog}
+							onConnectDialogChange={s.setShowConnectDialog}
+							onSignIn={s.handleSignIn}
+							onSignOut={s.handleSignOut}
+							onSyncNow={s.handleSyncNow}
+						/>
+					</section>
 
 					<Separator />
 
-					<YouTubeSection />
+					<section id="youtube" className="scroll-mt-24">
+						<YouTubeSection />
+					</section>
 
 					<Separator />
 
-					<AboutSection />
+					<section id="about" className="scroll-mt-24">
+						<AboutSection />
+					</section>
 				</div>
 			</div>
 
