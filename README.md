@@ -7,15 +7,11 @@
 
 # ReadrSync
 
-### Your bookmarks. Your feeds. Your rules, everywhere you read.
+### Your bookmarks and feeds, everywhere you read.
 
 **One place for the links you save and the feeds you follow, synced across desktop, web, and mobile.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19+-61DAFB)](https://reactjs.org/)
-[![Expo](https://img.shields.io/badge/Expo-51-000080)](https://expo.dev/)
-[![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red)](#)
+
 
 [Download](#-download) · [Features](#-why-youll-love-it) · [Screenshots](#-see-it-in-action) · [Demo Video](#-watch-the-demo) · [Get Started](#-get-started-in-minutes)
 
@@ -27,11 +23,8 @@
 
 <br/>
 
-## ✨ Why ReadrSync?
 
-The internet moves fast. Great articles, saved links, and RSS feeds pile up in a dozen different apps, and half of them get lost forever.
-
-**ReadrSync brings it all into one calm, distraction-free space.** Save a link, subscribe to a feed, and read it later, on your laptop, in your browser, or from your phone on the train. No accounts to manage, no cloud lock-in, no ads. Just your reading list, exactly how you left it.
+**ReadrSync brings all your links into one calm, distraction-free space.** Save a link, subscribe to a feed, and read it later, on your laptop, in your browser, or from your phone on the train. No accounts to manage, no cloud lock-in, no ads. Just your reading list, exactly how you left it.
 
 > 🔒 **Local-first by design.** Your data lives on your device, not on someone else's server.
 
@@ -72,18 +65,24 @@ The internet moves fast. Great articles, saved links, and RSS feeds pile up in a
 
 <br/>
 
-## 💡 Why You'll Love It
+## 💡 Features
 
-| | |
-|---|---|
-| 📚 **Effortless Bookmarking** | Save any link and ReadrSync instantly grabs the title, description, and favicon, no manual entry. |
-| 📰 **Feeds, Simplified** | Subscribe to any RSS feed and get a clean, cached, offline-ready reading list. |
-| 🎨 **Gorgeous on Every Screen** | A consistent, polished design language across desktop, web, and mobile, it always feels like home. |
-| 💾 **Your Data, Your Device** | Local-first storage means your library works offline and stays private by default. |
-| 🌙 **Easy on the Eyes** | A thoughtfully designed dark mode for late-night reading sessions. |
-| 🔍 **Find Anything Fast** | Instant search and filtering across bookmarks and articles. |
-| ✍️ **Highlight & Annotate** | Mark up articles as you read and revisit your favorite passages later. |
-| 📱 **Truly Native Feel** | Built with React Native for mobile, so it moves like a native app should. |
+
+- 📚 **Effortless Bookmarking** 
+
+- 📰 **Feeds, Simplified** 
+
+- 🎨 **Gorgeous on Every Screen** 
+
+- 💾 **Your Data, Your Device** 
+
+- 🌙 **Easy on the Eyes** 
+
+- 🔍 **Find Anything Fast** 
+
+- ✍️ **Highlight & Annotate** 
+
+
 
 <br/>
 
@@ -94,7 +93,6 @@ The internet moves fast. Great articles, saved links, and RSS feeds pile up in a
 </div>
 
 - 🖥️ **Desktop**, a fast, native app powered by Tauri
-- 🌐 **Web**, the full experience, right in your browser
 - 📱 **Mobile**, a native-feeling companion built with Expo and React Native
 
 <br/>
@@ -134,7 +132,7 @@ cd apps/mobile && pnpm dev     # Mobile via Expo Go
 </div>
 
 <br/>
-
+<!-- 
 ## 🗺️ What's Next
 
 ReadrSync is actively growing. Here's what's already here and what's coming:
@@ -152,7 +150,7 @@ ReadrSync is actively growing. Here's what's already here and what's coming:
 - [ ] Push notifications for new articles
 <!-- - [ ] AI-powered summaries -->
 - [x] Import/export via OPML and HTML
-- [x] Collections sorting
+- [x] Collections sorting -->
 
 Have a feature request? [Open an issue](https://github.com/Abdulkareemoj/ReadrSync/issues), we're building this in the open.
 
