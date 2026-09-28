@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { exchangeGoogleCode } from "@/lib/google-auth-server";
 
 export const Route = createFileRoute("/auth/callback")({
 	component: AuthCallbackComponent,
@@ -18,54 +19,31 @@ interface StoredTokens {
 	name: string | null;
 }
 
-function getClientId(): string {
-	return import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID ?? "";
-}
-
-function getClientSecret(): string {
-	return import.meta.env.VITE_GOOGLE_WEB_SECRET_ID ?? "";
-}
-
 function getRedirectUri(): string {
 	return `${window.location.origin}/auth/callback`;
 }
 
-function exchangeCodeForTokens(
+async function exchangeCodeForTokens(
 	code: string,
 	codeVerifier: string,
 ): Promise<StoredTokens | null> {
-	const clientId = getClientId();
-	const clientSecret = getClientSecret();
-	const redirectUri = getRedirectUri();
-
-	const body = new URLSearchParams({
-		code,
-		client_id: clientId,
-		code_verifier: codeVerifier,
-		redirect_uri: redirectUri,
-		grant_type: "authorization_code",
-	});
-	if (clientSecret) body.append("client_secret", clientSecret);
-
-	return fetch("https://oauth2.googleapis.com/token", {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body,
-	}).then(async (res) => {
-		if (!res.ok) {
-			const text = await res.text();
-			console.error("[OAuth] Token exchange failed:", res.status, text);
-			return null;
-		}
-		const data = await res.json();
+	try {
+		// The code-for-token exchange runs server-side so the client secret
+		// never ships in the client bundle.
+		const data = await exchangeGoogleCode({
+			data: { code, codeVerifier, redirectUri: getRedirectUri() },
+		});
 		return {
-			accessToken: data.access_token,
-			refreshToken: data.refresh_token ?? null,
-			expiresAt: Date.now() + data.expires_in * 1000,
+			accessToken: data.accessToken,
+			refreshToken: data.refreshToken,
+			expiresAt: Date.now() + data.expiresIn * 1000,
 			email: null,
 			name: null,
 		};
-	});
+	} catch (e) {
+		console.error("[OAuth] Token exchange failed:", e);
+		return null;
+	}
 }
 
 function AuthCallbackComponent() {

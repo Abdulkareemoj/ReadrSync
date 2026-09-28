@@ -5,13 +5,16 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import type React from "react";
+import { useEffect, useState } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import BottomNav from "@/components/bottom-nav";
+import { DesktopShell } from "@/components/desktop-shell";
 import { StoreProvider } from "@/components/store-provider";
 import Toolbar from "@/components/toolbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/integrations/theme-provider";
+import { isTauri } from "@/lib/platform";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -44,6 +47,39 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function AppLayout({ children }: { children: React.ReactNode }) {
+	// Desktop shell gate: the Tauri webview is detected via isTauri() (works
+	// no matter which bundle the window loads desktop CSR or the web Start
+	// server), and ?shell=desktop forces it in the browser for preview. Both
+	// are post-mount so SSR renders the web layout and hydration never
+	// mismatches; the shell swaps in right after.
+	const [forcedShell, setForcedShell] = useState(false);
+	useEffect(() => {
+		if (
+			isTauri() ||
+			new URLSearchParams(window.location.search).get("shell") === "desktop"
+		) {
+			setForcedShell(true);
+		}
+	}, []);
+	const isDesktop = forcedShell;
+
+	if (isDesktop) {
+		return (
+			<ThemeProvider
+				attribute="class"
+				defaultTheme="system"
+				enableSystem
+				disableTransitionOnChange
+			>
+				<StoreProvider>
+					<TooltipProvider>
+						<DesktopShell>{children}</DesktopShell>
+					</TooltipProvider>
+				</StoreProvider>
+			</ThemeProvider>
+		);
+	}
+
 	return (
 		<ThemeProvider
 			attribute="class"

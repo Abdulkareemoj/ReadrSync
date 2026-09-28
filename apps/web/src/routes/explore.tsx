@@ -1,8 +1,11 @@
-﻿import {
+﻿import { useSettingsStore } from "@packages/store";
+import {
 	type DiscoveredFeed,
 	discoverFeedsFromUrl,
 	discoverYouTubeChannelFeed,
+	extractYouTubeHandle,
 	parseYouTubeChannelUrl,
+	resolveYouTubeHandle,
 	type SearchedFeed,
 	searchFeedsByKeyword,
 } from "@packages/utils";
@@ -371,6 +374,20 @@ function Explore() {
 				if (platformResolve) {
 					const platformUrl = await platformResolve(youtubeUrl);
 					if (platformUrl) resolvedUrl = platformUrl;
+				}
+				if (resolvedUrl === feedInfo.feedUrl) {
+					// Shared JS resolver official YouTube Data API v3 when a key
+					// is configured, keyless InnerTube/scraping otherwise
+					const handle = extractYouTubeHandle(normalizedUrl);
+					if (handle) {
+						const channelId = await resolveYouTubeHandle(
+							handle,
+							useSettingsStore.getState().youtubeApiKey,
+						);
+						if (channelId) {
+							resolvedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+						}
+					}
 				}
 			}
 			await handleAddFeed(resolvedUrl, feedInfo.title);
