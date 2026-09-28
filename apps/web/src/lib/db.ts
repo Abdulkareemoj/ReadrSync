@@ -9,11 +9,11 @@ import { runFtsSetup, runMigrations, SCHEMA_VERSION } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import { seedDatabase } from "@packages/db/src/seed-data";
+import { createGoogleDriveSyncAgent } from "@packages/sync";
 import { drizzle } from "drizzle-orm/sql-js";
 import type { Database } from "sql.js";
 import initSqlJs from "sql.js";
 import { createWebAuthAgent } from "@/lib/auth-agent";
-import { createWebSyncAgent } from "@/lib/sync-agent";
 
 const DB_NAME = "bookmark_tool_web.db";
 
@@ -179,25 +179,25 @@ let initializedAgents: {
 	collectionAgent: ReturnType<typeof createCollectionAgent>;
 	rssAgent: ReturnType<typeof createRssAgent>;
 	highlightAgent: ReturnType<typeof createHighlightAgent>;
-	syncAgent: ReturnType<typeof createWebSyncAgent>;
+	syncAgent: ReturnType<typeof createGoogleDriveSyncAgent>;
 	authAgent: ReturnType<typeof createWebAuthAgent>;
 } | null = null;
 
-// Function to initialize the Drizzle client and agents asynchronously
+// initialize the Drizzle client and agents asynchronously
 export async function initializeWebAgents() {
 	if (initializedAgents) {
 		return initializedAgents;
 	}
 
-	// 1. Initialize sql.js (loads WASM)
-	// Tell sql.js where to find the WASM file
+	// Initialize sql.js (loads WASM)
+	// Then tell sql.js where to find the WASM file
 	const SQL = await initSqlJs({
 		locateFile: () => {
 			return "/sql-wasm.wasm";
 		},
 	});
 
-	// 2. Create an in-memory database client
+	// Create in-memory database client
 	// NOTE: This is in-memory by default. Persistence requires manual handling (e.g., saving/loading to IndexedDB).
 	const saved =
 		typeof indexedDB !== "undefined" ? await idbGet(IDB_KEY) : undefined;
@@ -207,32 +207,34 @@ export async function initializeWebAgents() {
 
 	const { persistNow } = setupPersistence(client);
 
-	// 3. Run migrations directly on sql.js client
+	// Run migrations directly on sql.js client
 	const drizzleDb = drizzle(client, { schema });
 	await runMigrations(drizzleDb as unknown as DB);
 	await runFtsSetup(drizzleDb as unknown as DB);
 	await persistNow();
 	console.log(`[Web DB] Schema initialized to version ${SCHEMA_VERSION}`);
 
-	// 4. Initialize Drizzle client
+	// Initialize Drizzle client
 	const db = drizzle(client, { schema });
 
-	// 5. Seed dev data (no-op when the DB already has rows)
-	await seedDatabase(db);
+	// Dev-only: populate a fresh database with sample content
+	if (import.meta.env.DEV) {
+		await seedDatabase(db);
+	}
 	await persistNow();
-	// We assert the type to the generic DB union type for agent compatibility
+	// We assert the type to the generic DB union type for agent compatibility accross platforms
 	const genericDb = db as unknown as DB;
 	const bookmarkAgent = createBookmarkAgent(genericDb);
 	const collectionAgent = createCollectionAgent(genericDb);
 	const rssAgent = createRssAgent(genericDb);
 	const highlightAgent = createHighlightAgent(genericDb);
 	const authAgent = createWebAuthAgent();
-	const syncAgent = createWebSyncAgent(
+	const syncAgent = createGoogleDriveSyncAgent({
 		authAgent,
 		bookmarkAgent,
 		rssAgent,
 		highlightAgent,
-	);
+	});
 
 	initializedAgents = {
 		bookmarkAgent,
@@ -244,7 +246,7 @@ export async function initializeWebAgents() {
 	};
 	return initializedAgents;
 }
-
+// Should be easy enough
 export function getInitializedWebAgents(): IAgents {
 	if (!initializedAgents) {
 		throw new Error(

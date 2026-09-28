@@ -4,6 +4,7 @@ import type {
 	AuthUserInfo,
 	IAuthAgent,
 } from "@packages/agents";
+import { refreshGoogleToken } from "./google-auth-server";
 
 const TOKEN_KEY = "google_drive_tokens";
 const CODE_VERIFIER_KEY = "oauth_code_verifier";
@@ -21,10 +22,6 @@ interface StoredTokens {
 
 function getClientId(): string {
 	return import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID ?? "";
-}
-
-function getClientSecret(): string {
-	return import.meta.env.VITE_GOOGLE_WEB_SECRET_ID ?? "";
 }
 
 function getRedirectUri(): string {
@@ -68,32 +65,17 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
 async function refreshAccessToken(
 	refreshToken: string,
 ): Promise<string | null> {
-	const clientId = getClientId();
-	const clientSecret = getClientSecret();
-
 	try {
-		const body = new URLSearchParams({
-			client_id: clientId,
-			refresh_token: refreshToken,
-			grant_type: "refresh_token",
-		});
-		if (clientSecret) body.append("client_secret", clientSecret);
-
-		const res = await fetch("https://oauth2.googleapis.com/token", {
-			method: "POST",
-			headers: { "Content-Type": "application/x-www-form-urlencoded" },
-			body,
-		});
-		if (!res.ok) return null;
-
-		const data = await res.json();
+		// Token exchange runs server-side so the client secret never ships in
+		// the client bundle.
+		const data = await refreshGoogleToken({ data: { refreshToken } });
 		const current = loadTokens();
 		if (current) {
-			current.accessToken = data.access_token;
-			current.expiresAt = Date.now() + (data.expires_in ?? 3600) * 1000;
+			current.accessToken = data.accessToken;
+			current.expiresAt = Date.now() + (data.expiresIn ?? 3600) * 1000;
 			saveTokens(current);
 		}
-		return data.access_token;
+		return data.accessToken;
 	} catch {
 		return null;
 	}
