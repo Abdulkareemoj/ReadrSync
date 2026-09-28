@@ -17,38 +17,6 @@ const config = defineConfig({
 			jsxImportSource: "react",
 		}),
 	],
-	resolve: {
-		alias: {
-			"react-native": "react-native-web",
-			"drizzle-orm/expo-sqlite": path.resolve(
-				import.meta.dirname,
-				"src/lib/db-stubs.ts",
-			),
-			"expo-sqlite": path.resolve(import.meta.dirname, "src/lib/db-stubs.ts"),
-			expo: "wa-sqlite",
-		},
-		extensions: [
-			".web.js",
-			".web.jsx",
-			".web.ts",
-			".web.tsx",
-			".js",
-			".jsx",
-			".ts",
-			".tsx",
-			".json",
-		],
-	},
-	optimizeDeps: {
-		exclude: [
-			"expo",
-			"expo-modules-core",
-			"expo-sqlite",
-			"react-native",
-			"react-native-web",
-			"@expo/vector-icons",
-		],
-	},
 });
 
 export default config;
