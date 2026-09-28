@@ -2,6 +2,7 @@ import { runFtsSetup, runMigrations } from "@packages/db";
 import type { DB } from "@packages/db/src/index";
 import * as schema from "@packages/db/src/schema";
 import { seedDatabase } from "@packages/db/src/seed-data";
+import { createGoogleDriveSyncAgent } from "@packages/sync";
 import {
 	createBookmarkAgent,
 	createCollectionAgent,
@@ -13,7 +14,7 @@ import { mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
 import { drizzle } from "drizzle-orm/sql-js";
 import initSqlJs, { type Database as SqlJsDatabase } from "sql.js";
 import { createDesktopAuthAgent } from "./auth-agent";
-import { createDesktopSyncAgent } from "./sync-agent";
+import { createDesktopFileStore } from "./file-store";
 
 const DB_FILENAME = "bookmark_tool.db";
 
@@ -22,7 +23,7 @@ let initializedAgents: {
 	collectionAgent: ReturnType<typeof createCollectionAgent>;
 	rssAgent: ReturnType<typeof createRssAgent>;
 	highlightAgent: ReturnType<typeof createHighlightAgent>;
-	syncAgent: ReturnType<typeof createDesktopSyncAgent>;
+	syncAgent: ReturnType<typeof createGoogleDriveSyncAgent>;
 	authAgent: ReturnType<typeof createDesktopAuthAgent>;
 } | null = null;
 
@@ -107,8 +108,10 @@ export async function initializeTauriAgents() {
 	await runMigrations(db as unknown as DB);
 	await runFtsSetup(db as unknown as DB);
 
-	// Seed dev data (no-op when the DB already has rows)
-	await seedDatabase(db);
+	// Dev-only: populate a fresh database with sample content
+	if (import.meta.env.DEV) {
+		await seedDatabase(db);
+	}
 
 	const genericDb = db as unknown as DB;
 	const bookmarkAgent = createBookmarkAgent(genericDb);
@@ -116,12 +119,13 @@ export async function initializeTauriAgents() {
 	const rssAgent = createRssAgent(genericDb);
 	const highlightAgent = createHighlightAgent(genericDb);
 	const authAgent = createDesktopAuthAgent();
-	const syncAgent = createDesktopSyncAgent(
+	const syncAgent = createGoogleDriveSyncAgent({
 		authAgent,
 		bookmarkAgent,
 		rssAgent,
 		highlightAgent,
-	);
+		fileStore: createDesktopFileStore(),
+	});
 
 	initializedAgents = {
 		bookmarkAgent,

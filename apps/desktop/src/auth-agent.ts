@@ -68,7 +68,7 @@ async function clearTokens(): Promise<void> {
 		const path = await getTokensPath();
 		await writeTextFile(path, JSON.stringify({}));
 	} catch {
-		// Ignore, file might not exist
+		//  file might not exist
 	}
 }
 
@@ -82,14 +82,23 @@ function getClientId(): string {
 	return "";
 }
 
-function getClientSecret(): string {
-	if (
-		typeof import.meta !== "undefined" &&
-		import.meta.env?.VITE_GOOGLE_DESKTOP_SECRET_ID
-	) {
-		return import.meta.env.VITE_GOOGLE_DESKTOP_SECRET_ID;
-	}
-	return "";
+// PKCE (S256) installed-app clients are public, no client secret
+
+function base64UrlEncode(str: string): string {
+	return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function generateCodeVerifier(): Promise<string> {
+	const array = new Uint8Array(32);
+	crypto.getRandomValues(array);
+	return base64UrlEncode(String.fromCharCode(...array));
+}
+
+async function generateCodeChallenge(verifier: string): Promise<string> {
+	const encoder = new TextEncoder();
+	const data = encoder.encode(verifier);
+	const digest = await crypto.subtle.digest("SHA-256", data);
+	return base64UrlEncode(String.fromCharCode(...new Uint8Array(digest)));
 }
 
 export function createDesktopAuthAgent(): IAuthAgent {
@@ -185,9 +194,13 @@ export function createDesktopAuthAgent(): IAuthAgent {
 			}
 
 			try {
+				const codeVerifier = await generateCodeVerifier();
+				const codeChallenge = await generateCodeChallenge(codeVerifier);
+
 				const result: OAuthFlowResult = await invoke("start_oauth_flow", {
 					clientId,
-					clientSecret: getClientSecret(),
+					codeChallenge,
+					codeVerifier,
 					scopes: SCOPES,
 				});
 
@@ -240,3 +253,5 @@ export function createDesktopAuthAgent(): IAuthAgent {
 		getUserInfo,
 	};
 }
+
+// Will probably need to check for more leaks, i dont trust myself with security stuff enough, even though im following advice i see online
