@@ -10,6 +10,11 @@ import type {
 } from "@packages/agents";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { create } from "zustand";
+import { useSettingsStore } from "./settings-store";
+
+// Module-level timer for the store-driven auto-sync loop (the store is a
+// singleton, so one timer is enough).
+let autoSyncTimer: ReturnType<typeof setInterval> | null = null;
 
 // Types
 export interface Highlight {
@@ -64,18 +69,25 @@ export interface ReaderState {
 
 	addFeed: (data: Parameters<IRssAgent["addFeed"]>[0]) => Promise<void>;
 	removeFeed: (id: string) => Promise<void>;
+	updateFeed: (
+		id: string,
+		data: { title?: string; feedUrl?: string },
+	) => Promise<void>;
 	refreshFeed: (id: string) => Promise<void>;
 
 	markArticleRead: (id: string, read: boolean) => Promise<void>;
 	toggleArticleLike: (id: string) => Promise<void>;
 	toggleArticleSave: (id: string) => Promise<void>;
 
-	//TODO: This is currently implemented in the store for web/desktop using dynamic import of @packages/utils extractArticleContent, but it's really a platform-specific concern and should be moved to mobile-init.ts for mobile and utils/index.ts for web/desktop
-	// fetchArticleContent is platform-specific:
-	// - Web: implemented in store using @packages/utils extractArticleContent
-	// - Mobile: overridden in mobile-init.ts using apps/mobile/lib/rss.ts
+	// fetchArticleContent is platform-specific and wired at app init:
+	// - Web/desktop: wireWebFetchArticleContent() in apps/web/src/lib/article-content.ts
+	// - Mobile: overridden in apps/mobile/lib/mobile-init.ts
 	fetchArticleContent: (id: string) => Promise<void>;
 	triggerSync: () => Promise<SyncResult>;
+	// Auto-sync runs through the store so sync status and lastSyncedAt reflect
+	// in the UI — the same path as the manual "Sync now".
+	startAutoSync: (intervalMs: number) => void;
+	stopAutoSync: () => void;
 
 	// Collection actions
 	loadCollections: () => Promise<void>;
@@ -248,6 +260,14 @@ export const createReaderStore = (
 			articles: s.articles.filter((a) => a.feedId !== id),
 		}));
 	},
+	updateFeed: async (id, data) => {
+		await get().rssAgent.updateFeed(id, data);
+		const [feeds, articles] = await Promise.all([
+			get().rssAgent.listFeeds(),
+			get().rssAgent.listArticles(),
+		]);
+		set(() => ({ feeds: withUnreadCounts(feeds, articles), articles }));
+	},
 
 	refreshFeed: async (id) => {
 		try {
@@ -366,38 +386,12 @@ export const createReaderStore = (
 		}));
 	},
 
-	// Default fetchArticleContent for web/desktop
+	// Unwired default — each platform's init replaces this (see the interface
+	// comment). Warns loudly so a missing wire-up is discoverable.
 	fetchArticleContent: async (id) => {
-		const article = get().articles.find((a) => a.id === id);
-		if (!article || !article.link) return;
-
-		const contentText = (article.content ?? "").replace(/<[^>]*>/g, "").trim();
-		if ((article as any).fullContent || contentText.length >= 500) return;
-
-		try {
-			const { extractArticleContent, needsFullContent } = await import(
-				"@packages/utils"
-			);
-			if (!needsFullContent(article)) return;
-
-			const extracted = await extractArticleContent(article.link);
-			if (!extracted?.content) return;
-
-			const imageUrl = article.imageUrl ?? extracted.image ?? null;
-			await get().rssAgent.updateArticleContent(
-				id,
-				extracted.content,
-				imageUrl,
-			);
-
-			set((s) => ({
-				articles: s.articles.map((a) =>
-					a.id === id ? { ...a, fullContent: extracted.content, imageUrl } : a,
-				),
-			}));
-		} catch (err) {
-			console.warn("[fetchArticleContent] Failed:", err);
-		}
+		console.warn(
+			`[store] fetchArticleContent called before platform wiring (article ${id})`,
+		);
 	},
 
 	// Collection actions
@@ -458,6 +452,30 @@ export const createReaderStore = (
 			}));
 		}
 		return result;
+	},
+
+	startAutoSync: (intervalMs) => {
+		if (autoSyncTimer !== null) clearInterval(autoSyncTimer);
+		autoSyncTimer = setInterval(async () => {
+			const settings = useSettingsStore.getState();
+			if (settings.syncStatus === "syncing") return;
+			settings.setSyncStatus("syncing");
+			try {
+				const result = await get().triggerSync();
+				const next = useSettingsStore.getState();
+				next.setSyncStatus(result.success ? "connected" : "error");
+				if (result.syncedAt) next.setLastSyncedAt(result.syncedAt);
+			} catch {
+				useSettingsStore.getState().setSyncStatus("error");
+			}
+		}, intervalMs);
+	},
+
+	stopAutoSync: () => {
+		if (autoSyncTimer !== null) {
+			clearInterval(autoSyncTimer);
+			autoSyncTimer = null;
+		}
 	},
 });
 
