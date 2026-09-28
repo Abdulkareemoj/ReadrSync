@@ -23,7 +23,7 @@ import {
 } from "@packages/db/src/schema";
 import { and, asc, desc, eq, gte, inArray, like, lte, sql } from "drizzle-orm";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 
 function randomId(prefix: string): string {
 	return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -49,11 +49,9 @@ function now(): string {
 	return new Date().toISOString();
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type { Article, Bookmark, Collection, Feed };
 
-// ─── Collection Tree Types ─────────────────────────────────────────────────────
+// Collection Tree Types
 
 export interface CollectionTreeNode {
 	id: string;
@@ -66,7 +64,7 @@ export interface CollectionTreeNode {
 	children: CollectionTreeNode[];
 }
 
-// ─── Filter Types ──────────────────────────────────────────────────────────────
+// Filter Types
 
 export interface BookmarkFilterOptions {
 	collectionId?: string;
@@ -97,7 +95,7 @@ export interface ArticleFilterOptions {
 	orderDir?: "asc" | "desc";
 }
 
-// ─── Sync Types ───────────────────────────────────────────────────────────────
+// Sync Types
 
 export interface SyncData {
 	version: number;
@@ -137,7 +135,7 @@ export interface AuthUserInfo {
 	picture?: string;
 }
 
-// ─── Auth Agent ────────────────────────────────────────────────────────────────
+// Auth Agent
 
 export interface IAuthAgent {
 	signIn(provider: AuthProvider): Promise<AuthResult>;
@@ -148,7 +146,7 @@ export interface IAuthAgent {
 	getUserInfo(): Promise<AuthUserInfo | null>;
 }
 
-// ─── Sync Agent ───────────────────────────────────────────────────────────────
+// Sync Agent
 
 export interface ISyncAgent {
 	sync(): Promise<SyncResult>;
@@ -173,7 +171,7 @@ export interface ParsedArticle {
 	lastUpdatedAt: string;
 }
 
-// ─── Collection Agent ─────────────────────────────────────────────────────────
+// Collection Agent
 
 export interface ICollectionAgent {
 	createCollection(name: string, parentId?: string | null): Promise<Collection>;
@@ -192,7 +190,7 @@ export interface ICollectionAgent {
 	getDescendantIds(id: string): Promise<string[]>;
 }
 
-// ─── Bookmark Agent ───────────────────────────────────────────────────────────
+// Bookmark Agent
 
 export interface IBookmarkAgent {
 	addBookmark(data: Omit<NewBookmark, "id" | "dateAdded">): Promise<Bookmark>;
@@ -399,7 +397,7 @@ export function createBookmarkAgent(db: DB): IBookmarkAgent {
 	};
 }
 
-// ─── RSS Agent ────────────────────────────────────────────────────────────────
+// RSS Agent
 
 export interface IRssAgent {
 	addFeed(data: Omit<NewFeed, "id">): Promise<Feed>;
@@ -411,6 +409,10 @@ export interface IRssAgent {
 	updateFeedMeta(
 		id: string,
 		meta: { title?: string; lastFetched?: string; unreadCount?: number },
+	): Promise<void>;
+	updateFeed(
+		id: string,
+		data: { title?: string; feedUrl?: string },
 	): Promise<void>;
 	listArticles(feedId?: string): Promise<Article[]>;
 	listArticlesFiltered(options?: ArticleFilterOptions): Promise<Article[]>;
@@ -558,6 +560,22 @@ export function createRssAgent(db: DB): IRssAgent {
 				.set({ ...meta, lastUpdatedAt: now() })
 				.where(eq(feeds.id, id));
 		},
+		updateFeed: async (id, data) => {
+			if (data.feedUrl) {
+				const clash = await q
+					.select({ id: feeds.id })
+					.from(feeds)
+					.where(eq(feeds.feedUrl, data.feedUrl))
+					.limit(1);
+				if (clash[0] && clash[0].id !== id) {
+					throw new Error("Another feed already uses this URL.");
+				}
+			}
+			await q
+				.update(feeds)
+				.set({ ...data, lastUpdatedAt: now() })
+				.where(eq(feeds.id, id));
+		},
 		listArticles: async (feedId) => {
 			if (feedId)
 				return q.select().from(articles).where(eq(articles.feedId, feedId));
@@ -635,7 +653,7 @@ export function createRssAgent(db: DB): IRssAgent {
 	};
 }
 
-// ─── Collection Agent ─────────────────────────────────────────────────────────
+// Collection Agent
 
 export function createCollectionAgent(db: DB): ICollectionAgent {
 	const q = db as any;
@@ -851,7 +869,7 @@ function slugify(input: string): string {
 		.replace(/-+/g, "-");
 }
 
-// ─── Highlight Agent ─────────────────────────────────────────────────────────
+// Highlight Agent
 
 export interface IHighlightAgent {
 	listHighlights(articleId?: string): Promise<Highlight[]>;
@@ -933,7 +951,7 @@ export function createHighlightAgent(db: DB): IHighlightAgent {
 	};
 }
 
-// ─── IAgents ─────────────────────────────────────────────────────────────────
+// IAgents
 
 export interface IAgents {
 	bookmarkAgent: IBookmarkAgent;
