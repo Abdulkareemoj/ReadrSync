@@ -1,5 +1,6 @@
 import { useCollectionsStore } from "@packages/store";
 import {
+	Link,
 	useMatchRoute,
 	useNavigate,
 	useRouterState,
@@ -10,7 +11,10 @@ import AnimatedTabs from "@/components/animated-tabs";
 import { BookmarkSidebar } from "@/components/bookmarks/bookmark-sidebar";
 import { NavItems } from "@/components/navitems";
 import { FeedSidebar } from "@/components/rss/feed-sidebar";
-import { SettingsSidebar } from "@/components/settings-sidebar";
+import {
+	SETTINGS_SECTION_ORDER,
+	SETTINGS_SECTIONS,
+} from "@/components/settings/registry";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useFeeds } from "@/hooks/use-feeds";
 import { useReaderStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { ExploreSidebar } from "./explore-sidebar";
 import { SidebarBrand } from "./sidebar-brand";
 
@@ -41,7 +46,12 @@ const navSecondary = [
 	},
 ];
 
-export function AppSidebar() {
+export function AppSidebar({
+	variant = "web",
+}: {
+	variant?: "web" | "desktop";
+}) {
+	const isDesktop = variant === "desktop";
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const matchRoute = useMatchRoute();
@@ -171,7 +181,32 @@ export function AppSidebar() {
 		}
 
 		if (matchRoute({ to: "/settings", fuzzy: true })) {
-			return <SettingsSidebar />;
+			// The settings menu is centralized here in the sidebar (driven by the
+			// same registry as the routes); the page shows only the active section.
+			return (
+				<div className="px-2 py-1">
+					{SETTINGS_SECTION_ORDER.map((key) => {
+						const section = SETTINGS_SECTIONS[key];
+						const active = location.pathname === `/settings/${key}`;
+						return (
+							<Link
+								key={key}
+								to="/settings/$section"
+								params={{ section: key }}
+								className={cn(
+									"flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors",
+									active
+										? "bg-accent font-medium text-foreground"
+										: "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+								)}
+							>
+								<section.icon className="size-4 shrink-0" />
+								<span className="truncate">{section.label}</span>
+							</Link>
+						);
+					})}
+				</div>
+			);
 		}
 
 		if (matchRoute({ to: "/explore" })) {
@@ -186,10 +221,21 @@ export function AppSidebar() {
 	};
 
 	return (
-		<Sidebar collapsible="offcanvas">
-			<SidebarHeader>
-				<SidebarBrand />
-			</SidebarHeader>
+		<Sidebar
+			collapsible={isDesktop ? "none" : "offcanvas"}
+			className={
+				isDesktop
+					? "border-r-0! bg-transparent! text-foreground [--sidebar-width:15rem]"
+					: undefined
+			}
+		>
+			{/* Desktop shell renders its own drag strip with app identity above
+			    the sidebar; web keeps the brand header. */}
+			{!isDesktop && (
+				<SidebarHeader>
+					<SidebarBrand />
+				</SidebarHeader>
+			)}
 			<SidebarContent>
 				<div className="p-2">
 					<AnimatedTabs />
@@ -224,17 +270,19 @@ export function AppSidebar() {
 											{matchRoute({ to: "/settings", fuzzy: true }) &&
 												"Settings"}
 										</h2>
+										{/* Desktop shell: the panel header owns search */}
 										<div className="flex items-center gap-2">
-											{!matchRoute({ to: "/settings", fuzzy: true }) && (
-												<Button
-													variant="ghost"
-													size="icon"
-													onClick={() => setShowSearch(true)}
-													className="size-6 text-muted-foreground hover:text-foreground"
-												>
-													<Search className="size-5" />
-												</Button>
-											)}
+											{!isDesktop &&
+												!matchRoute({ to: "/settings", fuzzy: true }) && (
+													<Button
+														variant="ghost"
+														size="icon"
+														onClick={() => setShowSearch(true)}
+														className="size-6 text-muted-foreground hover:text-foreground"
+													>
+														<Search className="size-5" />
+													</Button>
+												)}
 										</div>
 									</>
 								)}
@@ -250,7 +298,7 @@ export function AppSidebar() {
 			<SidebarFooter>
 				<NavItems items={navSecondary} />
 			</SidebarFooter>
-			<SidebarRail />
+			{!isDesktop && <SidebarRail />}
 		</Sidebar>
 	);
 }

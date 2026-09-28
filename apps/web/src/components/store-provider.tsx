@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import type { StoreApi } from "zustand";
+import { wireWebFetchArticleContent } from "@/lib/article-content";
 import { initializeWebAgents } from "@/lib/db";
 import { initializeReaderStore, type ReaderState } from "@/lib/store";
 
@@ -32,6 +33,9 @@ export function StoreProvider({ children }: StoreProviderProps) {
 				const store = initializeReaderStore(
 					agents,
 				) as unknown as InitializedStore;
+
+				// Platform wiring: web/desktop article extraction
+				wireWebFetchArticleContent(store);
 
 				// refreshFeed now baked into store, no override needed
 

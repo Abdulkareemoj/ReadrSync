@@ -11,13 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
 import { Route as BookmarksIdRouteImport } from './routes/bookmarks/$id'
 import { Route as BookmarksArchiveRouteImport } from './routes/bookmarks/archive'
 import { Route as BookmarksFavoritesRouteImport } from './routes/bookmarks/favorites'
 import { Route as RssIndexRouteImport } from './routes/rss/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsSectionRouteImport } from './routes/settings/$section'
 import { Route as RssArticleIdRouteImport } from './routes/rss/article.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,7 +32,7 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
+const SettingsRouteRoute = SettingsRouteRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
@@ -65,6 +67,16 @@ const RssIndexRoute = RssIndexRouteImport.update({
   path: '/rss/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
+const SettingsSectionRoute = SettingsSectionRouteImport.update({
+  id: '/$section',
+  path: '/$section',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
 const RssArticleIdRoute = RssArticleIdRouteImport.update({
   id: '/rss/article/$id',
   path: '/rss/article/$id',
@@ -73,84 +85,94 @@ const RssArticleIdRoute = RssArticleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/explore': typeof ExploreRoute
-  '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof BookmarksIdRoute
   '/bookmarks/archive': typeof BookmarksArchiveRoute
   '/bookmarks/favorites': typeof BookmarksFavoritesRoute
+  '/settings/$section': typeof SettingsSectionRoute
   '/bookmarks/': typeof BookmarksIndexRoute
   '/rss/': typeof RssIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/rss/article/$id': typeof RssArticleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
-  '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof BookmarksIdRoute
   '/bookmarks/archive': typeof BookmarksArchiveRoute
   '/bookmarks/favorites': typeof BookmarksFavoritesRoute
+  '/settings/$section': typeof SettingsSectionRoute
   '/bookmarks': typeof BookmarksIndexRoute
   '/rss': typeof RssIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/rss/article/$id': typeof RssArticleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/explore': typeof ExploreRoute
-  '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookmarks/$id': typeof BookmarksIdRoute
   '/bookmarks/archive': typeof BookmarksArchiveRoute
   '/bookmarks/favorites': typeof BookmarksFavoritesRoute
+  '/settings/$section': typeof SettingsSectionRoute
   '/bookmarks/': typeof BookmarksIndexRoute
   '/rss/': typeof RssIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/rss/article/$id': typeof RssArticleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/explore'
     | '/settings'
+    | '/explore'
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/bookmarks/archive'
     | '/bookmarks/favorites'
+    | '/settings/$section'
     | '/bookmarks/'
     | '/rss/'
+    | '/settings/'
     | '/rss/article/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/explore'
-    | '/settings'
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/bookmarks/archive'
     | '/bookmarks/favorites'
+    | '/settings/$section'
     | '/bookmarks'
     | '/rss'
+    | '/settings'
     | '/rss/article/$id'
   id:
     | '__root__'
     | '/'
-    | '/explore'
     | '/settings'
+    | '/explore'
     | '/auth/callback'
     | '/bookmarks/$id'
     | '/bookmarks/archive'
     | '/bookmarks/favorites'
+    | '/settings/$section'
     | '/bookmarks/'
     | '/rss/'
+    | '/settings/'
     | '/rss/article/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   ExploreRoute: typeof ExploreRoute
-  SettingsRoute: typeof SettingsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookmarksIdRoute: typeof BookmarksIdRoute
   BookmarksArchiveRoute: typeof BookmarksArchiveRoute
@@ -180,7 +202,7 @@ declare module '@tanstack/react-router' {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+      preLoaderRoute: typeof SettingsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -225,6 +247,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RssIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
+    '/settings/$section': {
+      id: '/settings/$section'
+      path: '/$section'
+      fullPath: '/settings/$section'
+      preLoaderRoute: typeof SettingsSectionRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
     '/rss/article/$id': {
       id: '/rss/article/$id'
       path: '/rss/article/$id'
@@ -235,10 +271,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SettingsRouteRouteChildren {
+  SettingsSectionRoute: typeof SettingsSectionRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
+  SettingsSectionRoute: SettingsSectionRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
+  SettingsRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SettingsRouteRoute: SettingsRouteRouteWithChildren,
   ExploreRoute: ExploreRoute,
-  SettingsRoute: SettingsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookmarksIdRoute: BookmarksIdRoute,
   BookmarksArchiveRoute: BookmarksArchiveRoute,
