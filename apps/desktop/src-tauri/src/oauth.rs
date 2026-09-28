@@ -43,23 +43,22 @@ fn extract_query_param(query: &str, name: &str) -> Option<String> {
 fn exchange_code(
     code: &str,
     client_id: &str,
-    client_secret: &str,
     redirect_uri: &str,
+    code_verifier: &str,
 ) -> Result<OAuthTokens, String> {
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(30))
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
-    let mut params: Vec<(&str, &str)> = vec![
+    // Installed-app clients are public: no client_secret, PKCE only.
+    let params: Vec<(&str, &str)> = vec![
         ("code", code),
         ("client_id", client_id),
         ("redirect_uri", redirect_uri),
+        ("code_verifier", code_verifier),
         ("grant_type", "authorization_code"),
     ];
-    if !client_secret.is_empty() {
-        params.push(("client_secret", client_secret));
-    }
 
     let resp = client
         .post("https://oauth2.googleapis.com/token")
@@ -93,19 +92,20 @@ fn exchange_code(
 #[tauri::command]
 pub fn start_oauth_flow(
     client_id: String,
-    client_secret: String,
+    code_challenge: String,
+    code_verifier: String,
     scopes: Vec<String>,
 ) -> Result<OAuthTokens, String> {
     let redirect_uri = "http://127.0.0.1:9876/callback";
     let scope_str = scopes.join(" ");
 
     let client_id = client_id.trim().to_string();
-    let client_secret = client_secret.trim().to_string();
     let auth_url = format!(
-		"https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope={}&access_type=offline&prompt=consent",
+		"https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope={}&access_type=offline&prompt=consent&code_challenge={}&code_challenge_method=S256",
 		urlencoding::encode(&client_id),
 		urlencoding::encode(redirect_uri),
 		urlencoding::encode(&scope_str),
+		urlencoding::encode(code_challenge.trim()),
     );
 
     let listener = TcpListener::bind("127.0.0.1:9876")
@@ -148,5 +148,5 @@ pub fn start_oauth_flow(
     let code = extract_query_param(query, "code")
         .ok_or_else(|| "No authorization code in callback".to_string())?;
 
-    exchange_code(&code, &client_id, &client_secret, redirect_uri)
+    exchange_code(&code, &client_id, redirect_uri, code_verifier.trim())
 }
