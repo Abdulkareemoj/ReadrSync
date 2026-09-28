@@ -19,6 +19,7 @@ export function useFeeds(feedId?: string) {
 
 	const addFeed = useReaderStore((s) => s.addFeed);
 	const removeFeed = useReaderStore((s) => s.removeFeed);
+	const updateFeed = useReaderStore((s) => s.updateFeed);
 	const refreshFeed = useReaderStore((s) => s.refreshFeed);
 	const markArticleRead = useReaderStore((s) => s.markArticleRead);
 	const toggleArticleLike = useReaderStore((s) => s.toggleArticleLike);
@@ -47,6 +48,7 @@ export function useFeeds(feedId?: string) {
 		articles,
 		addFeed,
 		removeFeed,
+		updateFeed,
 		refreshFeed,
 		toggleArticleRead,
 		toggleArticleLike: (id: string) => void toggleArticleLike(id),
