@@ -5,16 +5,19 @@
   "identifier": "com.readrsync.desktop",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:5173",
     "beforeBuildCommand": "pnpm --filter desktop build"
   },
   "app": {
     "windows": [
       {
         "title": "ReadrSync",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 720,
+        "minWidth": 900,
+        "minHeight": 600,
         "resizable": true,
+        "decorations": false,
         "fullscreen": false
       }
     ],

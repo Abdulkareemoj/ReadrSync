@@ -26,6 +26,9 @@ importers:
       '@packages/store':
         specifier: workspace:*
         version: link:../../packages/store
+      '@packages/sync':
+        specifier: workspace:*
+        version: link:../../packages/sync
       '@packages/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -147,6 +150,9 @@ importers:
       '@packages/store':
         specifier: workspace:*
         version: link:../../packages/store
+      '@packages/sync':
+        specifier: workspace:*
+        version: link:../../packages/sync
       '@packages/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -406,6 +412,9 @@ importers:
       '@packages/store':
         specifier: workspace:*
         version: link:../../packages/store
+      '@packages/sync':
+        specifier: workspace:*
+        version: link:../../packages/sync
       '@packages/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -436,6 +445,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.168.23
         version: 1.168.29(@tanstack/react-router@1.170.25(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(esbuild@0.28.2)(rolldown@1.2.3)(supports-color@8.1.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.9.0))
+      '@tauri-apps/api':
+        specifier: 2.11.1
+        version: 2.11.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -511,9 +523,6 @@ importers:
       vite-tsconfig-paths:
         specifier: ^6.1.1
         version: 6.1.1(supports-color@8.1.1)(typescript@7.0.2)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.9.0))
-      wa-sqlite:
-        specifier: ^1.0.0
-        version: 1.0.0
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -719,6 +728,16 @@ importers:
       zustand:
         specifier: ^5.0.8
         version: 5.0.14(@types/react@19.2.18)(immer@11.1.16)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+    devDependencies:
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@26.2.0)(jsdom@29.1.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.9.0))
+
+  packages/sync:
+    dependencies:
+      '@packages/agents':
+        specifier: workspace:^
+        version: link:../agents
     devDependencies:
       vitest:
         specifier: ^4.1.10
@@ -7434,6 +7453,7 @@ packages:
 
   react-native-render-html@6.3.4:
     resolution: {integrity: sha512-H2jSMzZjidE+Wo3qCWPUMU1nm98Vs2SGCvQCz/i6xf0P3Y9uVtG/b0sDbG/cYFir2mSYBYCIlS1Dv0WC1LjYig==}
+    deprecated: This package has been replaced with @native-html/render
     peerDependencies:
       react: '*'
       react-native: '*'
@@ -8406,9 +8426,6 @@ packages:
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
-
-  wa-sqlite@1.0.0:
-    resolution: {integrity: sha512-Kyybo5/BaJp76z7gDWGk2J6Hthl4NIPsE+swgraEjy3IY6r5zIR02wAs1OJH4XtJp1y3puj3Onp5eMGS0z7nUA==}
 
   walker@1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}
@@ -17040,8 +17057,6 @@ snapshots:
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
-
-  wa-sqlite@1.0.0: {}
 
   walker@1.0.8:
     dependencies:
