@@ -17,43 +17,12 @@ import { sql } from "drizzle-orm";
 import {
 	getCreateTableStatements,
 	getSchemaVersion,
+	MIGRATIONS,
 	SCHEMA_VERSION,
 } from "./schema-to-sql";
 
-// Add new migrations here as you evolve the schema.
-// Each entry runs only when the DB version is below its version number.
-const MIGRATIONS: { version: number; statements: string[] }[] = [
-	{
-		version: 2,
-		statements: [
-			"ALTER TABLE articles ADD COLUMN liked INTEGER NOT NULL DEFAULT 0",
-			"ALTER TABLE articles ADD COLUMN saved INTEGER NOT NULL DEFAULT 0",
-			"ALTER TABLE bookmarks ADD COLUMN liked INTEGER NOT NULL DEFAULT 0",
-			"ALTER TABLE bookmarks ADD COLUMN saved INTEGER NOT NULL DEFAULT 1",
-			"ALTER TABLE bookmarks ADD COLUMN collection_id TEXT NOT NULL DEFAULT 'inbox'",
-		],
-	},
-	{ version: 3, statements: ["ALTER TABLE articles ADD COLUMN read_at TEXT"] },
-	{
-		version: 4,
-		statements: [
-			"ALTER TABLE bookmarks ADD COLUMN image TEXT",
-			"ALTER TABLE articles ADD COLUMN image TEXT",
-		],
-	},
-	{
-		version: 5,
-		statements: ["ALTER TABLE articles ADD COLUMN image_url TEXT"],
-	},
-	{
-		version: 6,
-		statements: ["ALTER TABLE articles ADD COLUMN image_data TEXT"],
-	},
-	{
-		version: 7,
-		statements: ["ALTER TABLE articles ADD COLUMN full_content TEXT"],
-	},
-];
+// Add new migrations to the MIGRATIONS array in ./schema-to-sql.ts one
+// idempotent block per schema change, with the next version number.
 
 export async function runMigrations(db: any): Promise<void> {
 	console.log("Running migrations...");

@@ -6,9 +6,81 @@
 
 import { sql } from "drizzle-orm";
 
-//need to find a way to keep track of this
+/**
+ * Versioned schema migrations for databases created before the current DDL.
+ *
+ * Rules:
+ * - Every schema change appends ONE new block with the next version number.
+ * - Blocks must be idempotent (IF NOT EXISTS, or ALTERs that tolerate
+ *   "duplicate column" errors) a block may run on a database that already
+ *   has the change.
+ * - SCHEMA_VERSION is derived from the last block below; never bump it by
+ *   hand. Fresh installs get the full DDL from getCreateTableStatements() and
+ *   stamp this version directly, so the last block is expected to be a no-op
+ *   for them.
+ */
+export const MIGRATIONS: { version: number; statements: string[] }[] = [
+	{
+		version: 2,
+		statements: [
+			"ALTER TABLE articles ADD COLUMN liked INTEGER NOT NULL DEFAULT 0",
+			"ALTER TABLE articles ADD COLUMN saved INTEGER NOT NULL DEFAULT 0",
+			"ALTER TABLE bookmarks ADD COLUMN liked INTEGER NOT NULL DEFAULT 0",
+			"ALTER TABLE bookmarks ADD COLUMN saved INTEGER NOT NULL DEFAULT 1",
+			"ALTER TABLE bookmarks ADD COLUMN collection_id TEXT NOT NULL DEFAULT 'inbox'",
+		],
+	},
+	{ version: 3, statements: ["ALTER TABLE articles ADD COLUMN read_at TEXT"] },
+	{
+		version: 4,
+		statements: [
+			"ALTER TABLE bookmarks ADD COLUMN image TEXT",
+			"ALTER TABLE articles ADD COLUMN image TEXT",
+		],
+	},
+	{
+		version: 5,
+		statements: ["ALTER TABLE articles ADD COLUMN image_url TEXT"],
+	},
+	{
+		version: 6,
+		statements: ["ALTER TABLE articles ADD COLUMN image_data TEXT"],
+	},
+	{
+		version: 7,
+		statements: ["ALTER TABLE articles ADD COLUMN full_content TEXT"],
+	},
+	{
+		// Collections table existed in the DDL before versioned blocks were kept
+		// for it; older databases get it here. Idempotent.
+		version: 8,
+		statements: [
+			`CREATE TABLE IF NOT EXISTS collections (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        parent_id TEXT REFERENCES collections(id) ON DELETE SET NULL,
+        position INTEGER DEFAULT 0 NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )`,
+		],
+	},
+	{
+		// FTS virtual tables + sync triggers. On engines without FTS5 these
+		// statements fail and are skipped; runFtsSetup() handles the FTS4
+		// fallback at init time.
+		version: 9,
+		statements: [...getFtsStatements("fts5"), ...getFtsTriggerStatements()],
+	},
+	{
+		// Performance indexes for frequently filtered columns.
+		version: 10,
+		statements: [...getIndexStatements()],
+	},
+];
 
-export const SCHEMA_VERSION = 10; // bump this whenever you add a migration block
+/** Highest applied migration = current schema version. */
+export const SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
 
 /**
  * Gets the CREATE TABLE statements needed to initialize the database
