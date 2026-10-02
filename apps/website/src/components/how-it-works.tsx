@@ -5,7 +5,8 @@ const steps = [
 		number: "01",
 		title: "Save what matters",
 		body: "Clip any page into your library. Titles, descriptions and favicons are fetched automatically, then organized with collections and tags.",
-		media: "Step one, the bookmark library on desktop with collections and tags",
+		media:
+			"Step one, the bookmark library on desktop with collections and tags",
 		mediaSrc: "/screens/desktop-bookmarks-dark.png",
 	},
 	{
@@ -19,7 +20,8 @@ const steps = [
 		number: "03",
 		title: "Read anywhere",
 		body: "Phone at lunch, desktop at your desk. Highlights, saved articles and read state travel with you through optional Google Drive sync.",
-		media: "Step three, ReadrSync on Android, saved links and feeds in your pocket",
+		media:
+			"Step three, ReadrSync on Android, saved links and feeds in your pocket",
 		mediaSrc: "/screens/mobile-rss-light.png",
 	},
 ];

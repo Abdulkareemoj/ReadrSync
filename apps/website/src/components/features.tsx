@@ -30,7 +30,8 @@ const features = [
 const categories = [
 	{
 		label: "Bookmarks",
-		media: "Screenshot, the bookmark library on desktop with collections and tags",
+		media:
+			"Screenshot, the bookmark library on desktop with collections and tags",
 		src: "/screens/desktop-bookmarks-dark.png",
 	},
 	{
@@ -63,25 +64,25 @@ export function FeaturesSection() {
 				</div>
 			</div>
 
-		<div id="screens" className="bg-background px-6 py-24">
-			<div className="mx-auto grid max-w-[1383px] gap-4 lg:grid-cols-2">
-				{categories.map((category) => (
-					<div
-						key={category.label}
-						className="relative aspect-[2/1] overflow-hidden rounded-xl"
-					>
-						<MediaLightbox
-							label={category.media}
-							src={category.src}
-							className="h-full w-full"
-						/>
-						<span className="absolute top-6 left-6 font-medium text-[16px] text-background">
-							{category.label}
-						</span>
-					</div>
-				))}
+			<div id="screens" className="bg-background px-6 py-24">
+				<div className="mx-auto grid max-w-[1383px] gap-4 lg:grid-cols-2">
+					{categories.map((category) => (
+						<div
+							key={category.label}
+							className="relative aspect-[2/1] overflow-hidden rounded-xl"
+						>
+							<MediaLightbox
+								label={category.media}
+								src={category.src}
+								className="h-full w-full"
+							/>
+							<span className="absolute top-6 left-6 font-medium text-[16px] text-background">
+								{category.label}
+							</span>
+						</div>
+					))}
+				</div>
 			</div>
-		</div>
 		</section>
 	);
 }
