@@ -75,7 +75,7 @@ export default function Explore() {
 					description="Saved articles you haven't read yet"
 					articleIds={d.backlogIds}
 					emptyTitle="All caught up"
-					emptyDesc="No unread saved articles — you're on top of it"
+					emptyDesc="No unread saved articles, you're on top of it"
 				/>
 
 				<YouTubeSubscribeCard
