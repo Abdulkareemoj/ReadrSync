@@ -1,3 +1,4 @@
+import { useSettingsStore } from "@packages/store";
 import {
 	type DiscoveredFeed,
 	discoverFeedsFromUrl,
@@ -166,7 +167,12 @@ export function useExploreData() {
 			if (result.requiresChannelId) {
 				const handle = extractYouTubeHandle(normalizedUrl);
 				if (handle) {
-					const channelId = await resolveYouTubeHandle(handle);
+					// Official YouTube Data API v3 when a key is configured,
+					// keyless InnerTube/scraping otherwise
+					const channelId = await resolveYouTubeHandle(
+						handle,
+						useSettingsStore.getState().youtubeApiKey,
+					);
 					if (channelId) {
 						feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 					} else {

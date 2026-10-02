@@ -30,6 +30,3 @@ export const GOOGLE_OAUTH_CONFIG = {
 	scopes: ["https://www.googleapis.com/auth/drive.file"],
 	redirectUri: undefined as string | undefined, // set by makeRedirectUri()
 };
-
-export const DRIVE_SYNC_FILENAME = "bookmark-reader-sync.json";
-export const DRIVE_SYNC_MIME = "application/json";

@@ -3,25 +3,24 @@ import { MediaLightbox } from "@/components/media-lightbox";
 const steps = [
 	{
 		number: "01",
-		title: "Connect your library",
-		body: "Point ReadrSync at your ebooks, audiobooks and reading accounts. Nothing is copied or uploaded, it reads where your books already live.",
-		media: "Step one, an open laptop showing a library import in progress",
-		mediaSrc: "/rss.png",
+		title: "Save what matters",
+		body: "Clip any page into your library. Titles, descriptions and favicons are fetched automatically, then organized with collections and tags.",
+		media: "Step one, the bookmark library on desktop with collections and tags",
+		mediaSrc: "/screens/desktop-bookmarks-dark.png",
 	},
 	{
 		number: "02",
-		title: "Read anywhere",
-		body: "Open the same title on your phone at lunch and your tablet at night. Position, highlights and notes travel with you in under a second.",
-		media: "Step two, hands holding a tablet on a train at dusk",
-		mediaSrc: "/home.jpeg",
+		title: "Follow your feeds",
+		body: "Subscribe to RSS and Atom feeds, including YouTube channels. New articles land on every device, ready to read offline.",
+		media: "Step two, the RSS reader on desktop in dark mode",
+		mediaSrc: "/screens/desktop-rss-dark.png",
 	},
 	{
 		number: "03",
-		title: "Stay in one place",
-		body: "Switching between text and audio keeps a single page number. No bookmarks to reconcile, no guessing where you left off.",
-		media:
-			"Step three, over-the-shoulder shot of a phone resuming an audiobook",
-		mediaSrc: "/bookmarks.png",
+		title: "Read anywhere",
+		body: "Phone at lunch, desktop at your desk. Highlights, saved articles and read state travel with you through optional Google Drive sync.",
+		media: "Step three, ReadrSync on Android, saved links and feeds in your pocket",
+		mediaSrc: "/screens/mobile-rss-light.png",
 	},
 ];
 

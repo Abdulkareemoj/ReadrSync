@@ -21,15 +21,38 @@ import {
 	SCHEMA_VERSION,
 } from "./schema-to-sql";
 
-// Add new migrations to the MIGRATIONS array in ./schema-to-sql.ts one
+// Add new migrations to the MIGRATIONS array in ./schema-to-sql.ts — one
 // idempotent block per schema change, with the next version number.
+
+// Cross-connection contention (another handle mid-write on the same database
+// file) surfaces as SQLITE_BUSY/LOCKED. busy_timeout handles most contention;
+// this retry is the backstop for longer locks — leaked handles from JS
+// reloads can hold a lock until their process dies.
+const BUSY_PATTERN = /locked|busy/i;
+
+async function runMigrationStatement(db: unknown, stmt: string): Promise<void> {
+	for (let attempt = 0; ; attempt++) {
+		try {
+			await (db as { run: (q: unknown) => unknown }).run(sql.raw(stmt));
+			return;
+		} catch (error) {
+			const message = String(
+				(error as { cause?: { message?: string } })?.cause?.message ??
+					(error as { message?: string })?.message ??
+					error,
+			);
+			if (attempt >= 9 || !BUSY_PATTERN.test(message)) throw error;
+			await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)));
+		}
+	}
+}
 
 export async function runMigrations(db: any): Promise<void> {
 	console.log("Running migrations...");
 
 	// Create tables for fresh installs
 	for (const stmt of getCreateTableStatements()) {
-		await db.run(sql.raw(stmt));
+		await runMigrationStatement(db, stmt);
 	}
 
 	// Get current DB version
@@ -41,26 +64,24 @@ export async function runMigrations(db: any): Promise<void> {
 
 		for (const stmt of migration.statements) {
 			try {
-				await db.run(sql.raw(stmt));
+				await runMigrationStatement(db, stmt);
 			} catch {
 				// Column already exists, safe to ignore on ALTER TABLE
 			}
 		}
 
 		// Record that this version was applied
-		await db.run(
-			sql.raw(
-				`INSERT OR REPLACE INTO schema_version (version) VALUES (${migration.version})`,
-			),
+		await runMigrationStatement(
+			db,
+			`INSERT OR REPLACE INTO schema_version (version) VALUES (${migration.version})`,
 		);
 		console.log(`[DB] Migrated to schema version ${migration.version}`);
 	}
 
 	// Mark the schema as fully current so needsMigration() reports correctly.
-	await db.run(
-		sql.raw(
-			`INSERT OR REPLACE INTO schema_version (version) VALUES (${SCHEMA_VERSION})`,
-		),
+	await runMigrationStatement(
+		db,
+		`INSERT OR REPLACE INTO schema_version (version) VALUES (${SCHEMA_VERSION})`,
 	);
 	console.log("Migrations completed successfully");
 }

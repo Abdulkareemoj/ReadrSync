@@ -7,16 +7,15 @@ import {
 	Safari,
 } from "@/components/devices";
 import { Zoomable } from "@/components/media-lightbox";
-import { MediaPlaceholder } from "@/components/media-placeholder";
 import { Button } from "@/components/ui/button";
 
 const shots = {
-	mac: "ReadrSync on macOS, library grid with continue-reading shelf",
-	safari: "ReadrSync web app in Safari, reader view with synced highlights",
-	browser: "ReadrSync web app, notes panel exporting to Markdown",
-	ipad: "ReadrSync on iPad, two-page reader with margin notes",
-	iphone: "ReadrSync on iPhone, resuming an audiobook at the same page",
-	android: "ReadrSync on Android, offline library with pending sync badge",
+	mac: "ReadrSync on macOS, dashboard with reading stats and pinned items",
+	safari: "ReadrSync web app, immersive article reader in dark mode",
+	browser: "ReadrSync web app, the RSS article grid on desktop",
+	ipad: "ReadrSync on iPad, the bookmark library with collections and tags",
+	iphone: "ReadrSync on iPhone, dashboard with saved links and reading stats",
+	android: "ReadrSync on Android, RSS feeds and articles offline",
 };
 
 export function PromoBand() {
@@ -38,7 +37,11 @@ export function PromoBand() {
 							className="block w-full"
 						>
 							<MacbookPro>
-								<MediaPlaceholder label={shots.mac} />
+								<img
+									src="/screens/desktop-home-dark.png"
+									alt={shots.mac}
+									className="h-full w-full object-cover object-top"
+								/>
 							</MacbookPro>
 						</Zoomable>
 					</div>
@@ -49,7 +52,11 @@ export function PromoBand() {
 							className="mx-auto block w-full max-w-[200px]"
 						>
 							<IPhone>
-								<MediaPlaceholder label={shots.iphone} />
+								<img
+									src="/screens/mobile-home-light.png"
+									alt={shots.iphone}
+									className="h-full w-full object-cover object-top"
+								/>
 							</IPhone>
 						</Zoomable>
 						<Zoomable
@@ -57,7 +64,11 @@ export function PromoBand() {
 							className="mx-auto block w-full max-w-[200px]"
 						>
 							<Android>
-								<MediaPlaceholder label={shots.android} />
+								<img
+									src="/screens/mobile-rss-light.png"
+									alt={shots.android}
+									className="h-full w-full object-cover object-top"
+								/>
 							</Android>
 						</Zoomable>
 					</div>
@@ -65,7 +76,11 @@ export function PromoBand() {
 					<div className="lg:col-span-5">
 						<Zoomable contentClassName="max-w-[900px]" className="block w-full">
 							<IPad>
-								<MediaPlaceholder label={shots.ipad} />
+								<img
+									src="/screens/desktop-bookmarks-dark.png"
+									alt={shots.ipad}
+									className="h-full w-full object-cover object-top"
+								/>
 							</IPad>
 						</Zoomable>
 					</div>
@@ -76,7 +91,11 @@ export function PromoBand() {
 							className="block w-full"
 						>
 							<Safari>
-								<MediaPlaceholder label={shots.safari} />
+								<img
+									src="/screens/desktop-reader-dark.png"
+									alt={shots.safari}
+									className="h-full w-full object-cover object-top"
+								/>
 							</Safari>
 						</Zoomable>
 					</div>
@@ -87,7 +106,11 @@ export function PromoBand() {
 							className="block w-full"
 						>
 							<Browser>
-								<MediaPlaceholder label={shots.browser} />
+								<img
+									src="/screens/desktop-rss-articles-dark.png"
+									alt={shots.browser}
+									className="h-full w-full object-cover object-top"
+								/>
 							</Browser>
 						</Zoomable>
 					</div>

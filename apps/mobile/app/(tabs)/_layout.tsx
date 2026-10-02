@@ -11,12 +11,16 @@ import {
 import React, { useCallback, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUniwind } from "uniwind";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { THEME } from "@/lib/theme";
 
 export default function TabsLayout() {
 	const [showSearchInput, setShowSearchInput] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
+	const { theme } = useUniwind();
+	const colors = theme === "dark" ? THEME.dark : THEME.light;
 
 	useFocusEffect(
 		useCallback(() => {
@@ -35,8 +39,8 @@ export default function TabsLayout() {
 			screenOptions={{
 				headerShown: true,
 				tabBarStyle: {
-					backgroundColor: "#ffffff",
-					borderTopColor: "#e5e7eb",
+					backgroundColor: colors.background,
+					borderTopColor: colors.border,
 					borderTopWidth: 1,
 					height: Platform.OS === "ios" ? 88 : 70,
 					paddingBottom: Platform.OS === "ios" ? 28 : 8,
@@ -46,19 +50,15 @@ export default function TabsLayout() {
 					marginTop: 4,
 					fontWeight: "600",
 				},
-				tabBarActiveTintColor: "#3b82f6",
-				tabBarInactiveTintColor: "#9ca3af",
+				tabBarActiveTintColor: colors.primary,
+				tabBarInactiveTintColor: colors.mutedForeground,
 				header: ({ route, options }) => (
 					<View
 						style={{ paddingTop: top + 7 }}
 						className="flex-row items-center justify-between border-border border-b bg-background px-4 pb-3"
 					>
 						<View className="flex-1 flex-row items-center gap-3">
-							{route.name === "settings" ? (
-								<Text className="font-bold text-foreground text-xl">
-									{options.title}
-								</Text>
-							) : showSearchInput ? (
+							{showSearchInput ? (
 								<Input
 									placeholder={`Search ${route.name}...`}
 									value={searchQuery}
@@ -76,21 +76,17 @@ export default function TabsLayout() {
 							)}
 						</View>
 
-						{route.name !== "settings" && (
-							<View className="flex-row items-center">
-								<Pressable
-									onPress={() => setShowSearchInput((prev) => !prev)}
-									className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
-								>
-									<Search
-										size={20}
-										className={
-											showSearchInput ? "text-primary" : "text-muted-foreground"
-										}
-									/>
-								</Pressable>
-							</View>
-						)}
+						<Pressable
+							onPress={() => setShowSearchInput((prev) => !prev)}
+							className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
+						>
+							<Search
+								size={20}
+								className={
+									showSearchInput ? "text-primary" : "text-muted-foreground"
+								}
+							/>
+						</Pressable>
 					</View>
 				),
 			}}

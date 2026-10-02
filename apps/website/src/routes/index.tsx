@@ -9,20 +9,20 @@ import { TestimonialsSection } from "@/components/testimonials";
 export const Route = createFileRoute("/")({
 	head: () => ({
 		meta: [
-			{ title: "ReadrSync, One page number across every device" },
+			{ title: "ReadrSync, Bookmarks and RSS, everywhere you read" },
 			{
 				name: "description",
 				content:
-					"ReadrSync keeps your ebooks and audiobooks on the same page across phone, tablet and desktop. Sub-second sync, offline first, free in beta.",
+					"ReadrSync keeps your links and feeds on every device. Local-first, offline-ready, optional Google Drive sync. Free in beta.",
 			},
 			{
 				property: "og:title",
-				content: "ReadrSync, One page number across every device",
+				content: "ReadrSync, Bookmarks and RSS, everywhere you read",
 			},
 			{
 				property: "og:description",
 				content:
-					"Keep your reading position, highlights and notes in sync across every device. Free while in beta.",
+					"Save links, follow feeds and read anywhere. Local-first with optional Google Drive sync. Free while in beta.",
 			},
 			{ property: "og:type", content: "website" },
 			{ name: "twitter:card", content: "summary_large_image" },

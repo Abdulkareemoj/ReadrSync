@@ -2,39 +2,41 @@ import { MediaLightbox } from "@/components/media-lightbox";
 
 const features = [
 	{
-		title: "Sub-second sync",
-		body: "Position updates land on every signed-in device before you finish putting your phone down.",
+		title: "Local-first",
+		body: "Everything lives in SQLite on your device. The app works fully offline; the cloud is optional, never required.",
 	},
 	{
-		title: "Text and audio, unified",
-		body: "One progress marker shared between the ebook and the audiobook edition of the same title.",
-	},
-	{
-		title: "Offline first",
-		body: "Read on a plane, sync on landing. Conflicts resolve to the furthest honest position.",
+		title: "Full-text search",
+		body: "Search every bookmark and article in milliseconds, powered by SQLite full-text search with graceful fallbacks.",
 	},
 	{
 		title: "Highlights that travel",
-		body: "Notes, highlights and bookmarks are portable and exportable in plain Markdown.",
+		body: "Highlight any passage and keep your notes with it. Highlights sync to your other devices alongside read state.",
 	},
 	{
-		title: "Private by default",
-		body: "Your library index stays on your devices. We sync positions, not your books.",
+		title: "Feeds, simplified",
+		body: "RSS and Atom subscriptions with offline reading, feed discovery by URL or keyword, and YouTube channel support.",
+	},
+	{
+		title: "Sync on your terms",
+		body: "Optional Google Drive sync through your own account. Last-write-wins merging, no servers of ours in the path.",
 	},
 	{
 		title: "Every platform",
-		body: "Web today, with native desktop and mobile builds in active development.",
+		body: "Web today. Native Windows, macOS, Linux and Android builds are generated for every release.",
 	},
 ];
 
 const categories = [
 	{
-		label: "Fiction",
-		media: "Category card, a paperback open on a sunlit bench",
+		label: "Bookmarks",
+		media: "Screenshot, the bookmark library on desktop with collections and tags",
+		src: "/screens/desktop-bookmarks-dark.png",
 	},
 	{
-		label: "Non-fiction",
-		media: "Category card, a desk with annotated hardcovers",
+		label: "Feeds",
+		media: "Screenshot, the RSS article grid on desktop in dark mode",
+		src: "/screens/desktop-rss-articles-dark.png",
 	},
 ];
 
@@ -61,21 +63,25 @@ export function FeaturesSection() {
 				</div>
 			</div>
 
-			<div id="library" className="bg-background px-6 py-24">
-				<div className="mx-auto grid max-w-[1383px] gap-4 lg:grid-cols-2">
-					{categories.map((category) => (
-						<div
-							key={category.label}
-							className="relative aspect-[2/1] overflow-hidden rounded-xl"
-						>
-							<MediaLightbox label={category.media} />
-							<span className="absolute top-6 left-6 font-medium text-[16px] text-background">
-								{category.label}
-							</span>
-						</div>
-					))}
-				</div>
+		<div id="screens" className="bg-background px-6 py-24">
+			<div className="mx-auto grid max-w-[1383px] gap-4 lg:grid-cols-2">
+				{categories.map((category) => (
+					<div
+						key={category.label}
+						className="relative aspect-[2/1] overflow-hidden rounded-xl"
+					>
+						<MediaLightbox
+							label={category.media}
+							src={category.src}
+							className="h-full w-full"
+						/>
+						<span className="absolute top-6 left-6 font-medium text-[16px] text-background">
+							{category.label}
+						</span>
+					</div>
+				))}
 			</div>
+		</div>
 		</section>
 	);
 }

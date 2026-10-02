@@ -14,7 +14,6 @@ import {
 	Linking,
 	Pressable,
 	Share,
-	useColorScheme,
 	useWindowDimensions,
 	View,
 } from "react-native";
@@ -26,6 +25,7 @@ import Animated, {
 } from "react-native-reanimated";
 import RenderHtml from "react-native-render-html";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useUniwind } from "uniwind";
 import { Text } from "@/components/ui/text";
 import { useFeeds } from "@/hooks/use-feeds";
 import { THEME } from "@/lib/theme";
@@ -49,9 +49,10 @@ export default function ArticleScreen() {
 	const { width } = useWindowDimensions();
 	const { id } = useLocalSearchParams<{ id: string }>();
 
-	// Tag styles
-	const colorScheme = useColorScheme();
-	const theme = colorScheme === "dark" ? THEME.dark : THEME.light;
+	// Tag styles — useUniwind resolves the effective theme, including the
+	// in-app light/dark override from Settings.
+	const { theme: scheme } = useUniwind();
+	const theme = scheme === "dark" ? THEME.dark : THEME.light;
 
 	const tagsStyles: Record<string, object> = {
 		p: {

@@ -1,8 +1,6 @@
 import type { Feed } from "@packages/store";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
 import {
-	ArrowLeft,
 	ChevronRight,
 	Edit3,
 	Plus,
@@ -21,12 +19,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddFeedModal } from "@/components/rss/add-feed-modal";
 import { EditFeedModal } from "@/components/rss/edit-feed-modal";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 import { useFeeds } from "@/hooks/use-feeds";
 
 export default function SourcesScreen() {
-	const router = useRouter();
-	const { feeds, articles, addFeed, removeFeed, refreshFeed } = useFeeds();
+	const { feeds, articles, addFeed, removeFeed, refreshFeed, updateFeed } =
+		useFeeds();
 
 	const [addModalOpen, setAddModalOpen] = useState(false);
 	const [editModalOpen, setEditModalOpen] = useState(false);
@@ -95,12 +94,22 @@ export default function SourcesScreen() {
 	);
 
 	const handleSaveTitle = useCallback(
-		(id: string, data: { title: string; feedUrl: string }) => {
-			Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-			// TODO: Implement updateFeed in store when available
-			console.log("Save feed:", id, data);
+		async (id: string, data: { title: string; feedUrl: string }) => {
+			try {
+				await updateFeed(id, data);
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+			} catch (e) {
+				console.error("Update feed failed:", e);
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+				Alert.alert(
+					"Update failed",
+					e instanceof Error
+						? e.message
+						: "Could not save feed changes. Please try again.",
+				);
+			}
 		},
-		[],
+		[updateFeed],
 	);
 
 	const renderFeed = useCallback(
@@ -219,31 +228,17 @@ export default function SourcesScreen() {
 
 	return (
 		<SafeAreaView className="flex-1 bg-background">
-			{/* Header */}
-			<View className="flex-row items-center justify-between border-border border-b px-4 py-3">
-				<Pressable
-					onPress={() => router.back()}
-					className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
-				>
-					<ArrowLeft size={20} className="text-foreground" />
-				</Pressable>
-
-				<View className="mx-3 flex-1">
-					<Text className="text-center font-semibold text-foreground text-lg">
-						Sources
-					</Text>
-					<Text className="mt-0.5 text-center text-muted-foreground text-xs">
-						{feeds.length} feed{feeds.length !== 1 ? "s" : ""} subscribed
-					</Text>
-				</View>
-
-				<Pressable
-					onPress={() => setAddModalOpen(true)}
-					className="rounded-xl bg-primary p-2.5 active:opacity-80"
-				>
-					<Plus size={20} className="text-primary-foreground" />
-				</Pressable>
-			</View>
+			<ScreenHeader
+				title="Sources"
+				right={
+					<Pressable
+						onPress={() => setAddModalOpen(true)}
+						className="rounded-xl bg-primary p-2.5 active:opacity-80"
+					>
+						<Plus size={20} className="text-primary-foreground" />
+					</Pressable>
+				}
+			/>
 
 			{/* Feed list */}
 			{feeds.length === 0 ? (

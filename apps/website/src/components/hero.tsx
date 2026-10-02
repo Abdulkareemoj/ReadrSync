@@ -6,17 +6,18 @@ import { cn } from "@/lib/utils";
 const slides = [
 	{
 		label:
-			"Product shot, ReadrSync library view on desktop, reading progress synced across shelves",
-		mediaSrc: "/rss.png",
+			"Product shot, ReadrSync on desktop, RSS reader with article images in dark mode",
+		mediaSrc: "/screens/desktop-rss-dark.png",
 	},
 	{
 		label:
-			"Product shot, phone and tablet side by side, resuming the same page mid-sentence",
-		mediaSrc: "/home.jpeg",
+			"Product shot, bookmark library on desktop with collections, tags and full-text search",
+		mediaSrc: "/screens/desktop-bookmarks-dark.png",
 	},
 	{
-		label: "Product shot, highlights and notes panel syncing in real time",
-		mediaSrc: "/bookmarks.png",
+		label:
+			"Product shot, ReadrSync on Android, saved links and feeds in your pocket",
+		mediaSrc: "/screens/mobile-rss-light.png",
 	},
 ];
 
@@ -53,7 +54,7 @@ export default function Hero() {
 			<div className="flex flex-col items-center text-center">
 				<h1 className="text-foreground text-hero">ReadrSync</h1>
 				<p className="mt-2 text-muted-foreground text-promo">
-					Every book, every device, one page number
+					Every link and every feed, on every device
 				</p>
 
 				<div className="mt-8 flex w-full max-w-[420px] flex-col items-center gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4">

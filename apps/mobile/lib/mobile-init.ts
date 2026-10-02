@@ -9,11 +9,24 @@ import { initializeMobileAgents } from "./db";
 let isInit = false;
 let initError: Error | null = null;
 let storeInstance: any = null;
+// Single-flight guard: `isInit` only flips true after every await completes,
+// so a concurrent caller (fast-refresh remount, effect re-run) would racingly
+// start a second appInit — and a second SQLite connection — without this.
+let appInitPromise: Promise<any> | null = null;
 
-export async function appInit() {
-	if (isInit) return storeInstance;
+export function appInit(): Promise<any> {
+	if (isInit) return Promise.resolve(storeInstance);
 	if (initError) throw initError;
+	if (!appInitPromise) {
+		appInitPromise = doAppInit().catch((error) => {
+			appInitPromise = null; // allow a fresh attempt after a failure
+			throw error;
+		});
+	}
+	return appInitPromise;
+}
 
+async function doAppInit() {
 	try {
 		console.log("[appInit] Initializing agents...");
 		const agents = await initializeMobileAgents();
@@ -166,7 +179,11 @@ export async function appInit() {
 		console.log("[appInit] Ready");
 		return storeInstance;
 	} catch (error) {
-		console.error("[appInit] Failed:", error);
+		console.error(
+			"[appInit] Failed:",
+			error,
+			(error as { cause?: unknown })?.cause ?? "",
+		);
 		initError = error as Error;
 		throw error;
 	}

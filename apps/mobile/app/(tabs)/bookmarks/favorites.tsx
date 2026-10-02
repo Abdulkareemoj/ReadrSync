@@ -1,16 +1,11 @@
 import type { Bookmark } from "@packages/store";
-import { router, Stack } from "expo-router";
-import {
-	ArrowLeft,
-	BookmarkIcon,
-	Heart,
-	LayoutGrid,
-	List,
-} from "lucide-react-native";
+import { BookmarkIcon, Heart, LayoutGrid, List } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { FlatList, Linking, Pressable, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BookmarkCard from "@/components/bookmarks/bookmark-card";
 import { Icon } from "@/components/ui/icon";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 
@@ -49,18 +44,8 @@ export default function FavoritesPage() {
 	const keyExtractor = useCallback((item: Bookmark) => item.id, []);
 
 	return (
-		<View className="flex-1 bg-background">
-			<Stack.Screen
-				options={{
-					headerShown: true,
-					title: "Favorites",
-					headerLeft: () => (
-						<Pressable onPress={() => router.back()}>
-							<ArrowLeft size={24} className="mx-2 text-foreground" />
-						</Pressable>
-					),
-				}}
-			/>
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+			<ScreenHeader title="Favorites" />
 
 			<View className="flex-row items-center justify-between px-4 pt-3 pb-2">
 				<Text className="font-bold text-foreground text-xl">
@@ -111,6 +96,6 @@ export default function FavoritesPage() {
 					</Text>
 				</View>
 			)}
-		</View>
+		</SafeAreaView>
 	);
 }

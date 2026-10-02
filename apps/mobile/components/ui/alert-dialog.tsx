@@ -63,7 +63,7 @@ function AlertDialogContent({
 					className={cn(
 						"z-50 flex flex-col gap-4 rounded-lg border border-border bg-background p-6 shadow-black/5 shadow-lg sm:max-w-lg",
 						Platform.select({
-							web: "fade-in-0 zoom-in-95 web:max-w-[calc(100%-2rem)] animate-in duration-200",
+							web: "fade-in-0 zoom-in-95 web:max-w-[92%] animate-in duration-200",
 						}),
 						className,
 					)}

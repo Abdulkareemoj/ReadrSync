@@ -7,20 +7,20 @@ import {
 
 const faqs = [
 	{
-		q: "Does ReadrSync store my books?",
-		a: "No. ReadrSync indexes where your books live and syncs your reading position, highlights and notes. The files stay with you.",
+		q: "Where does my data live?",
+		a: "On your device, in a local SQLite database. Optional Google Drive sync stores a copy of your library in your own Drive. We run no servers.",
 	},
 	{
-		q: "Which formats are supported?",
-		a: "EPUB and PDF for text, plus M4B and MP3 audiobooks. DRM-free files only.",
+		q: "Can I import my existing bookmarks and feeds?",
+		a: "Yes. Import HTML bookmarks and OPML feed lists from any browser or reader. JSON export is supported too, so your library is never locked in.",
 	},
 	{
-		q: "What happens if I read offline on two devices?",
-		a: "Both positions are kept and reconciled when you reconnect. ReadrSync resolves to the furthest position and keeps the other as a bookmark.",
+		q: "What happens if I use the app offline on two devices?",
+		a: "Both devices keep their changes and reconcile when you reconnect. Google Drive sync resolves conflicts with the newest edit winning.",
 	},
 	{
 		q: "Is there a native desktop or mobile app?",
-		a: "The web app is available today. Desktop builds for Windows, macOS and Linux and mobile builds for iOS and Android are in development.",
+		a: "Yes. Windows, macOS and Linux installers and an Android APK are generated for each release, see the download page. iOS is in development.",
 	},
 	{
 		q: "What does it cost?",
