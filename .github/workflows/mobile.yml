@@ -6,11 +6,20 @@ on:
   push:
     branches: [main, develop]
     paths: ["apps/mobile/**", "packages/**"]
-    tags: ["mobile-v*"]
+    tags: ["mobile-v*", "mobile-dev-v*"]
   pull_request:
     branches: [main, develop]
     paths: ["apps/mobile/**", "packages/**"]
   workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        type: choice
+        options:
+          - preview
+          - development
+        default: preview
+        required: true
 
 jobs:
   test:
@@ -34,11 +43,12 @@ jobs:
       - name: Run tests
         run: pnpm --filter @packages/utils test
 
-  # Only runs when you push a tag like "mobile-v1.0.0" — this is what
-  # actually builds an installable APK and publishes it.
+  # Runs on tags like "mobile-v0.0.6" (preview APK) or "mobile-dev-v0.0.6"
+  # (development-client APK), and on manual dispatch with a profile choice.
+  # This is what actually builds an installable APK and publishes it.
   release:
     needs: test
-    if: startsWith(github.ref, 'refs/tags/mobile-v')
+    if: startsWith(github.ref, 'refs/tags/mobile-')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -61,12 +71,20 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - name: Pick the EAS profile from the tag
+        run: |
+          if [[ "$GITHUB_REF_NAME" == mobile-dev-* ]]; then
+            echo "EAS_PROFILE=development" >> "$GITHUB_ENV"
+          else
+            echo "EAS_PROFILE=preview" >> "$GITHUB_ENV"
+          fi
+
       - name: Trigger EAS build and wait for it to finish
         working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          eas build --platform android --profile preview \
+          eas build --platform android --profile "$EAS_PROFILE" \
             --non-interactive --wait --json > eas-build-result.json
           cat eas-build-result.json
 
@@ -74,11 +92,15 @@ jobs:
         working-directory: apps/mobile
         run: |
           BUILD_URL=$(node -e "console.log(require('./eas-build-result.json')[0].artifacts.buildUrl)")
-          curl -L "$BUILD_URL" -o ReadrSync.apk
+          if [[ "$EAS_PROFILE" == development ]]; then
+            curl -L "$BUILD_URL" -o ReadrSync-dev.apk
+          else
+            curl -L "$BUILD_URL" -o ReadrSync.apk
+          fi
 
       - name: Attach APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: apps/mobile/ReadrSync.apk
+          files: apps/mobile/ReadrSync*.apk
           generate_release_notes: true
           prerelease: true
