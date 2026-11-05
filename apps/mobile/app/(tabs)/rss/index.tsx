@@ -1,6 +1,6 @@
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { BookMarked, Check, Filter, Rss, X } from "lucide-react-native";
+import { BookMarked, Check, Filter, Rss, Search, X } from "lucide-react-native";
 import React, {
 	useCallback,
 	useEffect,
@@ -9,9 +9,11 @@ import React, {
 	useState,
 } from "react";
 import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AddFeedModal } from "@/components/rss/add-feed-modal";
 import { RssArticleCardMobile } from "@/components/rss/rss-article-card-mobile";
 import { Icon } from "@/components/ui/icon";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 import { useFeeds } from "@/hooks/use-feeds";
 
@@ -147,8 +149,20 @@ export default function RssScreen() {
 	);
 
 	return (
-		<View className="flex-1 bg-background pt-4">
-			{/* Header with Filter Button */}
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+			<ScreenHeader
+				title="RSS"
+				back={false}
+				right={
+					<Pressable
+						onPress={() => router.push("/search")}
+						className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
+						hitSlop={8}
+					>
+						<Search size={20} className="text-muted-foreground" />
+					</Pressable>
+				}
+			/>
 			<View className="flex-row items-center justify-between px-4 pb-3">
 				<Text className="font-medium text-foreground">
 					{sortedArticles.length} articles
@@ -309,6 +323,6 @@ export default function RssScreen() {
 					});
 				}}
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }

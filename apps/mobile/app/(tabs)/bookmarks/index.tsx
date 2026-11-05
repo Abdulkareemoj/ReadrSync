@@ -3,18 +3,21 @@ import { router, useLocalSearchParams } from "expo-router";
 import { BookmarkIcon, LayoutGrid, List, Menu } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, Linking, Pressable, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AddBookmarkModal } from "@/components/bookmarks/add-bookmark-modal";
 import BookmarkCard from "@/components/bookmarks/bookmark-card";
 import { EditBookmarkModal } from "@/components/bookmarks/edit-bookmark-modal";
 import { CollectionsBottomSheet } from "@/components/collections-bottom-sheet";
 import { Icon } from "@/components/ui/icon";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 
 type ViewMode = "list" | "grid";
 
 export default function Bookmarks() {
-	const { searchQuery, collectionId = "all" } = useLocalSearchParams();
+	const { collectionId = "all" } = useLocalSearchParams();
+	const [searchQuery, setSearchQuery] = useState("");
 	const [viewMode, setViewMode] = useState<ViewMode>("list");
 	const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -92,7 +95,12 @@ export default function Bookmarks() {
 	const keyExtractor = useCallback((item: Bookmark) => item.id, []);
 
 	return (
-		<View className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+			<ScreenHeader
+				title="Bookmarks"
+				back={false}
+				search={{ value: searchQuery, onChange: setSearchQuery }}
+			/>
 			<View className="flex-row items-center justify-between px-4 pt-3 pb-2">
 				<Pressable
 					onPress={() => setIsSidebarOpen(true)}
@@ -177,6 +185,6 @@ export default function Bookmarks() {
 				activeTab={(collectionId as string) || "all"}
 				onTabChange={handleCollectionChange}
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }

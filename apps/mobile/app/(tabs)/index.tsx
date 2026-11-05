@@ -1,7 +1,8 @@
-import { Stack } from "expo-router";
-import { Flame, Pin, Plus, TrendingUp } from "lucide-react-native";
+import { router } from "expo-router";
+import { Flame, Pin, Plus, Search, TrendingUp } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, RefreshControl, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CollectionsSection from "@/components/home/CollectionsSection";
 import { DashboardCardMobile } from "@/components/home/dashboard-card-mobile";
 import FromYourFeedsSection from "@/components/home/FromYourFeedsSection";
@@ -12,6 +13,7 @@ import ReadingStreakCard from "@/components/home/ReadingStreakCard";
 import RecentActivityCard from "@/components/home/RecentActivityCard";
 import TagCloud from "@/components/home/TagCloud";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 
 export default function Home() {
@@ -19,7 +21,7 @@ export default function Home() {
 	const data = useHomeData();
 
 	return (
-		<View className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
 			<ScrollView
 				className="flex-1"
 				contentContainerStyle={{
@@ -39,9 +41,21 @@ export default function Home() {
 					/>
 				}
 			>
-				<Stack.Screen options={{ title: "Home" }} />
+				<ScreenHeader
+					title="Home"
+					back={false}
+					right={
+						<Pressable
+							onPress={() => router.push("/search")}
+							className="rounded-xl border border-border bg-card p-2.5 active:opacity-80"
+							hitSlop={8}
+						>
+							<Search size={20} className="text-muted-foreground" />
+						</Pressable>
+					}
+				/>
 
-				<Text className="mb-5 text-muted-foreground">
+				<Text className="mt-4 mb-5 text-muted-foreground">
 					A quick overview of your saved content and feeds.
 				</Text>
 
@@ -145,6 +159,6 @@ export default function Home() {
 					<Plus size={24} className="text-primary-foreground" />
 				</Pressable>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }

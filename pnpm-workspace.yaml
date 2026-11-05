@@ -5,14 +5,31 @@ allowBuilds:
   better-sqlite3: true
   dtrace-provider: true
   esbuild: true
+  protobufjs: true
 minimumReleaseAgeExclude:
-  - '@tanstack/query-core@5.104.1'
-  - '@tanstack/query-devtools@5.104.1'
-  - '@tanstack/react-query-devtools@5.104.1'
-  - '@tanstack/react-query@5.104.1'
-  - '@types/node@26.6.4'
-  - framer-motion@14.0.0
-  - lucide-react@1.50.0
-  - motion-dom@14.0.0
-  - motion-utils@14.0.0
-  - motion@14.0.0
+  - '@biomejs/biome@2.6.5'
+  - '@biomejs/cli-android-arm64@2.6.5'
+  - '@biomejs/cli-android-x64@2.6.5'
+  - '@biomejs/cli-darwin-arm64@2.6.5'
+  - '@biomejs/cli-darwin-x64@2.6.5'
+  - '@biomejs/cli-linux-arm64-musl@2.6.5'
+  - '@biomejs/cli-linux-arm64@2.6.5'
+  - '@biomejs/cli-linux-x64-musl@2.6.5'
+  - '@biomejs/cli-linux-x64@2.6.5'
+  - '@biomejs/cli-win32-arm64@2.6.5'
+  - '@biomejs/cli-win32-x64@2.6.5'
+  - '@expo/eas-build-job@27.4.1'
+  - '@expo/eas-json@27.4.1'
+  - '@expo/logger@27.4.1'
+  - '@expo/steps@27.4.1'
+  - '@expo/turtle-spawn@27.4.1'
+  - '@tanstack/query-core@5.106.0'
+  - '@tanstack/query-devtools@5.106.0'
+  - '@tanstack/react-query-devtools@5.106.0'
+  - '@tanstack/react-query@5.106.0'
+  - eas-cli@27.4.1
+  - framer-motion@14.9.1
+  - lucide-react-native@1.68.0
+  - lucide-react@1.68.0
+  - motion-dom@14.9.1
+  - motion@14.9.1
