@@ -1,5 +1,6 @@
 import { Redirect, useLocalSearchParams } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	isSettingsSectionKey,
 	SETTINGS_SECTIONS,
@@ -15,7 +16,7 @@ export default function SettingsSectionPage() {
 	const { label, component: SectionComponent } = SETTINGS_SECTIONS[section];
 
 	return (
-		<View className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
 			<ScreenHeader title={label} />
 
 			<ScrollView
@@ -29,6 +30,6 @@ export default function SettingsSectionPage() {
 			>
 				<SectionComponent />
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }

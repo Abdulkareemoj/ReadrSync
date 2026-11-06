@@ -38,15 +38,15 @@ export default function TabsLayout() {
 	return (
 		<ThemeProvider value={navTheme as ReactNavigation.Theme}>
 			<NativeTabs>
-				<NativeTabs.Trigger name="index">
+				<NativeTabs.Trigger name="index" labelVisibilityMode="labeled">
 					<NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
 					<NativeTabs.Trigger.Icon sf="house.fill" md="home" />
 				</NativeTabs.Trigger>
-				<NativeTabs.Trigger name="bookmarks">
+				<NativeTabs.Trigger name="bookmarks" labelVisibilityMode="labeled">
 					<NativeTabs.Trigger.Label>Bookmarks</NativeTabs.Trigger.Label>
 					<NativeTabs.Trigger.Icon sf="bookmark.fill" md="bookmark" />
 				</NativeTabs.Trigger>
-				<NativeTabs.Trigger name="rss">
+				<NativeTabs.Trigger name="rss" labelVisibilityMode="labeled">
 					<NativeTabs.Trigger.Label>RSS</NativeTabs.Trigger.Label>
 					<NativeTabs.Trigger.Icon
 						sf="dot.radiowaves.left.and.right"
@@ -58,11 +58,11 @@ export default function TabsLayout() {
 						</NativeTabs.Trigger.Badge>
 					)}
 				</NativeTabs.Trigger>
-				<NativeTabs.Trigger name="explore">
+				<NativeTabs.Trigger name="explore" labelVisibilityMode="labeled">
 					<NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
 					<NativeTabs.Trigger.Icon sf="safari" md="explore" />
 				</NativeTabs.Trigger>
-				<NativeTabs.Trigger name="settings">
+				<NativeTabs.Trigger name="settings" labelVisibilityMode="labeled">
 					<NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
 					<NativeTabs.Trigger.Icon sf="gear" md="settings" />
 				</NativeTabs.Trigger>

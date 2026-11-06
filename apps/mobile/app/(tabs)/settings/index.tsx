@@ -1,17 +1,20 @@
 import { type Href, useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { Pressable, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	SETTINGS_SECTION_ORDER,
 	SETTINGS_SECTIONS,
 } from "@/components/settings/registry";
+import { ScreenHeader } from "@/components/ui/screen-header";
 import { Text } from "@/components/ui/text";
 
 export default function SettingsIndex() {
 	const router = useRouter();
 
 	return (
-		<View className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+			<ScreenHeader title="Settings" back={false} />
 			<ScrollView
 				className="flex-1"
 				contentContainerStyle={{
@@ -48,6 +51,6 @@ export default function SettingsIndex() {
 					);
 				})}
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }
